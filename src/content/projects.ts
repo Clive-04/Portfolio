@@ -127,10 +127,11 @@ export const projects: Project[] = [
     slug: 'smartfeather',
     title: 'SmartFeather',
     summary: 'An IoT-driven poultry-farm platform for monitoring house conditions, assigning work, and keeping records.',
-    teamLabel: 'Capstone · manager & admin frontend',
+    teamLabel: 'Capstone · team of 5 · manager & admin frontend',
     problem: 'Poultry farms need one place to monitor houses, flocks, sensors, inventory, and biosecurity, and to coordinate the people doing the work.',
     role: 'Built the manager and admin frontend and UI: dashboards, house, inventory, sensor, and report pages, shared layout, responsive sidebar, login, and pagination.',
-    collaboration: 'Capstone team project, built for a client farm. Built the manager and admin frontend together with one groupmate.',
+    collaboration:
+      'Capstone project built with four groupmates for a client farm. Built the manager and admin frontend together with one of them.',
     status: 'completed',
     featured: false,
     stack: [
