@@ -1,12 +1,12 @@
 # Portfolio
 
-Personal portfolio website for Clive, an aspiring software developer.
+Personal portfolio website for Clive Owen S. Benito, a full-stack and front-end developer applying for internships.
 
-The site presents selected projects, skills, certifications, and contact details for job applications. Every project claim is meant to be backed by evidence, with work clearly labeled as implemented, in progress, or planned.
+The site presents selected projects, skills, certifications, and contact details for job applications. Every project claim is backed by repository evidence, with work clearly labeled as completed or in progress.
 
 ## Status
 
-**In development.** The frontend foundation is built; section content is in progress. See [ROADMAP.md](ROADMAP.md) for the checklist.
+**Content and design complete; validation and deployment next.** All sections are built with verified content. The résumé download and the social-sharing image are pending. See [ROADMAP.md](ROADMAP.md) for the checklist.
 
 ## Version-one scope
 
@@ -31,8 +31,12 @@ Decided on 2026-11-21.
 | UI library | React |
 | Language | TypeScript |
 | Build tool | Vite |
-| Styling | CSS Modules with a shared design-token layer (CSS custom properties) |
+| Styling | CSS Modules with a shared design-token layer (CSS custom properties); dark theme |
+| Font | Plus Jakarta Sans (variable), self-hosted through `@fontsource-variable` |
+| Linting | oxlint |
 | Hosting | Vercel, with security headers set in `vercel.json` |
+
+Runtime dependencies are limited to React, React DOM, and the font package.
 
 ## Requirements
 
@@ -61,17 +65,29 @@ GitHub Actions runs `lint` and `build` on every push and pull request to `main`.
 
 ```
 src/
-  content/      Typed portfolio data (profile, projects, certifications, sections)
-  components/   Reusable UI pieces, each with its own CSS Module
-  styles/       Design tokens and global styles
+  content/      Typed portfolio data: profile, projects, skills, certifications, sections
+  components/   UI pieces, each with its own CSS Module
+  lib/          Small helpers: scroll reveal, cursor spotlight, date formatting
+  styles/       Design tokens (tokens.css) and global styles
   App.tsx       Page layout
+public/         Favicon, profile photo, and project screenshots
+docs/           Wireframes and design notes
 vercel.json     Security headers for the Vercel deployment
 ```
 
-To update a project or add a certification, edit the matching file in `src/content/`. No layout code needs to change.
+## Updating content
+
+Facts live in `src/content/`; no layout code needs to change.
+
+- **Project:** edit `projects.ts`. Screenshots go in `public/projects/` (1600×768 JPEG, no private data).
+- **Skill:** edit `skills.ts`, listing only the projects whose repositories show it.
+- **Certification:** edit `certifications.ts` with the verification link, an `issuerMark` for the seal, and a `motif` (`network`, `code`, `database`, or `timeline`) for exam-based certifications.
+- **Profile, contact, résumé:** edit `profile.ts`. Setting `links.resume.href` turns on the résumé download buttons.
+
+Run `npm run lint` and `npm run build` before pushing.
 
 ## Copyright
 
-© Clive. All rights reserved.
+© Clive Owen S. Benito. All rights reserved.
 
 This repository is public so its code can be reviewed, but no license is granted. The code, text, résumé, images, and certificates may not be copied, modified, or redistributed without permission.

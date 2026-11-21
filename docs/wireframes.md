@@ -4,10 +4,26 @@ Low-fidelity layouts for version one (Phase 2). The site is a single page; each 
 
 Visual tokens live in `src/styles/tokens.css`. These wireframes describe structure only.
 
+## Changes since approval (2026-11-22)
+
+The wireframes below were approved on 2026-11-22. The built site has since changed in these ways; where they differ, the code is the source of truth.
+
+- **Theme:** dark pine-charcoal theme built on Figma's "Mountain mist" palette, with a brightened teal accent (`#2ec4b0`) and dark text on teal fills. All text pairs measured at WCAG AA.
+- **Header:** active-section highlight, reading-progress line, Contact as a call-to-action button, and an animated mobile menu.
+- **Hero:** the name reacts letter by letter to the pointer (variable font weight); a title line ("Full-stack & front-end developer") and a first-person headline; the side card was replaced by a portrait with decorative orbit rings.
+- **Tech ticker:** a two-row strip below the hero drifts slowly (top row left, bottom row right), with a pause button; still under reduced motion.
+- **About:** a bento grid (bio, "Looking for", Manila with a live clock, stats, focus) instead of two columns.
+- **Projects:** screenshot covers; case studies open in a dialog that morphs from the card (View Transitions), not by expanding in place. The dialog has a top bar with a counter, a browser-framed screenshot, a story timeline, icon lists, Previous/Next, and independently scrolling columns on wide screens.
+- **Skills:** category tabs plus a skill × project matrix instead of capability cards.
+- **Résumé:** Education and Organization only, plus the pending download.
+- **Certifications:** a summary strip, credential cards with issuer seals and topic watermarks, and a compact wall of Cisco Networking Academy course badges.
+- **Contact:** LinkedIn and GitHub buttons use the real logos.
+- **Motion:** scroll reveals, cursor spotlight on cards, and film-grain texture; reduced motion turns movement off.
+
 ## Page order
 
 ```
-Header (sticky) → Hero → About → Projects → Skills → Résumé → Certifications → Contact → Footer
+Header (sticky) → Hero → Tech ticker → About → Projects → Skills → Résumé → Certifications → Contact → Footer
 ```
 
 ## Header
