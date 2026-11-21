@@ -6,7 +6,7 @@ import { Section } from './components/Section/Section'
 import { SiteFooter } from './components/SiteFooter/SiteFooter'
 import { SiteHeader } from './components/SiteHeader/SiteHeader'
 import { SkillsGrid } from './components/SkillsGrid/SkillsGrid'
-import { certifications } from './content/certifications'
+import { certifications, credlyProfile } from './content/certifications'
 import { profile } from './content/profile'
 import { projects } from './content/projects'
 import { skillGroups } from './content/skills'
@@ -121,8 +121,17 @@ export default function App() {
           )}
         </Section>
 
-        <Section id="certifications" title="Certifications">
-          <h3 className={styles.subheading}>Certifications</h3>
+        <Section
+          id="certifications"
+          title="Certifications"
+          intro="Each entry links to its public verification page, so anyone can confirm it."
+        >
+          <div className={styles.actions}>
+            <ButtonLink href={credlyProfile} variant="secondary" size="sm" external>
+              View all badges on Credly
+            </ButtonLink>
+          </div>
+          <h3 className={`${styles.subheading} ${styles.spaced}`}>Certifications</h3>
           <CertificationList items={examCertifications} />
           <h3 className={`${styles.subheading} ${styles.spaced}`}>Course badges</h3>
           <p className={styles.note}>
