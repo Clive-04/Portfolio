@@ -9,7 +9,7 @@ import { ProjectCard } from './components/ProjectCard/ProjectCard'
 import { Section } from './components/Section/Section'
 import { SiteFooter } from './components/SiteFooter/SiteFooter'
 import { SiteHeader } from './components/SiteHeader/SiteHeader'
-import { SkillsGrid } from './components/SkillsGrid/SkillsGrid'
+import { SkillsMatrix } from './components/SkillsMatrix/SkillsMatrix'
 import { certifications, credlyProfile } from './content/certifications'
 import { profile } from './content/profile'
 import { projects } from './content/projects'
@@ -36,7 +36,7 @@ const email = profile.email ? `${profile.email.user}@${profile.email.domain}` : 
 const { github, linkedin, resume } = profile.links
 
 // The ticker shows each technology once, in the order the skills list them.
-const marqueeItems = [...new Set(skillGroups.flatMap((group) => group.items))]
+const marqueeItems = [...new Set(skillGroups.flatMap((group) => group.skills.map((skill) => skill.name)))]
 
 export default function App() {
   useReveal()
@@ -126,9 +126,9 @@ export default function App() {
           id="skills"
           index="03"
           title="Skills"
-          intro="Grouped by what I can do, with the projects that show it."
+          intro="Pick a category to see each skill and the projects that show it."
         >
-          <SkillsGrid groups={skillGroups} />
+          <SkillsMatrix groups={skillGroups} />
         </Section>
 
         <Section id="resume" index="04" title="Résumé">

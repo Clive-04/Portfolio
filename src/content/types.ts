@@ -72,11 +72,17 @@ export interface Certification {
   published: boolean
 }
 
+export interface Skill {
+  name: string
+  /** Project slugs whose repositories show this skill. Titles come from projects.ts. */
+  projects: string[]
+}
+
 export interface SkillGroup {
   title: string
-  items: string[]
-  /** Project slugs that demonstrate this group. Names are looked up from projects.ts. */
-  projects: string[]
+  /** One short line describing the category. */
+  blurb: string
+  skills: Skill[]
 }
 
 export interface ProfileLink {
