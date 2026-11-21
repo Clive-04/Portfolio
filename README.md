@@ -6,7 +6,7 @@ The site presents selected projects, skills, certifications, and contact details
 
 ## Status
 
-**Planning.** The project has not been scaffolded yet. No application code exists in this repository so far.
+**Planning complete.** Positioning, stack, and project evidence are settled; the app has not been scaffolded yet. See [ROADMAP.md](ROADMAP.md) for the checklist.
 
 ## Version-one scope
 
@@ -14,7 +14,7 @@ Version one is a focused, static site with these sections:
 
 - Home
 - About
-- Projects (two featured, evidence-backed case studies)
+- Projects (evidence-backed case studies: CareerTrack, Pedalya, SmartFeather, and Pasa-Buy)
 - Skills
 - Résumé
 - Certifications
@@ -22,17 +22,17 @@ Version one is a focused, static site with these sections:
 
 Version one deliberately has **no** backend, database, authentication, contact form, analytics, or CMS. Those are possible later additions only if they bring a clear benefit.
 
-## Proposed stack
+## Stack
 
-This is a proposed direction, not a final decision.
+Decided on 2026-11-21.
 
-| Area | Proposal |
+| Area | Choice |
 |---|---|
 | UI library | React |
-| Language | JavaScript or TypeScript (to be decided) |
+| Language | TypeScript |
 | Build tool | Vite |
-| Styling | Plain CSS with design tokens, CSS Modules, or Tailwind CSS (to be decided) |
-| Hosting | A static host that supports custom HTTP security headers, such as Netlify, Cloudflare Pages, or Vercel (to be decided) |
+| Styling | CSS Modules with a shared design-token layer (CSS custom properties) |
+| Hosting | Vercel, with security headers set in `vercel.json` |
 
 ## Requirements
 
