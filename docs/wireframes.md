@@ -67,30 +67,24 @@ Collapsed (default), two columns on desktop:
 └──────────────────────────────────────┘ └─────────────────────────────────────┘
 ```
 
-Expanded: the card spans the full row so the details have room.
+Case study: "View case study" (or a click on the cover) opens a dialog. The card morphs into it with a View Transition; browsers without View Transitions get a scale-and-fade, and reduced motion opens it instantly.
 
 ```
-┌─ CareerTrack ──────────────────────────────────────────────── [Completed] ┐
-│ Full-stack job-search workspace with AI résumé analysis.                  │
-│ [Live ↗] [Code ↗]                                       [Case study ▴]   │
-├───────────────────────────────────────────────────────────────────────────┤
-│ [ screenshot, 16:10 ]          │ Problem       ...                          │
-│                                │ My role       ...                          │
-│                                │ Collaboration ...                          │
-│                                │ Stack         [all technologies]           │
-├───────────────────────────────────────────────────────────────────────────┤
-│ Features          • ...  • ...  • ...                                     │
-│ Testing evidence  • ...  • ...                                            │
-│ Limitations       • ...                                                   │
-└───────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────── dialog ──────────────────────────────────(×)┐
+│ ┌─ left (stays in place) ──────────┐ │ PROBLEM        ...                   │
+│ │ [ screenshot, 16:10 ]            │ │ MY ROLE        ...                   │
+│ │ SOLO PROJECT                     │ │ COLLABORATION  ...                   │
+│ │ CareerTrack          [Completed] │ │ ┌ Features ──────────────────────┐   │
+│ │ summary                          │ │ │ • ...                          │   │
+│ │ [Visit live site ↗] [View code ↗]│ │ └────────────────────────────────┘   │
+│ │ STACK  [tag] [tag] [tag] ...     │ │ ┌ Testing evidence ┐ ┌ Limitations ┐ │
+│ └──────────────────────────────────┘ │                                      │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- The toggle is a real `<button>` with `aria-expanded` and `aria-controls`; the details are hidden from screen readers and the tab order when collapsed.
-- Opening uses a short height and opacity transition; it switches instantly under reduced motion.
-- Order: CareerTrack, Pasa-Buy, Pedalya, SmartFeather (strongest full-stack evidence first).
+- Native `<dialog>` with `showModal()`: focus stays inside, Escape and a backdrop click close it, and focus returns to the button.
 - Sections with no data (for example, empty testing evidence) are left out instead of showing an empty heading.
-- Mobile: one column; expanded details stack vertically, with the screenshot on top.
-
+- Mobile: a full-width sheet that rises from the bottom, in one column.
 ## Skills
 
 Capability groups instead of skill bars. Each group lists technologies and the projects that prove them.

@@ -52,13 +52,13 @@ export default function App() {
               <p className={styles.eyebrow}>{profile.targetRoles.join(' · ')}</p>
               <p className={styles.headline}>{profile.headline}</p>
               <div className={styles.actions}>
-                <ButtonLink href="#projects">View projects</ButtonLink>
+                <ButtonLink href="#projects" icon="down">View projects</ButtonLink>
                 {resume.href ? (
-                  <ButtonLink href={resume.href} variant="secondary" download>
+                  <ButtonLink href={resume.href} variant="secondary" icon="down" download>
                     {resume.label}
                   </ButtonLink>
                 ) : (
-                  <ButtonLink href="#contact" variant="secondary">
+                  <ButtonLink href="#contact" variant="secondary" icon="arrow">
                     Contact me
                   </ButtonLink>
                 )}
@@ -143,7 +143,7 @@ export default function App() {
           <SkillsGrid groups={skillGroups} />
         </Section>
 
-        <Section id="resume" index="04" tone="band" title="Résumé">
+        <Section id="resume" index="04" title="Résumé">
           <div className={styles.resume}>
             <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '0ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Education</h3>
@@ -168,7 +168,7 @@ export default function App() {
           </div>
           {resume.href ? (
             <div className={styles.actions}>
-              <ButtonLink href={resume.href} download>
+              <ButtonLink href={resume.href} icon="down" download>
                 {resume.label}
               </ButtonLink>
             </div>
@@ -180,6 +180,7 @@ export default function App() {
         <Section
           id="certifications"
           index="05"
+          tone="band"
           title="Certifications"
           intro="Each entry links to its public verification page, so anyone can confirm it."
         >
@@ -207,7 +208,7 @@ export default function App() {
         >
           <div className={styles.actions}>
             {email && (
-              <ButtonLink href={`mailto:${email}`} variant="light">
+              <ButtonLink href={`mailto:${email}`} variant="light" icon="mail">
                 Email me
               </ButtonLink>
             )}

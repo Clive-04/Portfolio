@@ -3,7 +3,18 @@
 }
 
 .section[data-tone="band"] {
-  background: var(--color-band);
+  background: var(--gradient-band);
+  border-block: 1px solid var(--color-border);
+}
+
+/* Two plain sections in a row get a hairline between them. */
+.section[data-tone="plain"] + .section[data-tone="plain"] .inner {
+  padding-top: var(--section-space);
+  border-top: 1px solid var(--color-border);
+}
+
+.section[data-tone="plain"] + .section[data-tone="plain"] {
+  padding-top: 0;
 }
 
 .section[data-tone="ink"] {

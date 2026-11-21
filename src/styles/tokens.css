@@ -10,23 +10,29 @@
    * pine "ink" for the closing panel. Every text pair below meets WCAG AA;
    * control borders meet 3:1.
    */
-  --color-bg: #f8fafc;
+  /*
+   * Neutrals are tinted toward the pine accent instead of cool blue-gray,
+   * so backgrounds, borders, and text read as one palette with the teal.
+   * Misty blue stays for decorative glows only.
+   */
+  --color-bg: #f5f9f8;
   --color-surface: #ffffff;
-  --color-surface-muted: #f1f5f9;
-  --color-band: #eef3f8; /* mist-tinted section band */
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
+  --color-surface-muted: #eef5f3;
+  --color-band: #e9f2ef; /* tinted section band */
+  --color-border: #dbe6e3;
+  --color-border-strong: #c2d2ce;
   /* Outlines of interactive controls: at least 3:1 against bg, band, and surface (WCAG 1.4.11). */
-  --color-border-control: #6d8196;
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-accent: #01796f; /* 5.06:1 on bg; white text on it 5.30:1 */
+  --color-border-control: #6b817d;
+  --color-text: #0d1f1e; /* 16.06:1 on bg */
+  --color-text-muted: #4a605c; /* 5.90:1 on band, 6.73:1 on surface */
+  --color-accent: #01796f; /* 4.99:1 on bg, 4.64:1 on band; white text on it 5.30:1 */
   --color-accent-hover: #016159; /* accent darkened 20% */
-  --color-accent-soft: #dfe7f2; /* misty blue lightened 60%; accent-hover text on it 5.90:1 */
+  /* Soft teal fill. Put accent-hover text on it (5.91:1), never plain accent. */
+  --color-accent-soft: #d6ebe6;
   --color-mist: #b0c4de; /* decorative only (1.78:1), never for text */
   --color-slate: #6d8196;
   --color-on-accent: #ffffff;
-  --color-focus: #1d4ed8;
+  --color-focus: #016159; /* 6.9:1 on bg: a clear ring that stays in the palette */
 
   /* Deep pine surface for the contact panel and footer. */
   --color-ink: #0b2e2c;
@@ -36,21 +42,25 @@
   --color-on-ink-accent: #5fd3c3; /* 8.04:1; also the focus ring on ink */
 
   /* Technology tags. */
-  --color-tag-bg: #eef3f8;
-  --color-tag-border: #dfe7f2;
-  --color-tag-text: #334155; /* 9.28:1 */
+  --color-tag-bg: #edf5f2;
+  --color-tag-border: #d5e4e0;
+  --color-tag-text: #2c4441; /* 9.42:1 */
 
   /* Status colours for evidence and project badges. */
   --color-status-done-bg: #dcfce7;
   --color-status-done-text: #166534;
   --color-status-progress-bg: #fef3c7;
   --color-status-progress-text: #92400e;
-  --color-status-pending-bg: #e2e8f0;
-  --color-status-pending-text: #334155;
+  --color-status-pending-bg: #e2ebe8;
+  --color-status-pending-text: #2c4441;
 
   /* Decorative gradients (never behind body text without a contrast check). */
-  --gradient-hero: radial-gradient(60rem 32rem at 90% -20%, rgb(176 196 222 / 0.55), transparent 62%),
-    radial-gradient(44rem 26rem at -15% 0%, rgb(1 121 111 / 0.1), transparent 60%);
+  --gradient-hero: radial-gradient(56rem 30rem at 92% -18%, rgb(176 196 222 / 0.5), transparent 62%),
+    radial-gradient(46rem 28rem at -12% 4%, rgb(1 121 111 / 0.12), transparent 60%),
+    linear-gradient(to bottom, var(--color-surface), var(--color-bg));
+  /* Projects band: soft tint that brightens toward the middle, so cards and screenshots stand out. */
+  --gradient-band: radial-gradient(70rem 30rem at 50% 0%, rgb(255 255 255 / 0.9), transparent 70%),
+    linear-gradient(to bottom, var(--color-band), var(--color-bg));
   --gradient-name: linear-gradient(120deg, var(--color-text) 35%, var(--color-accent) 100%);
   --gradient-rule: linear-gradient(90deg, var(--color-accent), var(--color-mist));
   --gradient-ink: radial-gradient(40rem 20rem at 100% 0%, rgb(95 211 195 / 0.16), transparent 60%),

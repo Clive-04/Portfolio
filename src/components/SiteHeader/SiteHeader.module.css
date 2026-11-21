@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgb(248 250 252 / 0.72);
+  background: rgb(245 249 248 / 0.72);
   backdrop-filter: blur(14px) saturate(1.4);
   border-bottom: 1px solid transparent;
   transition: background-color var(--motion-duration-base) var(--motion-ease-out),

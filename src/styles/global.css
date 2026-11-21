@@ -21,6 +21,37 @@ html {
   }
 }
 
+/* Reserve the scrollbar's space so locking scroll for a dialog doesn't shift the page. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* The page behind an open case study does not scroll. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+/*
+ * View Transitions (case-study open/close). Groups glide with the site's
+ * easing; snapshots crop instead of stretching when the shapes differ.
+ */
+::view-transition-group(*) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+}
+
 body {
   min-height: 100vh;
   background: var(--color-bg);

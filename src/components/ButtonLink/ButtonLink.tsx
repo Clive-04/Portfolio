@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Icon, type IconName } from '../Icon/Icon'
 import styles from './ButtonLink.module.css'
 
 interface ButtonLinkProps {
@@ -7,6 +8,8 @@ interface ButtonLinkProps {
   /** `light` and `ghost` are for dark (ink) backgrounds. */
   variant?: 'primary' | 'secondary' | 'light' | 'ghost'
   size?: 'md' | 'sm'
+  /** Trailing icon. External links get the "external" arrow automatically. */
+  icon?: IconName
   /** Opens in a new tab. `noopener noreferrer` stops the new page from controlling this one. */
   external?: boolean
   download?: boolean
@@ -17,25 +20,22 @@ export function ButtonLink({
   children,
   variant = 'primary',
   size = 'md',
+  icon,
   external = false,
   download = false,
 }: ButtonLinkProps) {
+  const trailing = icon ?? (external ? 'external' : undefined)
   return (
     <a
       href={href}
       className={[styles.button, styles[variant], size === 'sm' && styles.sm].filter(Boolean).join(' ')}
+      data-icon={trailing}
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
       {...(download && { download: true })}
     >
-      {children}
-      {external && (
-        <>
-          <span className={styles.icon} aria-hidden="true">
-            ↗
-          </span>
-          <span className="visually-hidden"> (opens in a new tab)</span>
-        </>
-      )}
+      <span className={styles.label}>{children}</span>
+      {trailing && <Icon name={trailing} className={styles.icon} />}
+      {external && <span className="visually-hidden"> (opens in a new tab)</span>}
     </a>
   )
 }

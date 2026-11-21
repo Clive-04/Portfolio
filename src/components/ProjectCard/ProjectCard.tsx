@@ -1,8 +1,11 @@
-import { useId, useState, type CSSProperties } from 'react'
+import { useId, useRef, type CSSProperties } from 'react'
 import type { Project, ProjectStatus } from '../../content/types'
 import { Badge, type BadgeTone } from '../Badge/Badge'
+import buttonStyles from '../ButtonLink/ButtonLink.module.css'
 import { ButtonLink } from '../ButtonLink/ButtonLink'
+import { Icon } from '../Icon/Icon'
 import styles from './ProjectCard.module.css'
+import dialogStyles from './CaseStudy.module.css'
 
 const statusBadge: Record<ProjectStatus, { label: string; tone: BadgeTone }> = {
   completed: { label: 'Completed', tone: 'done' },
@@ -10,8 +13,19 @@ const statusBadge: Record<ProjectStatus, { label: string; tone: BadgeTone }> = {
   planned: { label: 'Planned', tone: 'pending' },
 }
 
-/** Technologies shown on the collapsed card; the rest appear in the case study. */
+/** Technologies shown on the card; the case study lists them all. */
 const VISIBLE_TAGS = 4
+
+/** View Transitions run only where supported and when the visitor allows motion. */
+function canMorph() {
+  return (
+    'startViewTransition' in document && window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+  )
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
 interface ProjectCardProps {
   project: Project
@@ -20,41 +34,132 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
-  const [open, setOpen] = useState(false)
-  const detailsId = useId()
+  const titleId = useId()
+  const cardRef = useRef<HTMLLIElement>(null)
+  const cardCoverRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const panelCoverRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
   const status = statusBadge[project.status]
   const visibleTags = project.stack.slice(0, VISIBLE_TAGS)
   const hiddenCount = project.stack.length - visibleTags.length
   const screenshot = project.screenshots[0]
   const forProject = <span className="visually-hidden"> for {project.title}</span>
 
+  // Shared names pair the card with the open panel, so the browser can morph one into the other.
+  const panelName = `case-${project.slug}`
+  const coverName = `case-cover-${project.slug}`
+
+  function name(element: HTMLElement | null, value: string) {
+    if (element) element.style.viewTransitionName = value
+  }
+
+  function openCaseStudy() {
+    const dialog = dialogRef.current
+    if (!dialog || dialog.open) return
+
+    if (!canMorph()) {
+      if (!prefersReducedMotion()) dialog.dataset.anim = 'in'
+      dialog.showModal()
+      dialog.scrollTop = 0
+      return
+    }
+
+    name(cardRef.current, panelName)
+    name(cardCoverRef.current, coverName)
+    const transition = document.startViewTransition(() => {
+      name(cardRef.current, '')
+      name(cardCoverRef.current, '')
+      name(dialogRef.current, panelName)
+      name(panelCoverRef.current, coverName)
+      dialog.showModal()
+      dialog.scrollTop = 0
+    })
+    transition.finished.finally(() => {
+      name(dialogRef.current, '')
+      name(panelCoverRef.current, '')
+    })
+  }
+
+  function closeCaseStudy() {
+    const dialog = dialogRef.current
+    if (!dialog?.open) return
+
+    if (!canMorph()) {
+      if (prefersReducedMotion()) {
+        dialog.close()
+        return
+      }
+      dialog.dataset.anim = 'out'
+      dialog.addEventListener(
+        'animationend',
+        () => {
+          delete dialog.dataset.anim
+          dialog.close()
+        },
+        { once: true },
+      )
+      return
+    }
+
+    // The dialog box (not its scrolling content) is what morphs back into the card.
+    // The screenshot only morphs too if it is still in view.
+    const coverInView = dialog.scrollTop < (panelCoverRef.current?.offsetHeight ?? 0) / 2
+    name(dialogRef.current, panelName)
+    if (coverInView) name(panelCoverRef.current, coverName)
+    const transition = document.startViewTransition(() => {
+      name(dialogRef.current, '')
+      name(panelCoverRef.current, '')
+      dialog.close()
+      name(cardRef.current, panelName)
+      if (coverInView) name(cardCoverRef.current, coverName)
+    })
+    transition.finished.finally(() => {
+      name(cardRef.current, '')
+      name(cardCoverRef.current, '')
+      triggerRef.current?.focus()
+    })
+  }
+
+  const cover = screenshot ? (
+    <img src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} />
+  ) : (
+    // No screenshot: a decorative cover built from the project name.
+    <div className={styles.placeholder} aria-hidden="true">
+      <span>{project.title}</span>
+    </div>
+  )
+
   return (
     <li
+      ref={cardRef}
       id={`project-${project.slug}`}
       className={styles.card}
-      data-open={open}
       data-reveal
       style={{ '--reveal-delay': `${(index % 2) * 100}ms` } as CSSProperties}
     >
-      <div className={styles.cover}>
+      {/* The cover is an extra mouse target; keyboard users use the button below. */}
+      <div ref={cardCoverRef} className={styles.cover} onClick={openCaseStudy}>
         <span className={styles.coverBadge}>
           <Badge tone={status.tone}>{status.label}</Badge>
         </span>
         {screenshot ? (
           <img
             src={screenshot.src}
-            alt={screenshot.alt}
+            alt=""
             width={screenshot.width}
             height={screenshot.height}
             loading="lazy"
             decoding="async"
           />
         ) : (
-          // No screenshot: a decorative cover built from the project name.
-          <div className={styles.placeholder} aria-hidden="true">
-            <span>{project.title}</span>
-          </div>
+          cover
         )}
+        <span className={styles.coverHint} aria-hidden="true">
+          <Icon name="expand" />
+          View case study
+        </span>
       </div>
 
       <div className={styles.body}>
@@ -76,9 +181,22 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
         </ul>
 
         <div className={styles.actions}>
+          <button
+            ref={triggerRef}
+            type="button"
+            className={`${buttonStyles.button} ${buttonStyles.primary} ${buttonStyles.sm}`}
+            data-icon="arrow"
+            aria-haspopup="dialog"
+            onClick={openCaseStudy}
+          >
+            <span className={buttonStyles.label}>
+              View case study{forProject}
+            </span>
+            <Icon name="arrow" className={buttonStyles.icon} />
+          </button>
           {project.links.live && (
             <ButtonLink href={project.links.live} variant="secondary" size="sm" external>
-              Live site{forProject}
+              Live{forProject}
             </ButtonLink>
           )}
           {project.links.repository && (
@@ -86,23 +204,80 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               Code{forProject}
             </ButtonLink>
           )}
-          <button
-            type="button"
-            className={styles.toggle}
-            aria-expanded={open}
-            aria-controls={detailsId}
-            onClick={() => setOpen((value) => !value)}
-          >
-            {open ? 'Hide case study' : 'Read case study'}
-            {forProject}
-            <span className={styles.chevron} aria-hidden="true" />
-          </button>
         </div>
+      </div>
 
-        {/* Collapsed details use `visibility: hidden`, so they leave the tab order and the accessibility tree. */}
-        <div id={detailsId} className={styles.details} data-open={open}>
-          <div className={styles.detailsInner}>
-            <dl className={styles.facts}>
+      <dialog
+        ref={dialogRef}
+        className={dialogStyles.dialog}
+        aria-labelledby={titleId}
+        onCancel={(event) => {
+          // Escape: run the closing animation instead of closing instantly.
+          event.preventDefault()
+          closeCaseStudy()
+        }}
+        onClick={(event) => {
+          // A click on the dialog element itself is a click on the backdrop.
+          if (event.target === event.currentTarget) closeCaseStudy()
+        }}
+        onAnimationEnd={(event) => {
+          if (event.currentTarget.dataset.anim === 'in') delete event.currentTarget.dataset.anim
+        }}
+      >
+        <button type="button" className={dialogStyles.close} onClick={closeCaseStudy}>
+          <Icon name="close" />
+          <span className="visually-hidden">Close case study</span>
+        </button>
+
+        <div className={dialogStyles.panel}>
+          {/* Left on wide screens: stays in place while the details scroll. */}
+          <div className={dialogStyles.aside}>
+            <div ref={panelCoverRef} className={dialogStyles.cover}>
+              {cover}
+            </div>
+            <div className={dialogStyles.intro}>
+              <div>
+                <p className={dialogStyles.team}>{project.teamLabel}</p>
+                <h3 id={titleId} className={dialogStyles.title}>
+                  {project.title}
+                </h3>
+              </div>
+              <Badge tone={status.tone}>{status.label}</Badge>
+            </div>
+            <p className={dialogStyles.summary}>{project.summary}</p>
+
+            <div className={dialogStyles.links}>
+              {project.links.live && (
+                <ButtonLink href={project.links.live} size="sm" external>
+                  Visit live site
+                </ButtonLink>
+              )}
+              {project.links.repository && (
+                <ButtonLink href={project.links.repository} variant="secondary" size="sm" external>
+                  View code
+                </ButtonLink>
+              )}
+              {project.links.history && (
+                <ButtonLink href={project.links.history} variant="secondary" size="sm" external>
+                  Original history
+                </ButtonLink>
+              )}
+            </div>
+
+            <div className={dialogStyles.stackBlock}>
+              <p className={dialogStyles.label}>Stack</p>
+              <ul role="list" className={dialogStyles.stack}>
+                {project.stack.map((tech) => (
+                  <li key={tech.name}>
+                    <Badge>{tech.name}</Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className={dialogStyles.main}>
+            <dl className={dialogStyles.facts}>
               <div>
                 <dt>Problem</dt>
                 <dd>{project.problem}</dd>
@@ -115,30 +290,16 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                 <dt>Collaboration</dt>
                 <dd>{project.collaboration}</dd>
               </div>
-              <div>
-                <dt>Stack</dt>
-                <dd>{project.stack.map((tech) => tech.name).join(' · ')}</dd>
-              </div>
             </dl>
 
-            <div className={styles.lists}>
+            <div className={dialogStyles.lists}>
               <DetailList title="Features" items={project.features} />
               <DetailList title="Testing evidence" items={project.validation} />
               <DetailList title="Limitations" items={project.limitations} />
             </div>
-
-            {project.links.history && (
-              <p className={styles.history}>
-                Original commit history:{' '}
-                <a href={project.links.history} target="_blank" rel="noopener noreferrer">
-                  {project.links.history.replace('https://github.com/', '')}
-                  <span className="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              </p>
-            )}
           </div>
         </div>
-      </div>
+      </dialog>
     </li>
   )
 }
@@ -147,8 +308,8 @@ function DetailList({ title, items }: { title: string; items: string[] }) {
   // Leave the heading out entirely when there is nothing to show.
   if (items.length === 0) return null
   return (
-    <section className={styles.list}>
-      <h4 className={styles.listTitle}>{title}</h4>
+    <section className={dialogStyles.list}>
+      <h4 className={dialogStyles.listTitle}>{title}</h4>
       <ul>
         {items.map((item) => (
           <li key={item}>{item}</li>
