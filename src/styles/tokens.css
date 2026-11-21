@@ -4,19 +4,24 @@
  * so a visual change is made once here.
  */
 :root {
-  /* Colour: neutral slate with one teal accent. Text pairs meet WCAG AA. */
+  /*
+   * Colour: Figma's "Mountain mist" palette (slate #6D8196, misty blue
+   * #B0C4DE, pine teal #01796F) on neutral slate surfaces.
+   * Text pairs meet WCAG AA; control borders meet 3:1.
+   */
   --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-muted: #f1f5f9;
   --color-border: #e2e8f0;
   --color-border-strong: #cbd5e1;
   /* Outlines of interactive controls: at least 3:1 against bg and surface (WCAG 1.4.11). */
-  --color-border-control: #7c8aa0;
+  --color-border-control: #6d8196;
   --color-text: #0f172a;
   --color-text-muted: #475569;
-  --color-accent: #0f766e;
-  --color-accent-hover: #115e59;
-  --color-accent-soft: #ccfbf1;
+  --color-accent: #01796f; /* 5.06:1 on bg; white text on it 5.30:1 */
+  --color-accent-hover: #016159; /* accent darkened 20% */
+  --color-accent-soft: #dfe7f2; /* misty blue lightened 60%; accent-hover text on it 5.90:1 */
+  --color-mist: #b0c4de; /* decorative only (1.78:1), never for text */
   --color-on-accent: #ffffff;
   --color-focus: #1d4ed8;
 
