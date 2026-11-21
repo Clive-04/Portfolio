@@ -5,10 +5,8 @@
     "bio"
     "look"
     "clock"
-    "school"
     "stats"
-    "focus"
-    "org";
+    "focus";
 }
 
 @media (min-width: 40rem) {
@@ -17,9 +15,7 @@
     grid-template-areas:
       "bio bio"
       "look clock"
-      "school school"
-      "stats stats"
-      "focus org";
+      "stats focus";
   }
 }
 
@@ -27,9 +23,9 @@
   .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-areas:
-      "bio bio look clock"
-      "bio bio school school"
-      "stats stats focus org";
+      "bio bio bio look"
+      "bio bio bio clock"
+      "stats stats focus focus";
   }
 }
 
@@ -145,13 +141,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- School ---------- */
-
-.school {
-  grid-area: school;
-  justify-content: flex-end;
-}
-
 /* ---------- Stats ---------- */
 
 .stats {
@@ -216,15 +205,5 @@
   background: var(--color-tag-bg);
   color: var(--color-tag-text);
   font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-}
-
-/* ---------- Organization ---------- */
-
-.org {
-  grid-area: org;
-}
-
-.orgText {
   font-weight: var(--weight-semibold);
 }

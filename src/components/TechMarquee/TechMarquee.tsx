@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { Icon } from '../Icon/Icon'
 import styles from './TechMarquee.module.css'
 
 interface TechMarqueeProps {
@@ -5,27 +7,48 @@ interface TechMarqueeProps {
 }
 
 /**
- * Two rows of technologies that slide in opposite directions as the page
- * scrolls (CSS scroll-driven animation). Nothing moves unless the visitor
- * scrolls, so it never animates on its own. Decorative: the same skills are
- * listed in the Skills section, so it is hidden from screen readers.
+ * Two rows of technologies drifting slowly in opposite directions: the top
+ * row to the left, the bottom row to the right. Each row holds its items
+ * twice and moves by exactly one copy, so the loop is seamless.
+ *
+ * Moving content needs a way to stop it (WCAG 2.2.2), so there is a pause
+ * button; hovering also pauses, and reduced motion keeps it still. The rows
+ * are decorative (the Skills section lists the same items), so they are
+ * hidden from screen readers; the button is not.
  */
 export function TechMarquee({ items }: TechMarqueeProps) {
+  const [paused, setPaused] = useState(false)
   const half = Math.ceil(items.length / 2)
   const rows = [items.slice(0, half), items.slice(half)]
+
   return (
-    <div className={styles.marquee} aria-hidden="true">
-      {rows.map((row, rowIndex) => (
-        <div key={rowIndex} className={styles.row} data-direction={rowIndex === 0 ? 'left' : 'right'}>
-          {/* Repeated so the row stays filled while it slides. */}
-          {[...row, ...row, ...row].map((item, index) => (
-            <span key={`${item}-${index}`} className={styles.item}>
-              {item}
-              <span className={styles.star}>✦</span>
-            </span>
-          ))}
-        </div>
-      ))}
+    <div className={styles.marquee} data-paused={paused}>
+      <div className={styles.rows} aria-hidden="true">
+        {rows.map((row, rowIndex) => (
+          <div key={rowIndex} className={styles.track} data-direction={rowIndex === 0 ? 'left' : 'right'}>
+            {[0, 1].map((copy) => (
+              <div key={copy} className={styles.group}>
+                {row.map((item) => (
+                  <span key={item} className={styles.item}>
+                    {item}
+                    <span className={styles.star}>✦</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className={styles.toggle}
+        aria-pressed={paused}
+        onClick={() => setPaused((value) => !value)}
+      >
+        <Icon name={paused ? 'play' : 'pause'} />
+        <span className="visually-hidden">Pause the moving technology list</span>
+      </button>
     </div>
   )
 }

@@ -59,15 +59,7 @@ export function AboutBento({ profile, stats }: AboutBentoProps) {
         </p>
       </section>
 
-      <section className={`${styles.tile} ${styles.school}`} data-reveal data-spotlight style={tile(3)} aria-label="School">
-        <p className={styles.label}>School</p>
-        <p className={styles.big}>{profile.education.school}</p>
-        <p className={styles.muted}>
-          {profile.education.program} · {profile.education.years}
-        </p>
-      </section>
-
-      <section className={`${styles.tile} ${styles.stats}`} data-reveal data-spotlight style={tile(4)} aria-label="In numbers">
+      <section className={`${styles.tile} ${styles.stats}`} data-reveal data-spotlight style={tile(3)} aria-label="In numbers">
         <dl className={styles.statList}>
           {stats.map((stat) => (
             <div key={stat.label}>
@@ -78,22 +70,13 @@ export function AboutBento({ profile, stats }: AboutBentoProps) {
         </dl>
       </section>
 
-      <section className={`${styles.tile} ${styles.focus}`} data-reveal data-spotlight style={tile(5)} aria-label="Focus">
+      <section className={`${styles.tile} ${styles.focus}`} data-reveal data-spotlight style={tile(4)} aria-label="Focus">
         <p className={styles.label}>Focus</p>
         <ul role="list" className={styles.focusList}>
           {profile.focus.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-      </section>
-
-      <section className={`${styles.tile} ${styles.org}`} data-reveal data-spotlight style={tile(6)} aria-label="Organization">
-        <p className={styles.label}>Organization</p>
-        {profile.affiliations.map((item) => (
-          <p key={item} className={styles.orgText}>
-            {item}
-          </p>
-        ))}
       </section>
     </div>
   )

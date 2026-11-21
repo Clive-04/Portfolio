@@ -15,6 +15,8 @@ const paths = {
   prev: 'M15 6l-6 6 6 6',
   next: 'M9 6l6 6-6 6',
   lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z',
+  pause: 'M9 6v12M15 6v12',
+  play: 'M8 5.5v13l10-6.5z',
 } as const
 
 export type IconName = keyof typeof paths

@@ -89,9 +89,8 @@ export interface Profile {
   name: string
   shortName: string
   photo?: Screenshot
+  title: string
   headline: string
-  supportingLine: string
-  targetRoles: string[]
   about: string[]
   /** One line for the highlighted "Looking for" tile. */
   lookingFor: string

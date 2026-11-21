@@ -52,10 +52,10 @@ export default function App() {
             <div className={styles.heroText}>
               <p className={styles.status}>
                 <span className={styles.statusDot} aria-hidden="true" />
-                Open to internship opportunities
+                Open to internships
               </p>
               <KineticName id="hero-heading" name={profile.name} className={styles.heroTitle} />
-              <p className={styles.eyebrow}>{profile.targetRoles.join(' · ')}</p>
+              <p className={styles.eyebrow}>{profile.title}</p>
               <p className={styles.headline}>{profile.headline}</p>
               <div className={styles.actions}>
                 <ButtonLink href="#projects" icon="down">View projects</ButtonLink>
@@ -71,32 +71,23 @@ export default function App() {
               </div>
             </div>
 
-            <aside className={styles.heroCard} aria-label="At a glance">
-              <div className={styles.profile}>
-                {profile.photo && (
-                  <span className={styles.photoFrame}>
-                    <img
-                      className={styles.photo}
-                      src={profile.photo.src}
-                      alt={profile.photo.alt}
-                      width={profile.photo.width}
-                      height={profile.photo.height}
-                      fetchPriority="high"
-                    />
-                  </span>
-                )}
-                <div>
-                  <p className={styles.heroCardLabel}>At a glance</p>
-                  <p className={styles.profileName}>{profile.name}</p>
-                  <p className={styles.profileSchool}>{profile.education.school}</p>
-                </div>
+            {/* Portrait with decorative orbit rings. The facts live in About and Résumé. */}
+            {profile.photo && (
+              <div className={styles.portrait}>
+                <span className={styles.orbit} aria-hidden="true" />
+                <span className={`${styles.orbit} ${styles.orbitOuter}`} aria-hidden="true" />
+                <span className={styles.photoFrame}>
+                  <img
+                    className={styles.photo}
+                    src={profile.photo.src}
+                    alt={profile.photo.alt}
+                    width={profile.photo.width}
+                    height={profile.photo.height}
+                    fetchPriority="high"
+                  />
+                </span>
               </div>
-              <p className={styles.heroCardProgram}>
-                {profile.education.program}
-                <span>{profile.education.years}</span>
-              </p>
-              <p className={styles.heroCardStack}>{profile.supportingLine}</p>
-            </aside>
+            )}
           </div>
         </section>
 
@@ -111,7 +102,7 @@ export default function App() {
           index="02"
           tone="band"
           title="Selected projects"
-          intro="Each project states what I built, who I built it with, and how it was tested. Open a case study for the details."
+          intro="What I built, who I built it with, and how it was tested. Open any case study for the full story."
         >
           <ul role="list" className={styles.projectGrid}>
             {projects.map((project, index) => {
@@ -135,7 +126,7 @@ export default function App() {
           id="skills"
           index="03"
           title="Skills"
-          intro="Grouped by what I can do, with the projects that show it. No self-rated skill bars."
+          intro="Grouped by what I can do, with the projects that show it."
         >
           <SkillsGrid groups={skillGroups} />
         </Section>
@@ -149,18 +140,10 @@ export default function App() {
               <p className={styles.muted}>{profile.education.years}</p>
             </div>
             <div className={styles.resumeBlock} data-reveal data-spotlight style={{ '--reveal-delay': '100ms' } as CSSProperties}>
-              <h3 className={styles.resumeLabel}>Affiliations</h3>
+              <h3 className={styles.resumeLabel}>Organization</h3>
               {profile.affiliations.map((item) => (
                 <p key={item}>{item}</p>
               ))}
-            </div>
-            <div className={styles.resumeBlock} data-reveal data-spotlight style={{ '--reveal-delay': '200ms' } as CSSProperties}>
-              <h3 className={styles.resumeLabel}>Credentials</h3>
-              <p>
-                {examCertifications.length} certifications and {courseBadges.length} Cisco Networking Academy course
-                badges.
-              </p>
-              <a href="#certifications">See the list</a>
             </div>
           </div>
           {resume.href ? (
@@ -170,7 +153,7 @@ export default function App() {
               </ButtonLink>
             </div>
           ) : (
-            <Pending>A downloadable PDF will be added once a public version without personal contact details is ready.</Pending>
+            <Pending>A downloadable PDF is on its way.</Pending>
           )}
         </Section>
 
@@ -179,7 +162,7 @@ export default function App() {
           index="05"
           tone="band"
           title="Certifications"
-          intro="Each entry links to its public verification page, so anyone can confirm it."
+          intro="Every entry links to a public page where anyone can verify it."
         >
           {/* Summary strip: the counts at a glance, plus the full Credly profile. */}
           <div className={styles.certSummary} data-reveal>
@@ -191,10 +174,6 @@ export default function App() {
               <div>
                 <dt>Course badges</dt>
                 <dd>{courseBadges.length}</dd>
-              </div>
-              <div>
-                <dt>Verifiable online</dt>
-                <dd>{published.filter((item) => item.verificationUrl).length}</dd>
               </div>
             </dl>
             <ButtonLink href={credlyProfile} variant="secondary" size="sm" external>
@@ -219,7 +198,7 @@ export default function App() {
           index="06"
           tone="ink"
           title="Let’s work together"
-          intro="I’m looking for a full-stack or front-end developer internship. Email is the fastest way to reach me."
+          intro="Email is the fastest way to reach me. You can also find me on LinkedIn and GitHub."
         >
           <div className={styles.actions}>
             {email && (

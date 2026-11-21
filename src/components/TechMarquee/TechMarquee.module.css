@@ -1,22 +1,30 @@
 .marquee {
+  position: relative;
+  border-block: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.rows {
   display: grid;
   gap: var(--space-3);
   padding-block: var(--space-6);
   overflow: hidden;
-  border-block: 1px solid var(--color-border);
-  background: var(--color-surface);
   /* Fade both edges so the rows dissolve instead of being cut off. */
-  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 
-.row {
+/* A track holds two identical groups; moving it by -50% shows the second
+   group exactly where the first one started, so the loop has no seam. */
+.track {
   display: flex;
-  gap: var(--space-6);
   width: max-content;
 }
 
-.row[data-direction="right"] {
-  margin-left: -40%;
+.group {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-6);
+  padding-right: var(--space-6);
 }
 
 .item {
@@ -30,11 +38,8 @@
   white-space: nowrap;
 }
 
-/*
- * Second row: lighter weight in slate. (Outlined text was tried, but the
- * variable font's overlapping contours show through a stroke.)
- */
-.row[data-direction="right"] .item {
+/* Second row: lighter italic slate, so the two rows read as two layers. */
+.track[data-direction="right"] .item {
   color: var(--color-slate);
   font-weight: var(--weight-regular);
   font-style: italic;
@@ -46,37 +51,71 @@
   font-style: normal;
 }
 
-/*
- * Scroll-driven motion: the rows translate while the strip crosses the
- * viewport. Where unsupported, or with reduced motion, they stay still.
- */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .row {
-      animation: slide linear both;
-      animation-timeline: view();
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .track[data-direction="left"] {
+    animation: drift-left 90s linear infinite;
+  }
 
-    .row[data-direction="right"] {
-      animation-name: slide-reverse;
-    }
+  .track[data-direction="right"] {
+    animation: drift-right 110s linear infinite;
+  }
+
+  /* Paused by the button, or while the pointer rests on the strip. */
+  .marquee[data-paused="true"] .track,
+  .rows:hover .track {
+    animation-play-state: paused;
   }
 }
 
-@keyframes slide {
+@keyframes drift-left {
   from {
-    translate: 0 0;
+    transform: translateX(0);
   }
   to {
-    translate: -25% 0;
+    transform: translateX(-50%);
   }
 }
 
-@keyframes slide-reverse {
+@keyframes drift-right {
   from {
-    translate: -25% 0;
+    transform: translateX(-50%);
   }
   to {
-    translate: 0 0;
+    transform: translateX(0);
+  }
+}
+
+/* Pause / play button in the corner. */
+.toggle {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color var(--motion-duration-base) var(--motion-ease-out),
+    color var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.toggle:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.toggle svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Nothing moves under reduced motion, so the button has nothing to do. */
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    display: none;
   }
 }
