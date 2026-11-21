@@ -1,0 +1,82 @@
+.main:focus {
+  outline: none;
+}
+
+.hero {
+  padding-block: var(--space-16) var(--space-20);
+}
+
+.heroInner {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.eyebrow {
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.heroTitle {
+  margin-top: var(--space-3);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+}
+
+.headline {
+  max-width: 40rem;
+  margin-top: var(--space-4);
+  font-size: var(--text-xl);
+}
+
+.supporting {
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.actions:empty {
+  display: none;
+}
+
+.actions + * {
+  margin-top: var(--space-6);
+}
+
+.projectGrid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 48rem) {
+  .projectGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.projectHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.projectTitle {
+  font-size: var(--text-xl);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+}

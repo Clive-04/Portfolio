@@ -6,7 +6,7 @@ The site presents selected projects, skills, certifications, and contact details
 
 ## Status
 
-**Planning complete.** Positioning, stack, and project evidence are settled; the app has not been scaffolded yet. See [ROADMAP.md](ROADMAP.md) for the checklist.
+**In development.** The frontend foundation is built; section content is in progress. See [ROADMAP.md](ROADMAP.md) for the checklist.
 
 ## Version-one scope
 
@@ -45,7 +45,30 @@ Decided on 2026-11-21.
 
 ## Setup
 
-Setup instructions will be added once the project is scaffolded.
+Requires Node.js 22.12 or newer (CI uses the version in `.nvmrc`).
+
+```bash
+npm install       # install dependencies from the lockfile
+npm run dev       # start the dev server at http://localhost:5173
+npm run lint      # lint with oxlint (warnings fail the check)
+npm run build     # type-check with TypeScript, then build to dist/
+npm run preview   # serve the production build locally
+```
+
+GitHub Actions runs `lint` and `build` on every push and pull request to `main`.
+
+## Project structure
+
+```
+src/
+  content/      Typed portfolio data (profile, projects, certifications, sections)
+  components/   Reusable UI pieces, each with its own CSS Module
+  styles/       Design tokens and global styles
+  App.tsx       Page layout
+vercel.json     Security headers for the Vercel deployment
+```
+
+To update a project or add a certification, edit the matching file in `src/content/`. No layout code needs to change.
 
 ## Copyright
 
