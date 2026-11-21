@@ -5,72 +5,73 @@
  */
 :root {
   /*
-   * Colour: Figma's "Mountain mist" palette (slate #6D8196, misty blue
-   * #B0C4DE, pine teal #01796F) on neutral slate surfaces, with a deep
-   * pine "ink" for the closing panel. Every text pair below meets WCAG AA;
-   * control borders meet 3:1.
+   * Colour: a dark theme built on Figma's "Mountain mist" palette. Deep
+   * pine-charcoal surfaces, light text, and a brightened pine teal accent
+   * (the original #01796F is too dark to read on a dark background).
+   * Misty blue stays for decorative glows. Every text pair below was
+   * measured at WCAG AA or better; control borders meet 3:1.
    */
-  /*
-   * Neutrals are tinted toward the pine accent instead of cool blue-gray,
-   * so backgrounds, borders, and text read as one palette with the teal.
-   * Misty blue stays for decorative glows only.
-   */
-  --color-bg: #f5f9f8;
-  --color-surface: #ffffff;
-  --color-surface-muted: #eef5f3;
-  --color-band: #e9f2ef; /* tinted section band */
-  --color-border: #dbe6e3;
-  --color-border-strong: #c2d2ce;
-  /* Outlines of interactive controls: at least 3:1 against bg, band, and surface (WCAG 1.4.11). */
-  --color-border-control: #6b817d;
-  --color-text: #0d1f1e; /* 16.06:1 on bg */
-  --color-text-muted: #4a605c; /* 5.90:1 on band, 6.73:1 on surface */
-  --color-accent: #01796f; /* 4.99:1 on bg, 4.64:1 on band; white text on it 5.30:1 */
-  --color-accent-hover: #016159; /* accent darkened 20% */
-  /* Soft teal fill. Put accent-hover text on it (5.91:1), never plain accent. */
-  --color-accent-soft: #d6ebe6;
-  --color-mist: #b0c4de; /* decorative only (1.78:1), never for text */
-  --color-slate: #6d8196;
-  --color-on-accent: #ffffff;
-  --color-focus: #016159; /* 6.9:1 on bg: a clear ring that stays in the palette */
+  color-scheme: dark;
 
-  /* Deep pine surface for the contact panel and footer. */
-  --color-ink: #0b2e2c;
-  --color-ink-raised: #10403d;
-  --color-on-ink: #ffffff; /* 14.57:1 */
-  --color-on-ink-muted: #a7c4c2; /* 7.85:1 */
-  --color-on-ink-accent: #5fd3c3; /* 8.04:1; also the focus ring on ink */
+  --color-bg: #0b1615;
+  --color-surface: #11211f; /* raised cards */
+  --color-surface-muted: #162a27; /* insets inside cards */
+  --color-band: #0e1c1a; /* section bands */
+  --color-border: #1f3532; /* decorative hairlines */
+  --color-border-strong: #2b4743;
+  /* Outlines of interactive controls: 3.71:1 on surface, 4.11:1 on bg (WCAG 1.4.11). */
+  --color-border-control: #5e7d78;
+  --color-text: #e8f1ef; /* 16.02:1 on bg, 14.48:1 on surface */
+  --color-text-muted: #9db3af; /* 8.34:1 on bg, 6.81:1 on surface-muted */
+  --color-accent: #2ec4b0; /* 8.46:1 on bg, 7.64:1 on surface */
+  --color-accent-hover: #5fd3c3; /* lighter on hover in a dark theme */
+  --color-accent-soft: #12332f; /* teal-tinted fill; accent text on it 6.26:1 */
+  --color-mist: #b0c4de; /* decorative only */
+  --color-slate: #7f97a8; /* 5.47:1 on surface */
+  --color-on-accent: #04201d; /* dark text on teal fills: 7.84:1 */
+  --color-focus: #5fd3c3; /* 10.17:1 on bg */
+
+  /* Deepest pine for the contact panel and footer, below the page background. */
+  --color-ink: #071110;
+  --color-ink-raised: #0f2624;
+  --color-on-ink: #ffffff; /* 19.15:1 */
+  --color-on-ink-muted: #a7c4c2; /* 10.32:1 */
+  --color-on-ink-accent: #5fd3c3;
 
   /* Technology tags. */
-  --color-tag-bg: #edf5f2;
-  --color-tag-border: #d5e4e0;
-  --color-tag-text: #2c4441; /* 9.42:1 */
+  --color-tag-bg: #142826;
+  --color-tag-border: #22403c;
+  --color-tag-text: #c5d8d4; /* 10.39:1 */
 
   /* Status colours for evidence and project badges. */
-  --color-status-done-bg: #dcfce7;
-  --color-status-done-text: #166534;
-  --color-status-progress-bg: #fef3c7;
-  --color-status-progress-text: #92400e;
-  --color-status-pending-bg: #e2ebe8;
-  --color-status-pending-text: #2c4441;
+  --color-status-done-bg: #0f3a28;
+  --color-status-done-text: #6ee7a8; /* 8.25:1 */
+  --color-status-progress-bg: #3a2a0c;
+  --color-status-progress-text: #fbbf5a; /* 8.38:1 */
+  --color-status-pending-bg: #1c2e2b;
+  --color-status-pending-text: #b7cbc7; /* 8.39:1 */
+
+  /* Shadows go darker and lean on a faint teal glow instead of grey. */
+  --glow-accent: rgb(46 196 176 / 0.35);
 
   /* Decorative gradients (never behind body text without a contrast check). */
-  --gradient-hero: radial-gradient(56rem 30rem at 92% -18%, rgb(176 196 222 / 0.5), transparent 62%),
-    radial-gradient(46rem 28rem at -12% 4%, rgb(1 121 111 / 0.12), transparent 60%),
-    linear-gradient(to bottom, var(--color-surface), var(--color-bg));
-  /* Projects band: soft tint that brightens toward the middle, so cards and screenshots stand out. */
-  --gradient-band: radial-gradient(70rem 30rem at 50% 0%, rgb(255 255 255 / 0.9), transparent 70%),
+  --gradient-hero: radial-gradient(56rem 30rem at 92% -18%, rgb(46 196 176 / 0.16), transparent 62%),
+    radial-gradient(46rem 28rem at -12% 4%, rgb(176 196 222 / 0.08), transparent 60%),
+    linear-gradient(to bottom, #0f1e1d, var(--color-bg));
+  /* Section bands: a faint lift toward the top centre. */
+  --gradient-band: radial-gradient(70rem 30rem at 50% 0%, rgb(46 196 176 / 0.06), transparent 70%),
     linear-gradient(to bottom, var(--color-band), var(--color-bg));
   --gradient-name: linear-gradient(120deg, var(--color-text) 35%, var(--color-accent) 100%);
   --gradient-rule: linear-gradient(90deg, var(--color-accent), var(--color-mist));
-  --gradient-ink: radial-gradient(40rem 20rem at 100% 0%, rgb(95 211 195 / 0.16), transparent 60%),
+  --gradient-ink: radial-gradient(40rem 20rem at 100% 0%, rgb(95 211 195 / 0.14), transparent 60%),
     linear-gradient(160deg, var(--color-ink-raised), var(--color-ink));
-
+  /* Solid teal fill for primary buttons and the highlighted tile (dark text on it). */
+  --gradient-accent: linear-gradient(180deg, #46d3c0, var(--color-accent));
   /*
    * Film grain: tiny SVG noise tiles layered over gradients for a tactile
    * finish. Inline data URIs are allowed by the CSP (img-src 'self' data:).
    */
-  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --texture-grain-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* Typography: Plus Jakarta Sans, self-hosted, with system fallbacks. */
@@ -121,9 +122,9 @@
   --radius-lg: 14px;
   --radius-xl: 22px;
   --radius-full: 999px;
-  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
-  --shadow-md: 0 6px 16px -4px rgb(15 23 42 / 0.1), 0 2px 4px rgb(15 23 42 / 0.04);
-  --shadow-lg: 0 18px 40px -12px rgb(11 46 44 / 0.22), 0 4px 10px rgb(15 23 42 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 20px -6px rgb(0 0 0 / 0.55), 0 2px 4px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 24px 50px -14px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(46 196 176 / 0.06);
 
   /* Motion: short and subtle. Turned off under reduced motion in global.css. */
   --motion-duration-fast: 120ms;

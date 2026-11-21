@@ -1,101 +1,292 @@
-.list {
+/* ---------- Layouts ---------- */
+
+.grid {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
-.item {
+.wall {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 48rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wall {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .wall {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Featured credential card ---------- */
+
+.card {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-3) var(--space-4);
-  padding: var(--space-5);
+  grid-template-rows: 1fr auto;
+  gap: var(--space-4) var(--space-5);
+  overflow: hidden;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 320ms var(--motion-ease-out), border-color 320ms var(--motion-ease-out),
+    box-shadow 320ms var(--motion-ease-out);
+}
+
+/* A thin gradient edge along the top, like the foil strip on a certificate. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--gradient-rule);
+  opacity: 0.8;
+}
+
+/* Faint oversized seal watermark in the corner. Decorative. */
+.card::after {
+  content: "";
+  position: absolute;
+  right: -3rem;
+  bottom: -3rem;
+  width: 10rem;
+  height: 10rem;
+  border: 1.5rem solid rgb(46 196 176 / 0.05);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+.badge {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--motion-duration-base) var(--motion-ease-out),
-    box-shadow var(--motion-duration-base) var(--motion-ease-out),
-    transform var(--motion-duration-base) var(--motion-ease-out);
+  background-color: var(--color-surface);
+  transition: transform 320ms var(--motion-ease-out), border-color 320ms var(--motion-ease-out),
+    box-shadow 320ms var(--motion-ease-out);
 }
 
 @media (hover: hover) {
-  .item:hover {
-    transform: translateY(-2px);
-    border-color: var(--color-accent-soft);
-    box-shadow: var(--shadow-md);
+  .card:hover,
+  .badge:hover {
+    transform: translateY(-4px);
+    border-color: rgb(46 196 176 / 0.35);
+    box-shadow: var(--shadow-lg);
   }
 
-  /* The issuer chip fills with the accent on hover. */
-  .item:hover .chip {
-    background: var(--color-accent);
-    color: var(--color-on-accent);
+  .card:hover .seal,
+  .badge:hover .seal {
+    transform: rotate(-8deg) scale(1.05);
   }
 }
 
-.chip {
+/* ---------- Seal ---------- */
+
+.seal {
+  position: relative;
   display: grid;
+  grid-row: 1 / -1;
   place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  /* Ring: teal into mist. */
+  background: conic-gradient(from 200deg, var(--color-accent), var(--color-mist), var(--color-accent));
+  box-shadow: 0 8px 20px -8px var(--glow-accent);
+  transition: transform 400ms var(--motion-ease-out);
+}
+
+.badge .seal {
+  grid-row: auto;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: var(--radius-md);
-  background: linear-gradient(140deg, var(--color-accent-soft), var(--color-band));
+  padding: 2px;
+}
+
+.sealInner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
   color: var(--color-accent-hover);
   font-size: var(--text-sm);
   font-weight: var(--weight-extrabold);
-  transition: background-color var(--motion-duration-base) var(--motion-ease-out),
-    color var(--motion-duration-base) var(--motion-ease-out);
+  letter-spacing: 0.02em;
+}
+
+.badge .sealInner {
+  font-size: var(--text-xs);
+}
+
+/* Small "verified" tick on the seal's edge. */
+.sealTick {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.sealTick svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  stroke-width: 3;
+}
+
+.badge .sealTick {
+  width: 1rem;
+  height: 1rem;
+}
+
+.badge .sealTick svg {
+  width: 0.6rem;
+  height: 0.6rem;
+}
+
+/* ---------- Text ---------- */
+
+.text {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.kind {
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .name {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-extrabold);
+  line-height: 1.3;
+}
+
+.badge .name {
+  font-size: var(--text-sm);
   font-weight: var(--weight-bold);
 }
 
 .issuer {
-  margin-top: var(--space-1);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
 }
 
-.skills {
-  margin-top: var(--space-2);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
+.badge .issuer {
+  font-size: var(--text-xs);
 }
 
-/* Meta sits under the text on narrow screens, aligned with it. */
-.meta {
-  grid-column: 2;
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.skills li {
+  padding: 0.125rem var(--space-2);
+  border: 1px solid var(--color-tag-border);
+  border-radius: var(--radius-full);
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+/* ---------- Footer: dates and verify ---------- */
+
+.footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  grid-column: 2;
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-strong);
+}
+
+.badge .footer {
+  grid-column: 1 / -1;
+  padding-top: var(--space-3);
+}
+
+.dates {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-1) var(--space-4);
   color: var(--color-text-muted);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
 }
 
-.meta code {
-  font-family: var(--font-mono);
+.dates code {
   color: var(--color-text);
+  font-family: var(--font-mono);
 }
 
-.verify {
+/* Verify: a small outlined pill with a shield. */
+.verify,
+.verifyCompact {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-full);
+  color: var(--color-text);
+  font-size: var(--text-sm);
   font-weight: var(--weight-bold);
+  text-decoration: none;
+  transition: background-color var(--motion-duration-base) var(--motion-ease-out),
+    border-color var(--motion-duration-base) var(--motion-ease-out),
+    color var(--motion-duration-base) var(--motion-ease-out);
 }
 
-@media (min-width: 48rem) {
-  .list[data-layout="list"] .item {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-  }
+.verifyCompact {
+  min-height: 32px;
+  font-size: var(--text-xs);
+}
 
-  .list[data-layout="list"] .meta {
-    grid-column: 3;
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-  }
+.verify svg,
+.verifyCompact svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-accent);
+}
 
-  .list[data-layout="grid"] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.verify:hover,
+.verifyCompact:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
 }

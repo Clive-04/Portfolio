@@ -111,8 +111,8 @@
   display: grid;
   place-items: center;
   height: 100%;
-  background: radial-gradient(28rem 14rem at 85% 0%, rgb(176 196 222 / 0.7), transparent 65%),
-    radial-gradient(20rem 12rem at 0% 100%, rgb(1 121 111 / 0.22), transparent 60%), var(--color-band);
+  background: radial-gradient(28rem 14rem at 85% 0%, rgb(46 196 176 / 0.2), transparent 65%),
+    radial-gradient(20rem 12rem at 0% 100%, rgb(176 196 222 / 0.1), transparent 60%), var(--color-band);
 }
 
 .placeholder span {

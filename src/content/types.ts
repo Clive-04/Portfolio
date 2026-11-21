@@ -57,6 +57,8 @@ export type CredentialKind = 'certification' | 'course-badge'
 export interface Certification {
   name: string
   issuer: string
+  /** Short mark shown in the issuer seal, e.g. "PMI". */
+  issuerMark: string
   kind: CredentialKind
   /** ISO date, e.g. `2026-05-01`. Omit if the issuer does not show one. */
   issued?: string

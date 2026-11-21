@@ -181,19 +181,37 @@ export default function App() {
           title="Certifications"
           intro="Each entry links to its public verification page, so anyone can confirm it."
         >
-          <div className={styles.certHeader}>
-            <h3 className={styles.subheading}>Certifications</h3>
+          {/* Summary strip: the counts at a glance, plus the full Credly profile. */}
+          <div className={styles.certSummary} data-reveal>
+            <dl className={styles.certStats}>
+              <div>
+                <dt>Certifications</dt>
+                <dd>{examCertifications.length}</dd>
+              </div>
+              <div>
+                <dt>Course badges</dt>
+                <dd>{courseBadges.length}</dd>
+              </div>
+              <div>
+                <dt>Verifiable online</dt>
+                <dd>{published.filter((item) => item.verificationUrl).length}</dd>
+              </div>
+            </dl>
             <ButtonLink href={credlyProfile} variant="secondary" size="sm" external>
               View all on Credly
             </ButtonLink>
           </div>
+
+          <h3 className={`${styles.subheading} ${styles.spaced}`}>Exam-based certifications</h3>
           <CertificationList items={examCertifications} />
-          <h3 className={`${styles.subheading} ${styles.spaced}`}>Course badges</h3>
-          <p className={styles.note}>
-            Verified Cisco Networking Academy badges for completing each course. These are course completions, not
-            Cisco exam certifications.
-          </p>
-          <CertificationList items={courseBadges} layout="grid" />
+
+          <div className={`${styles.certGroupHead} ${styles.spaced}`}>
+            <h3 className={styles.subheading}>Cisco Networking Academy course badges</h3>
+            <p className={styles.note}>
+              Verified badges for completing each course. These are course completions, not Cisco exam certifications.
+            </p>
+          </div>
+          <CertificationList items={courseBadges} variant="compact" />
         </Section>
 
         <Section

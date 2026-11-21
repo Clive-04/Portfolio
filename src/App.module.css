@@ -17,7 +17,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: radial-gradient(rgb(1 121 111 / 0.16) 1px, transparent 1px);
+  background-image: radial-gradient(rgb(46 196 176 / 0.14) 1px, transparent 1px);
   background-size: 22px 22px;
   mask-image: linear-gradient(to bottom, black, transparent 85%);
 }
@@ -44,7 +44,7 @@
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--color-tag-border);
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 0.7);
+  background: rgb(17 33 31 / 0.7);
   color: var(--color-text);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
@@ -104,9 +104,9 @@
 
 .heroCard {
   padding: var(--space-6);
-  border: 1px solid rgb(255 255 255 / 0.8);
+  border: 1px solid rgb(46 196 176 / 0.16);
   border-radius: var(--radius-xl);
-  background: rgb(255 255 255 / 0.72);
+  background: rgb(17 33 31 / 0.72);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-lg);
 }
@@ -132,7 +132,7 @@
   padding: 3px;
   border-radius: var(--radius-xl);
   background: linear-gradient(140deg, var(--color-accent), var(--color-mist));
-  box-shadow: 0 10px 24px -12px rgb(1 121 111 / 0.7);
+  box-shadow: 0 10px 24px -12px var(--glow-accent);
 }
 
 .photo {
@@ -221,7 +221,7 @@
 
   .heroCard:hover {
     transform: translateY(-4px) rotate(-0.4deg);
-    box-shadow: 0 28px 60px -20px rgb(11 46 44 / 0.35), 0 4px 10px rgb(15 23 42 / 0.05);
+    box-shadow: 0 28px 60px -20px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(46 196 176 / 0.14);
   }
 }
 
@@ -328,16 +328,68 @@
 
 /* ---------- Certifications ---------- */
 
-.certHeader {
+.certSummary {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--texture-grain), linear-gradient(120deg, var(--color-surface), var(--color-surface-muted));
 }
 
-.certHeader + * {
-  margin-top: var(--space-4);
+.certStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-10);
+}
+
+.certStats div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-1);
+}
+
+.certStats dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.certStats dd {
+  margin: 0;
+  background: var(--gradient-name);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-display);
+  line-height: 1;
+}
+
+@media (forced-colors: active) {
+  .certStats dd {
+    background: none;
+    color: CanvasText;
+  }
+}
+
+.certGroupHead {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.certGroupHead .note {
+  margin: 0;
+}
+
+.certGroupHead + * {
+  margin-top: var(--space-5);
 }
 
 /* ---------- Contact ---------- */

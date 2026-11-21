@@ -176,7 +176,7 @@ ul[role="list"] {
   [data-spotlight]:hover {
     background-image: radial-gradient(
       22rem circle at var(--mx, 50%) var(--my, 50%),
-      rgb(1 121 111 / 0.09),
+      rgb(46 196 176 / 0.1),
       transparent 60%
     );
   }
