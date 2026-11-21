@@ -9,8 +9,14 @@
   border-radius: var(--radius-md);
   font-weight: var(--weight-semibold);
   text-decoration: none;
-  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out), border-color var(--motion-duration-fast) var(--motion-ease-out),
+    color var(--motion-duration-fast) var(--motion-ease-out), transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+/* Immediate press feedback; no transition delay on the way down. */
+.button:active {
+  transform: scale(var(--motion-press-scale));
+  transition-duration: 0s;
 }
 
 .primary {
@@ -25,7 +31,7 @@
 
 .secondary {
   background: var(--color-surface);
-  border-color: var(--color-border-strong);
+  border-color: var(--color-border-control);
   color: var(--color-text);
 }
 

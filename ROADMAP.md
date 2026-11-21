@@ -38,7 +38,7 @@ Sections without content stay visible and are marked as pending instead of being
 
 - [x] Phase 0: target roles, headline, and stack decided.
 - [x] Phase 1: evidence gathered for all four projects.
-- [ ] Phase 2: wireframes. Visual tokens were set during Phase 3 (`src/styles/tokens.css`); review them before Phase 4.
+- [ ] Phase 2: wireframes drafted in [docs/wireframes.md](docs/wireframes.md) (projects use expandable case-study cards); tokens checked for contrast and against the motion and token design notes. Awaiting approval.
 - [x] Phase 3: Vite, React, and TypeScript scaffold; layout; navigation; design tokens; base components; typed content model; CI workflow; `vercel.json` security headers.
 - [ ] Phase 4: Home, About, Projects, Skills, Résumé, Certifications, and Contact sections, plus metadata.
 - [ ] Phase 5: keyboard, responsive, reduced-motion, contrast, link, and build/lint checks.

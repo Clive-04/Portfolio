@@ -10,6 +10,8 @@
   --color-surface-muted: #f1f5f9;
   --color-border: #e2e8f0;
   --color-border-strong: #cbd5e1;
+  /* Outlines of interactive controls: at least 3:1 against bg and surface (WCAG 1.4.11). */
+  --color-border-control: #7c8aa0;
   --color-text: #0f172a;
   --color-text-muted: #475569;
   --color-accent: #0f766e;
@@ -67,9 +69,14 @@
   --shadow-md: 0 4px 12px rgb(15 23 42 / 0.08);
 
   /* Motion: short and subtle. Turned off under reduced motion in global.css. */
-  --duration-fast: 120ms;
-  --duration-base: 200ms;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-duration-fast: 120ms;
+  --motion-duration-base: 200ms;
+  --motion-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Press feedback: a small, immediate scale-down on :active. */
+  --motion-press-scale: 0.97;
+
+  /* Large display text reads better with slightly tighter tracking. */
+  --tracking-display: -0.02em;
 
   /* Layout. */
   --content-max: 72rem;

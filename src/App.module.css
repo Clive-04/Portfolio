@@ -23,6 +23,7 @@
   margin-top: var(--space-3);
   font-size: var(--text-3xl);
   font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-display);
 }
 
 .headline {

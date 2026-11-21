@@ -56,13 +56,19 @@
   gap: var(--space-2);
   min-height: 44px;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-control);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
   font-weight: var(--weight-medium);
   cursor: pointer;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.toggle:active {
+  transform: scale(var(--motion-press-scale));
+  transition-duration: 0s;
 }
 
 /* Three-line icon drawn with borders, so no icon asset is needed. */
@@ -73,8 +79,13 @@
   background: linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat;
 }
 
+/*
+ * Mobile menu: slides down from the header it belongs to. `visibility`
+ * keeps closed links out of the tab order and screen readers; its delay
+ * on close lets the fade finish before the menu is hidden.
+ */
 .list {
-  display: none;
+  display: flex;
   position: absolute;
   top: 100%;
   left: 0;
@@ -84,10 +95,18 @@
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-md);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--space-2)));
+  transition: opacity var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-base) var(--motion-ease-out), visibility 0s linear var(--motion-duration-base);
 }
 
 .list[data-open="true"] {
-  display: flex;
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
 }
 
 .link {
@@ -97,7 +116,7 @@
   color: var(--color-text);
   font-weight: var(--weight-medium);
   text-decoration: none;
-  transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  transition: color var(--motion-duration-fast) var(--motion-ease-out), background-color var(--motion-duration-fast) var(--motion-ease-out);
 }
 
 .link:hover {
@@ -112,7 +131,6 @@
 
   .list,
   .list[data-open="true"] {
-    display: flex;
     position: static;
     flex-direction: row;
     gap: var(--space-1);
@@ -120,6 +138,10 @@
     background: none;
     border: 0;
     box-shadow: none;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 
   .link {
