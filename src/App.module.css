@@ -2,6 +2,8 @@
   outline: none;
 }
 
+/* Hero */
+
 .hero {
   padding-block: var(--space-16) var(--space-20);
 }
@@ -37,6 +39,8 @@
   color: var(--color-text-muted);
 }
 
+/* Shared */
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -44,13 +48,78 @@
   margin-top: var(--space-8);
 }
 
-.actions:empty {
-  display: none;
-}
-
 .actions + * {
   margin-top: var(--space-6);
 }
+
+.subheading {
+  font-size: var(--text-lg);
+}
+
+.spaced {
+  margin-top: var(--space-12);
+}
+
+.subheading + * {
+  margin-top: var(--space-3);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.note {
+  max-width: 44rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.note + * {
+  margin-top: var(--space-4);
+}
+
+/* About */
+
+.about {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.aboutText {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 42rem;
+  font-size: var(--text-lg);
+}
+
+.facts {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.facts dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.facts dd {
+  margin: var(--space-1) 0 0;
+  font-weight: var(--weight-medium);
+}
+
+@media (min-width: 56rem) {
+  .about {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+/* Projects */
 
 .projectGrid {
   display: grid;
@@ -63,21 +132,23 @@
   }
 }
 
-.projectHeader {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+/* Résumé */
+
+.resume {
+  display: grid;
+  gap: var(--space-6);
 }
 
-.projectTitle {
-  font-size: var(--text-xl);
+.resumeStrong {
+  font-weight: var(--weight-semibold);
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: auto;
+@media (min-width: 48rem) {
+  .resume {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.resume + * {
+  margin-top: var(--space-8);
 }

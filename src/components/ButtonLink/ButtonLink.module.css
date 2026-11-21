@@ -19,6 +19,12 @@
   transition-duration: 0s;
 }
 
+.sm {
+  min-height: 40px;
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--text-sm);
+}
+
 .primary {
   background: var(--color-accent);
   color: var(--color-on-accent);

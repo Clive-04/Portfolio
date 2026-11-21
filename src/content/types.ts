@@ -25,12 +25,16 @@ export interface ProjectLinks {
 export interface Screenshot {
   src: string
   alt: string
+  width: number
+  height: number
 }
 
 export interface Project {
   slug: string
   title: string
   summary: string
+  /** A few words shown on the collapsed card, e.g. "Solo project". */
+  teamLabel: string
   problem: string
   role: string
   collaboration: string
@@ -44,11 +48,18 @@ export interface Project {
   limitations: string[]
 }
 
+/**
+ * `certification`: an exam-based credential.
+ * `course-badge`: a verified badge for completing a course, not an exam certification.
+ */
+export type CredentialKind = 'certification' | 'course-badge'
+
 export interface Certification {
   name: string
   issuer: string
-  /** ISO date, e.g. `2026-05-01`. */
-  issued: string
+  kind: CredentialKind
+  /** ISO date, e.g. `2026-05-01`. Omit if the issuer does not show one. */
+  issued?: string
   expires?: string
   credentialId?: string
   verificationUrl?: string
@@ -59,6 +70,13 @@ export interface Certification {
   published: boolean
 }
 
+export interface SkillGroup {
+  title: string
+  items: string[]
+  /** Project slugs that demonstrate this group. Names are looked up from projects.ts. */
+  projects: string[]
+}
+
 export interface ProfileLink {
   label: string
   /** Leave undefined until the link is ready to publish. */
@@ -67,13 +85,19 @@ export interface ProfileLink {
 
 export interface Profile {
   name: string
+  shortName: string
   headline: string
   supportingLine: string
   targetRoles: string[]
+  about: string[]
+  facts: { label: string; value: string }[]
+  education: { school: string; program: string; years: string }
+  affiliations: string[]
+  /** Split so the full address never appears as one string in the page source. */
+  email?: { user: string; domain: string }
   links: {
     github: ProfileLink
     linkedin: ProfileLink
-    email: ProfileLink
     resume: ProfileLink
   }
 }

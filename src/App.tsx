@@ -1,20 +1,25 @@
-import { Badge, type BadgeTone } from './components/Badge/Badge'
 import { ButtonLink } from './components/ButtonLink/ButtonLink'
-import { Card } from './components/Card/Card'
+import { CertificationList } from './components/CertificationList/CertificationList'
 import { Pending } from './components/Pending/Pending'
+import { ProjectCard } from './components/ProjectCard/ProjectCard'
 import { Section } from './components/Section/Section'
 import { SiteFooter } from './components/SiteFooter/SiteFooter'
 import { SiteHeader } from './components/SiteHeader/SiteHeader'
+import { SkillsGrid } from './components/SkillsGrid/SkillsGrid'
+import { certifications } from './content/certifications'
 import { profile } from './content/profile'
 import { projects } from './content/projects'
-import type { ProjectStatus } from './content/types'
+import { skillGroups } from './content/skills'
 import styles from './App.module.css'
 
-const statusBadge: Record<ProjectStatus, { label: string; tone: BadgeTone }> = {
-  completed: { label: 'Completed', tone: 'done' },
-  'in-progress': { label: 'In progress', tone: 'progress' },
-  planned: { label: 'Planned', tone: 'pending' },
-}
+const published = certifications.filter((item) => item.published)
+const examCertifications = published.filter((item) => item.kind === 'certification')
+const courseBadges = published.filter((item) => item.kind === 'course-badge')
+
+// Assembled at render time so the full address is never a single string in the page source.
+const email = profile.email ? `${profile.email.user}@${profile.email.domain}` : undefined
+
+const { github, linkedin, resume } = profile.links
 
 export default function App() {
   return (
@@ -26,68 +31,122 @@ export default function App() {
           <div className={styles.heroInner}>
             <p className={styles.eyebrow}>{profile.targetRoles.join(' · ')}</p>
             <h1 id="hero-heading" className={styles.heroTitle}>
-              Hi, I’m {profile.name}.
+              {profile.name}
             </h1>
             <p className={styles.headline}>{profile.headline}</p>
             <p className={styles.supporting}>{profile.supportingLine}</p>
             <div className={styles.actions}>
               <ButtonLink href="#projects">View projects</ButtonLink>
-              <ButtonLink href="#contact" variant="secondary">
-                Contact
-              </ButtonLink>
+              {resume.href ? (
+                <ButtonLink href={resume.href} variant="secondary" download>
+                  {resume.label}
+                </ButtonLink>
+              ) : (
+                <ButtonLink href="#contact" variant="secondary">
+                  Contact me
+                </ButtonLink>
+              )}
             </div>
           </div>
         </section>
 
         <Section id="about" title="About">
-          <Pending>The introduction, focus, and way of working are written in Phase 4.</Pending>
+          <div className={styles.about}>
+            <div className={styles.aboutText}>
+              {profile.about.map((paragraph) => (
+                <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+              ))}
+            </div>
+            <dl className={styles.facts}>
+              {profile.facts.map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </Section>
 
-        <Section id="projects" title="Projects" intro="Each project states what I built and who I built it with.">
+        <Section
+          id="projects"
+          title="Projects"
+          intro="Each project states what I built, who I built it with, and how it was tested. Open a case study for the details."
+        >
           <ul role="list" className={styles.projectGrid}>
-            {projects.map((project) => {
-              const status = statusBadge[project.status]
-              return (
-                <Card as="li" key={project.slug}>
-                  <div className={styles.projectHeader}>
-                    <h3 className={styles.projectTitle}>{project.title}</h3>
-                    <Badge tone={status.tone}>{status.label}</Badge>
-                  </div>
-                  <p>{project.summary}</p>
-                  <ul role="list" className={styles.tags} aria-label={`${project.title} technologies`}>
-                    {project.stack.map((tech) => (
-                      <li key={tech.name}>
-                        <Badge>{tech.name}</Badge>
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              )
-            })}
+            {projects.map((project) => (
+              <ProjectCard key={project.slug} project={project} />
+            ))}
           </ul>
         </Section>
 
-        <Section id="skills" title="Skills">
-          <Pending>Skills grouped by practical capability are added in Phase 4.</Pending>
+        <Section
+          id="skills"
+          title="Skills"
+          intro="Grouped by what I can do, with the projects that show it. No self-rated skill bars."
+        >
+          <SkillsGrid groups={skillGroups} />
         </Section>
 
         <Section id="resume" title="Résumé">
-          <Pending>The downloadable résumé will appear here once the file is ready.</Pending>
+          <div className={styles.resume}>
+            <div>
+              <h3 className={styles.subheading}>Education</h3>
+              <p className={styles.resumeStrong}>{profile.education.school}</p>
+              <p>{profile.education.program}</p>
+              <p className={styles.muted}>{profile.education.years}</p>
+            </div>
+            <div>
+              <h3 className={styles.subheading}>Affiliations</h3>
+              {profile.affiliations.map((item) => (
+                <p key={item}>{item}</p>
+              ))}
+            </div>
+            <div>
+              <h3 className={styles.subheading}>Credentials</h3>
+              <p>
+                {examCertifications.length} certifications and {courseBadges.length} Cisco Networking Academy course
+                badges. <a href="#certifications">See the list</a>.
+              </p>
+            </div>
+          </div>
+          {resume.href ? (
+            <div className={styles.actions}>
+              <ButtonLink href={resume.href} download>
+                {resume.label}
+              </ButtonLink>
+            </div>
+          ) : (
+            <Pending>A downloadable PDF will be added once a public version without personal contact details is ready.</Pending>
+          )}
         </Section>
 
         <Section id="certifications" title="Certifications">
-          <Pending>Certifications are listed only after their details are verified.</Pending>
+          <h3 className={styles.subheading}>Certifications</h3>
+          <CertificationList items={examCertifications} />
+          <h3 className={`${styles.subheading} ${styles.spaced}`}>Course badges</h3>
+          <p className={styles.note}>
+            Verified Cisco Networking Academy badges for completing each course. These are course completions, not
+            Cisco exam certifications.
+          </p>
+          <CertificationList items={courseBadges} />
         </Section>
 
-        <Section id="contact" title="Contact">
+        <Section id="contact" title="Contact" intro="Open to internship opportunities. Email is the fastest way to reach me.">
           <div className={styles.actions}>
-            {profile.links.github.href && (
-              <ButtonLink href={profile.links.github.href} variant="secondary" external>
-                {profile.links.github.label}
+            {email && <ButtonLink href={`mailto:${email}`}>Email me</ButtonLink>}
+            {linkedin.href && (
+              <ButtonLink href={linkedin.href} variant="secondary" external>
+                {linkedin.label}
+              </ButtonLink>
+            )}
+            {github.href && (
+              <ButtonLink href={github.href} variant="secondary" external>
+                {github.label}
               </ButtonLink>
             )}
           </div>
-          <Pending>Email and LinkedIn will be added once they are confirmed for publishing.</Pending>
+          {email && <p className={styles.muted}>{email}</p>}
         </Section>
       </main>
 

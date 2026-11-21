@@ -21,11 +21,13 @@ The Projects page shows all four. The Home page highlights CareerTrack and Pasa-
 
 ## Content still pending
 
-- [ ] Résumé file (PDF, metadata checked).
-- [ ] Certifications (name, issuer, dates, verification link).
-- [ ] LinkedIn URL.
-- [ ] Public contact email.
-- [ ] Approved project screenshots with no private data.
+- [ ] Public résumé PDF without phone number or home address (metadata checked).
+- [x] Certifications: name, issuer, and dates added. Cisco Networking Academy entries are labelled as course badges.
+- [ ] Public verification links for certifications (for example, a Credly profile).
+- [x] LinkedIn URL.
+- [x] Public contact email.
+- [x] Project screenshots for CareerTrack, Pedalya, and SmartFeather. Pasa-Buy has none (not deployed).
+- [ ] Social-sharing image, added once the production URL exists.
 
 Sections without content stay visible and are marked as pending instead of being filled with placeholder claims.
 
@@ -40,7 +42,7 @@ Sections without content stay visible and are marked as pending instead of being
 - [x] Phase 1: evidence gathered for all four projects.
 - [x] Phase 2: wireframes in [docs/wireframes.md](docs/wireframes.md) approved on 2026-11-22 (projects use expandable case-study cards). Colour palette: Figma "Mountain mist", checked for contrast and against the motion and token design notes.
 - [x] Phase 3: Vite, React, and TypeScript scaffold; layout; navigation; design tokens; base components; typed content model; CI workflow; `vercel.json` security headers.
-- [ ] Phase 4: Home, About, Projects, Skills, Résumé, Certifications, and Contact sections, plus metadata.
+- [x] Phase 4: Home, About, Projects (expandable case studies), Skills, Résumé, Certifications, and Contact sections, plus page metadata. The résumé download and social image stay pending until their files exist.
 - [ ] Phase 5: keyboard, responsive, reduced-motion, contrast, link, and build/lint checks.
 - [ ] Phase 6: deploy to Vercel with security headers in `vercel.json`; verify the public URL.
 
