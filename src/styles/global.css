@@ -87,6 +87,40 @@ ul[role="list"] {
   border: 0;
 }
 
+/* Plain text links: the underline settles in a little lower on hover. */
+a:not([class]) {
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: text-decoration-color var(--motion-duration-base) var(--motion-ease-out),
+    text-underline-offset var(--motion-duration-base) var(--motion-ease-out);
+}
+
+a:not([class]):hover {
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.3em;
+}
+
+/*
+ * Scroll reveal (see src/lib/useReveal.ts). Uses the independent `translate`
+ * property and an animation without forward fill, so it never overrides a
+ * component's own hover `transform` once it has played.
+ */
+.motion-ready [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+}
+
+.motion-ready [data-reveal][data-revealed] {
+  animation: reveal 640ms var(--motion-ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

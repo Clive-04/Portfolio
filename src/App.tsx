@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { ButtonLink } from './components/ButtonLink/ButtonLink'
 import { CertificationList } from './components/CertificationList/CertificationList'
 import { Pending } from './components/Pending/Pending'
@@ -10,6 +11,7 @@ import { certifications, credlyProfile } from './content/certifications'
 import { profile } from './content/profile'
 import { projects } from './content/projects'
 import { skillGroups } from './content/skills'
+import { useReveal } from './lib/useReveal'
 import styles from './App.module.css'
 
 const published = certifications.filter((item) => item.published)
@@ -17,10 +19,11 @@ const examCertifications = published.filter((item) => item.kind === 'certificati
 const courseBadges = published.filter((item) => item.kind === 'course-badge')
 
 // Counts shown in the hero card come from the content files, so they stay accurate.
+const liveCount = projects.filter((project) => project.links.live).length
 const stats = [
-  { value: projects.length, label: 'Projects' },
-  { value: published.length, label: 'Credentials' },
-  { value: projects.filter((project) => project.links.live).length, label: 'Live app' },
+  { value: projects.length, label: projects.length === 1 ? 'Project' : 'Projects' },
+  { value: published.length, label: published.length === 1 ? 'Credential' : 'Credentials' },
+  { value: liveCount, label: liveCount === 1 ? 'Live app' : 'Live apps' },
 ]
 
 // Assembled at render time so the full address is never a single string in the page source.
@@ -29,6 +32,8 @@ const email = profile.email ? `${profile.email.user}@${profile.email.domain}` : 
 const { github, linkedin, resume } = profile.links
 
 export default function App() {
+  useReveal()
+
   return (
     <>
       <SiteHeader name={profile.name} />
@@ -61,12 +66,28 @@ export default function App() {
             </div>
 
             <aside className={styles.heroCard} aria-label="At a glance">
-              <p className={styles.heroCardLabel}>At a glance</p>
-              <p className={styles.heroCardSchool}>
+              <div className={styles.profile}>
+                {profile.photo && (
+                  <span className={styles.photoFrame}>
+                    <img
+                      className={styles.photo}
+                      src={profile.photo.src}
+                      alt={profile.photo.alt}
+                      width={profile.photo.width}
+                      height={profile.photo.height}
+                      fetchPriority="high"
+                    />
+                  </span>
+                )}
+                <div>
+                  <p className={styles.heroCardLabel}>At a glance</p>
+                  <p className={styles.profileName}>{profile.name}</p>
+                  <p className={styles.profileSchool}>{profile.education.school}</p>
+                </div>
+              </div>
+              <p className={styles.heroCardProgram}>
                 {profile.education.program}
-                <span>
-                  {profile.education.school} · {profile.education.years}
-                </span>
+                <span>{profile.education.years}</span>
               </p>
               <dl className={styles.stats}>
                 {stats.map((stat) => (
@@ -83,12 +104,12 @@ export default function App() {
 
         <Section id="about" index="01" title="About">
           <div className={styles.about}>
-            <div className={styles.aboutText}>
+            <div className={styles.aboutText} data-reveal>
               {profile.about.map((paragraph) => (
                 <p key={paragraph.slice(0, 24)}>{paragraph}</p>
               ))}
             </div>
-            <dl className={styles.facts}>
+            <dl className={styles.facts} data-reveal style={{ '--reveal-delay': '120ms' } as CSSProperties}>
               {profile.facts.map((fact) => (
                 <div key={fact.label}>
                   <dt>{fact.label}</dt>
@@ -107,8 +128,8 @@ export default function App() {
           intro="Each project states what I built, who I built it with, and how it was tested. Open a case study for the details."
         >
           <ul role="list" className={styles.projectGrid}>
-            {projects.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
+            {projects.map((project, index) => (
+              <ProjectCard key={project.slug} project={project} index={index} />
             ))}
           </ul>
         </Section>
@@ -124,19 +145,19 @@ export default function App() {
 
         <Section id="resume" index="04" tone="band" title="Résumé">
           <div className={styles.resume}>
-            <div className={styles.resumeBlock}>
+            <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '0ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Education</h3>
               <p className={styles.resumeStrong}>{profile.education.school}</p>
               <p>{profile.education.program}</p>
               <p className={styles.muted}>{profile.education.years}</p>
             </div>
-            <div className={styles.resumeBlock}>
+            <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '100ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Affiliations</h3>
               {profile.affiliations.map((item) => (
                 <p key={item}>{item}</p>
               ))}
             </div>
-            <div className={styles.resumeBlock}>
+            <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '200ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Credentials</h3>
               <p>
                 {examCertifications.length} certifications and {courseBadges.length} Cisco Networking Academy course

@@ -13,12 +13,22 @@
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
   transition: border-color var(--motion-duration-base) var(--motion-ease-out),
-    box-shadow var(--motion-duration-base) var(--motion-ease-out);
+    box-shadow var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-base) var(--motion-ease-out);
 }
 
-.item:hover {
-  border-color: var(--color-accent-soft);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .item:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent-soft);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* The issuer chip fills with the accent on hover. */
+  .item:hover .chip {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
 }
 
 .chip {
@@ -31,6 +41,8 @@
   color: var(--color-accent-hover);
   font-size: var(--text-sm);
   font-weight: var(--weight-extrabold);
+  transition: background-color var(--motion-duration-base) var(--motion-ease-out),
+    color var(--motion-duration-base) var(--motion-ease-out);
 }
 
 .name {

@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useState, type CSSProperties } from 'react'
 import type { Project, ProjectStatus } from '../../content/types'
 import { Badge, type BadgeTone } from '../Badge/Badge'
 import { ButtonLink } from '../ButtonLink/ButtonLink'
@@ -15,9 +15,11 @@ const VISIBLE_TAGS = 4
 
 interface ProjectCardProps {
   project: Project
+  /** Position in the grid, used to stagger the scroll reveal. */
+  index?: number
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const [open, setOpen] = useState(false)
   const detailsId = useId()
   const status = statusBadge[project.status]
@@ -27,8 +29,17 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const forProject = <span className="visually-hidden"> for {project.title}</span>
 
   return (
-    <li id={`project-${project.slug}`} className={styles.card} data-open={open}>
+    <li
+      id={`project-${project.slug}`}
+      className={styles.card}
+      data-open={open}
+      data-reveal
+      style={{ '--reveal-delay': `${(index % 2) * 100}ms` } as CSSProperties}
+    >
       <div className={styles.cover}>
+        <span className={styles.coverBadge}>
+          <Badge tone={status.tone}>{status.label}</Badge>
+        </span>
         {screenshot ? (
           <img
             src={screenshot.src}
@@ -47,11 +58,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       <div className={styles.body}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{project.title}</h3>
-          <Badge tone={status.tone}>{status.label}</Badge>
-        </div>
         <p className={styles.team}>{project.teamLabel}</p>
+        <h3 className={styles.title}>{project.title}</h3>
         <p className={styles.summary}>{project.summary}</p>
 
         <ul role="list" className={styles.tags} aria-label={`${project.title} main technologies`}>

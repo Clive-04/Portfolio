@@ -30,7 +30,9 @@ export function ButtonLink({
       {children}
       {external && (
         <>
-          <span aria-hidden="true">↗</span>
+          <span className={styles.icon} aria-hidden="true">
+            ↗
+          </span>
           <span className="visually-hidden"> (opens in a new tab)</span>
         </>
       )}

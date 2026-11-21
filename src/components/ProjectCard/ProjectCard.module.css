@@ -19,8 +19,21 @@
   }
 
   .card:hover .cover img {
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
+
+  .card:hover .cover::after {
+    opacity: 1;
+  }
+
+  .card:hover .title {
+    color: var(--color-accent);
+  }
+}
+
+/* Keyboard users get the same emphasis when focus is inside the card. */
+.card:focus-within {
+  border-color: var(--color-accent-soft);
 }
 
 /* An open case study takes the full row so the details have room. */
@@ -51,7 +64,28 @@
   height: 100%;
   object-fit: cover;
   object-position: top left;
-  transition: transform 400ms var(--motion-ease-out);
+  transition: transform 500ms var(--motion-ease-out);
+}
+
+/* Pine wash that rises from the bottom of the cover on hover. */
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(11 46 44 / 0.45), transparent 55%);
+  opacity: 0;
+  transition: opacity var(--motion-duration-base) var(--motion-ease-out);
+  pointer-events: none;
+}
+
+/* Status badge floats on the cover. */
+.coverBadge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 1;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
 }
 
 .placeholder {
@@ -78,17 +112,11 @@
   padding: var(--space-6);
 }
 
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .title {
-  font-size: var(--text-xl);
+  margin-top: calc(-1 * var(--space-2));
+  font-size: var(--text-2xl);
   font-weight: var(--weight-extrabold);
+  transition: color var(--motion-duration-base) var(--motion-ease-out);
 }
 
 .team {

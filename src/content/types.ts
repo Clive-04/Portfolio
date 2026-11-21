@@ -86,6 +86,7 @@ export interface ProfileLink {
 export interface Profile {
   name: string
   shortName: string
+  photo?: Screenshot
   headline: string
   supportingLine: string
   targetRoles: string[]

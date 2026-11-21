@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { Certification } from '../../content/types'
 import { formatMonthYear } from '../../lib/format'
 import styles from './CertificationList.module.css'
@@ -21,8 +22,13 @@ function monogram(issuer: string) {
 export function CertificationList({ items, layout = 'list' }: CertificationListProps) {
   return (
     <ul role="list" className={styles.list} data-layout={layout}>
-      {items.map((item) => (
-        <li key={item.name} className={styles.item}>
+      {items.map((item, index) => (
+        <li
+          key={item.name}
+          className={styles.item}
+          data-reveal
+          style={{ '--reveal-delay': `${(index % 4) * 60}ms` } as CSSProperties}
+        >
           <span className={styles.chip} aria-hidden="true">
             {monogram(item.issuer)}
           </span>

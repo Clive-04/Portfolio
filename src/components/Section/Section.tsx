@@ -18,7 +18,7 @@ export function Section({ id, title, index, intro, tone = 'plain', children }: S
   return (
     <section id={id} aria-labelledby={headingId} className={styles.section} data-tone={tone}>
       <div className={styles.inner}>
-        <header className={styles.header}>
+        <header className={styles.header} data-reveal>
           {index && (
             <p className={styles.index} aria-hidden="true">
               <span>{index}</span>

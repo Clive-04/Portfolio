@@ -2,9 +2,31 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgb(248 250 252 / 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--color-border);
+  background: rgb(248 250 252 / 0.72);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid transparent;
+  transition: background-color var(--motion-duration-base) var(--motion-ease-out),
+    border-color var(--motion-duration-base) var(--motion-ease-out),
+    box-shadow var(--motion-duration-base) var(--motion-ease-out);
+}
+
+/* After the page scrolls, the header firms up and casts a soft shadow. */
+.header[data-scrolled="true"] {
+  background: rgb(255 255 255 / 0.88);
+  border-bottom-color: var(--color-border);
+  box-shadow: 0 8px 24px -16px rgb(11 46 44 / 0.25);
+}
+
+/* Reading progress along the bottom edge of the header. */
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--gradient-rule);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
 }
 
 .skipLink {
@@ -37,18 +59,7 @@
   padding-inline: var(--gutter);
 }
 
-.mark {
-  display: inline-grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-md);
-  background: linear-gradient(140deg, var(--color-accent), var(--color-ink));
-  color: var(--color-on-accent);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-extrabold);
-  letter-spacing: 0.02em;
-}
+/* ---------- Brand ---------- */
 
 .brand {
   display: inline-flex;
@@ -57,15 +68,45 @@
   /* Pushes the menu button and the navigation to the right edge. */
   margin-right: auto;
   color: var(--color-text);
-  letter-spacing: var(--tracking-heading);
   font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-heading);
   text-decoration: none;
 }
 
 .brand:hover {
-  color: var(--color-accent);
+  color: var(--color-text);
 }
+
+.mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(140deg, var(--color-accent), var(--color-ink));
+  color: var(--color-on-accent);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 10px -4px rgb(1 121 111 / 0.6);
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.brand:hover .mark {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.brandName {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+  transition: background-size var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.brand:hover .brandName {
+  background-size: 100% 2px;
+}
+
+/* ---------- Mobile toggle ---------- */
 
 .toggle {
   display: inline-flex;
@@ -78,7 +119,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
   transition: transform var(--motion-duration-fast) var(--motion-ease-out);
 }
@@ -88,13 +129,50 @@
   transition-duration: 0s;
 }
 
-/* Three-line icon drawn with borders, so no icon asset is needed. */
+/* Three bars that morph into an X when the menu is open. */
 .toggleIcon {
+  position: relative;
+  display: inline-block;
   width: 1rem;
   height: 0.75rem;
-  border-block: 2px solid currentColor;
-  background: linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat;
 }
+
+.toggleIcon span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--motion-duration-base) var(--motion-ease-out),
+    opacity var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.toggleIcon span:nth-child(1) {
+  top: 0;
+}
+
+.toggleIcon span:nth-child(2) {
+  top: calc(50% - 1px);
+}
+
+.toggleIcon span:nth-child(3) {
+  bottom: 0;
+}
+
+.toggle[aria-expanded="true"] .toggleIcon span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.toggle[aria-expanded="true"] .toggleIcon span:nth-child(2) {
+  opacity: 0;
+}
+
+.toggle[aria-expanded="true"] .toggleIcon span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+/* ---------- Links ---------- */
 
 /*
  * Mobile menu: slides down from the header it belongs to. `visibility`
@@ -108,10 +186,11 @@
   left: 0;
   right: 0;
   flex-direction: column;
-  padding: var(--space-2) var(--gutter) var(--space-4);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--gutter) var(--space-5);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   visibility: hidden;
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-2)));
@@ -126,22 +205,84 @@
   transition-delay: 0s;
 }
 
+/* Links arrive one after another when the mobile menu opens. */
+.list li {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.list[data-open="true"] li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+
 .link {
+  position: relative;
   display: block;
-  padding: var(--space-3) var(--space-2);
-  border-radius: var(--radius-sm);
-  color: var(--color-text);
-  font-weight: var(--weight-medium);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-semibold);
   text-decoration: none;
-  transition: color var(--motion-duration-fast) var(--motion-ease-out), background-color var(--motion-duration-fast) var(--motion-ease-out);
+  transition: color var(--motion-duration-fast) var(--motion-ease-out),
+    background-color var(--motion-duration-fast) var(--motion-ease-out);
 }
 
 .link:hover {
-  color: var(--color-accent);
+  color: var(--color-text);
   background: var(--color-surface-muted);
 }
 
-@media (min-width: 48rem) {
+/* The section currently on screen. */
+.link[aria-current="location"] {
+  color: var(--color-accent-hover);
+  background: var(--color-accent-soft);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+  box-shadow: 0 6px 16px -6px rgb(1 121 111 / 0.7);
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.cta:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-on-accent);
+  box-shadow: 0 10px 22px -8px rgb(1 121 111 / 0.8);
+}
+
+.cta:active {
+  transform: scale(var(--motion-press-scale));
+  transition-duration: 0s;
+}
+
+.ctaArrow {
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(3px);
+}
+
+/* ---------- Desktop ---------- */
+
+@media (min-width: 56rem) {
   .toggle {
     display: none;
   }
@@ -150,6 +291,7 @@
   .list[data-open="true"] {
     position: static;
     flex-direction: row;
+    align-items: center;
     gap: var(--space-1);
     padding: 0;
     background: none;
@@ -161,7 +303,49 @@
     transition: none;
   }
 
+  .list li,
+  .list[data-open="true"] li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   .link {
     padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+  }
+
+  /* Underline that grows from the centre on hover. */
+  .link::after {
+    content: "";
+    position: absolute;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: 4px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transition: transform var(--motion-duration-base) var(--motion-ease-out);
+  }
+
+  .link:hover {
+    background: none;
+  }
+
+  .link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .link[aria-current="location"]::after {
+    transform: scaleX(0);
+  }
+
+  .cta {
+    width: auto;
+    margin: 0 0 0 var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
   }
 }

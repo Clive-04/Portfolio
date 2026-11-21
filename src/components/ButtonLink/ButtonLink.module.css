@@ -14,6 +14,26 @@
     box-shadow var(--motion-duration-base) var(--motion-ease-out);
 }
 
+/* Small lift on hover, using `translate` so it stacks with the press scale. */
+@media (hover: hover) {
+  .button:hover {
+    translate: 0 -1px;
+  }
+
+  .button:hover .icon {
+    transform: translate(2px, -2px);
+  }
+}
+
+.button {
+  transition-property: background-color, border-color, color, transform, box-shadow, translate;
+}
+
+.icon {
+  display: inline-block;
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
 /* Immediate press feedback; no transition delay on the way down. */
 .button:active {
   transform: scale(var(--motion-press-scale));

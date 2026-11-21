@@ -28,13 +28,60 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Thin gradient rule across the top of each card. */
+.group {
+  transition: transform var(--motion-duration-base) var(--motion-ease-out),
+    box-shadow var(--motion-duration-base) var(--motion-ease-out),
+    border-color var(--motion-duration-base) var(--motion-ease-out);
+}
+
+/* Thin gradient rule across the top of each card; thickens on hover. */
 .group::before {
   content: "";
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
   background: var(--gradient-rule);
+  transform-origin: top;
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
+@media (hover: hover) {
+  .group:hover {
+    transform: translateY(var(--motion-lift));
+    border-color: var(--color-accent-soft);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .group:hover::before {
+    transform: scaleY(1.67);
+  }
+
+  .group:hover .count {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.count {
+  display: grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  transition: background-color var(--motion-duration-base) var(--motion-ease-out),
+    color var(--motion-duration-base) var(--motion-ease-out);
 }
 
 .title {

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { projects } from '../../content/projects'
 import type { SkillGroup } from '../../content/types'
 import styles from './SkillsGrid.module.css'
@@ -11,9 +12,17 @@ interface SkillsGridProps {
 export function SkillsGrid({ groups }: SkillsGridProps) {
   return (
     <ul role="list" className={styles.grid}>
-      {groups.map((group) => (
-        <li key={group.title} className={styles.group}>
-          <h3 className={styles.title}>{group.title}</h3>
+      {groups.map((group, index) => (
+        <li
+          key={group.title}
+          className={styles.group}
+          data-reveal
+          style={{ '--reveal-delay': `${(index % 3) * 80}ms` } as CSSProperties}
+        >
+          <div className={styles.top}>
+            <h3 className={styles.title}>{group.title}</h3>
+            <span className={styles.count}>{String(index + 1).padStart(2, '0')}</span>
+          </div>
           <ul role="list" className={styles.items}>
             {group.items.map((item) => (
               <li key={item}>{item}</li>

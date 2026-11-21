@@ -149,6 +149,7 @@ export const projects: Project[] = [
     validation: [],
     links: {
       repository: 'https://github.com/Alcoreza/SmartFeather',
+      live: 'https://smartfeather.org/',
     },
     screenshots: [
       {
@@ -158,6 +159,6 @@ export const projects: Project[] = [
         height: 768,
       },
     ],
-    limitations: ['Not publicly deployed.'],
+    limitations: ['Sign-in is limited to the client’s staff, so public visitors only see the landing page.'],
   },
 ]

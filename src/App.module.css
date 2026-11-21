@@ -134,18 +134,110 @@
   text-transform: uppercase;
 }
 
-.heroCardSchool {
-  margin-top: var(--space-3);
+/* Photo, name, and school at the top of the hero card. */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Gradient ring around the photo. */
+.photoFrame {
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(140deg, var(--color-accent), var(--color-mist));
+  box-shadow: 0 10px 24px -12px rgb(1 121 111 / 0.7);
+}
+
+.photo {
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 3px solid var(--color-surface);
+  border-radius: calc(var(--radius-xl) - 3px);
+  object-fit: cover;
+  background: var(--color-surface);
+}
+
+.profileName {
+  margin-top: var(--space-1);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.25;
+}
+
+.profileSchool {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.heroCardProgram {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-strong);
   font-weight: var(--weight-bold);
   line-height: 1.4;
 }
 
-.heroCardSchool span {
+.heroCardProgram span {
   display: block;
   margin-top: var(--space-1);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
+}
+
+/*
+ * Hero entrance: text and card rise in one after another on first load.
+ * Only when the visitor has not asked for reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .heroText > *,
+  .heroCard {
+    animation: rise 700ms var(--motion-ease-out) backwards;
+  }
+
+  .heroText > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  .heroText > :nth-child(3) {
+    animation-delay: 160ms;
+  }
+
+  .heroText > :nth-child(4) {
+    animation-delay: 220ms;
+  }
+
+  .heroText > :nth-child(5) {
+    animation-delay: 280ms;
+  }
+
+  .heroCard {
+    animation-delay: 360ms;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+/* The hero card lifts and tilts very slightly on hover. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .heroCard {
+    transition: transform 400ms var(--motion-ease-out), box-shadow 400ms var(--motion-ease-out);
+  }
+
+  .heroCard:hover {
+    transform: translateY(-4px) rotate(-0.4deg);
+    box-shadow: 0 28px 60px -20px rgb(11 46 44 / 0.35), 0 4px 10px rgb(15 23 42 / 0.05);
+  }
 }
 
 .stats {
