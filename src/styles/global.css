@@ -52,6 +52,55 @@ html:has(dialog[open]) {
   animation-duration: 320ms;
 }
 
+/* Previous / Next between case studies: the old panel slides out, the new one slides in. */
+::view-transition-group(case-switch) {
+  animation-duration: 0s;
+}
+
+::view-transition-old(case-switch) {
+  animation: case-out 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-new(case-switch) {
+  animation: case-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html[data-case-direction="previous"]::view-transition-old(case-switch) {
+  animation-name: case-out-reverse;
+}
+
+html[data-case-direction="previous"]::view-transition-new(case-switch) {
+  animation-name: case-in-reverse;
+}
+
+@keyframes case-out {
+  to {
+    opacity: 0;
+    transform: translateX(-8%) scale(0.97);
+  }
+}
+
+@keyframes case-in {
+  from {
+    opacity: 0;
+    transform: translateX(8%) scale(0.97);
+  }
+}
+
+@keyframes case-out-reverse {
+  to {
+    opacity: 0;
+    transform: translateX(8%) scale(0.97);
+  }
+}
+
+@keyframes case-in-reverse {
+  from {
+    opacity: 0;
+    transform: translateX(-8%) scale(0.97);
+  }
+}
+
 body {
   min-height: 100vh;
   background: var(--color-bg);

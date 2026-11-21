@@ -3,32 +3,33 @@
  * focus containment, Escape handling, and an inert page behind it.
  */
 .dialog {
-  width: min(60rem, calc(100% - 2 * var(--gutter)));
+  width: min(72rem, calc(100% - 2 * var(--gutter)));
   max-width: none;
   max-height: calc(100dvh - 3rem);
   margin: auto;
   padding: 0;
   overflow: auto;
   overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   border: 0;
   border-radius: var(--radius-xl);
   background: var(--color-surface);
   color: var(--color-text);
-  box-shadow: 0 40px 100px -30px rgb(11 46 44 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.4);
+  box-shadow: 0 50px 120px -30px rgb(11 46 44 / 0.65), 0 0 0 1px rgb(255 255 255 / 0.5);
 }
 
 .dialog::backdrop {
-  background: rgb(11 46 44 / 0.55);
-  backdrop-filter: blur(6px);
+  background: radial-gradient(60rem 40rem at 50% 0%, rgb(1 121 111 / 0.25), transparent 70%), rgb(11 46 44 / 0.6);
+  backdrop-filter: blur(8px) saturate(1.2);
 }
 
 /* Fallback animation when View Transitions are unavailable. */
 .dialog[data-anim="in"] {
-  animation: dialog-in 360ms var(--motion-ease-out);
+  animation: dialog-in 380ms var(--motion-ease-out);
 }
 
 .dialog[data-anim="in"]::backdrop {
-  animation: backdrop-in 360ms var(--motion-ease-out);
+  animation: backdrop-in 380ms var(--motion-ease-out);
 }
 
 .dialog[data-anim="out"] {
@@ -59,26 +60,67 @@
   }
 }
 
-.panel {
-  background: var(--color-surface);
+/* ---------- Top bar ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  background: rgb(255 255 255 / 0.86);
+  backdrop-filter: blur(12px) saturate(1.4);
 }
 
-/* Close button: stays pinned to the top-right corner while the dialog scrolls. */
+.counter {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.counter strong {
+  color: var(--color-accent-hover);
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.kbd {
+  padding: 0.125rem var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+/* Touch screens have no Escape key, so hide the hint there. */
+@media (hover: none) {
+  .kbd {
+    display: none;
+  }
+}
+
 .close {
-  position: sticky;
-  top: var(--space-3);
-  z-index: 2;
   display: grid;
   place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  margin: var(--space-3) var(--space-3) calc(-2.75rem - var(--space-3)) auto;
+  width: 2.5rem;
+  height: 2.5rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 0.9);
-  backdrop-filter: blur(8px);
+  background: var(--color-surface);
   color: var(--color-ink);
-  box-shadow: var(--shadow-md);
   cursor: pointer;
   transition: transform var(--motion-duration-base) var(--motion-ease-out),
     background-color var(--motion-duration-base) var(--motion-ease-out),
@@ -96,26 +138,92 @@
 }
 
 .close svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 /* ---------- Left column ---------- */
 
+.panel {
+  background: var(--color-surface);
+}
+
 .aside {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
   padding: var(--space-6);
+  /* Tint fades into white, so the column has no hard bottom edge. */
+  background: linear-gradient(to bottom, var(--color-band), var(--color-surface) 85%);
+}
+
+/* The screenshot sits in a small browser window. */
+.browser {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: #f87171;
+}
+
+.dots i:nth-child(2) {
+  background: #fbbf24;
+}
+
+.dots i:nth-child(3) {
+  background: #34d399;
+}
+
+.url {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  padding: 0.125rem var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.url svg {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--color-accent);
 }
 
 .cover {
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
   background: var(--color-band);
-  box-shadow: var(--shadow-md);
 }
 
 .cover img {
@@ -143,16 +251,13 @@
 }
 
 .intro {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
+  display: grid;
+  gap: var(--space-2);
 }
 
 .team,
-.label {
+.sectionLabel,
+.meta dt {
   color: var(--color-accent);
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
@@ -161,9 +266,9 @@
 }
 
 .title {
-  margin-top: var(--space-1);
   font-size: var(--text-3xl);
   font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-display);
 }
 
 .summary {
@@ -177,96 +282,259 @@
   gap: var(--space-2);
 }
 
-.stackBlock {
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
-
-.stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-}
-
-/* ---------- Right column ---------- */
-
-.main {
-  padding: 0 var(--space-6) var(--space-8);
-}
-
-.facts {
+/* Overview box at the top of the right column: status and full stack. */
+.meta {
   display: grid;
-  gap: var(--space-5);
-}
-
-.facts dt {
-  color: var(--color-accent);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-}
-
-.facts dd {
-  margin: var(--space-2) 0 0;
-}
-.lists {
-  display: grid;
-  gap: var(--space-3);
-  margin-top: var(--space-6);
-}
-
-.list {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4) var(--space-6);
   padding: var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface-muted);
 }
 
-.listTitle {
-  font-size: var(--text-base);
+.meta div {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.meta dd {
+  margin: 0;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* ---------- Right column ---------- */
+
+.main {
+  display: grid;
+  align-content: start;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-6) var(--space-10);
+}
+
+/* Story timeline: numbered steps joined by a vertical line. */
+.timeline {
+  position: relative;
+  display: grid;
+  gap: var(--space-6);
+  margin: calc(-1 * var(--space-4)) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--color-accent), var(--color-mist));
+}
+
+.timeline li {
+  position: relative;
+  padding-left: var(--space-12);
+}
+
+.step {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-accent-hover);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+}
+
+.timeline h5 {
+  padding-top: 0.25rem;
+  font-size: var(--text-lg);
   font-weight: var(--weight-extrabold);
 }
 
+.timeline p {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+/* Feature, testing, and limitation lists with leading icons. */
 .list ul {
   display: grid;
   gap: var(--space-2);
   margin-top: var(--space-3);
-  padding-left: var(--space-5);
 }
 
-.list li::marker {
-  color: var(--color-accent);
+.list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-base) var(--motion-ease-out);
 }
 
-/* Wide screens: two columns. The left column stays put while the right one scrolls. */
-@media (min-width: 60rem) {
-  .dialog {
-    width: min(70rem, calc(100% - 2 * var(--gutter)));
+@media (hover: hover) {
+  .list li:hover {
+    border-color: var(--color-accent-soft);
+    transform: translateX(3px);
   }
+}
 
+.listIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.05rem;
+  border-radius: var(--radius-full);
+}
+
+.listIcon svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.list[data-tone="accent"] .listIcon {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.list[data-tone="done"] .listIcon {
+  background: var(--color-status-done-bg);
+  color: var(--color-status-done-text);
+}
+
+.list[data-tone="muted"] .listIcon {
+  background: var(--color-status-pending-bg);
+  color: var(--color-status-pending-text);
+}
+
+.list[data-tone="muted"] li {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Previous / Next ---------- */
+
+.pager {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagerButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 4rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--motion-duration-base) var(--motion-ease-out),
+    background-color var(--motion-duration-base) var(--motion-ease-out),
+    box-shadow var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.pagerButton[data-direction="next"] {
+  grid-column: 2;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.pagerButton small {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.pagerButton svg {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-accent);
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
+.pagerButton:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.pagerButton[data-direction="previous"]:hover svg {
+  transform: translateX(-4px);
+}
+
+.pagerButton[data-direction="next"]:hover svg {
+  transform: translateX(4px);
+}
+
+.pagerButton:active {
+  transform: scale(var(--motion-press-scale));
+}
+
+/* ---------- Wide screens: two columns ---------- */
+
+@media (min-width: 60rem) {
   .panel {
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     align-items: start;
   }
 
   .aside {
     position: sticky;
-    top: 0;
+    /* Below the sticky top bar. */
+    top: 4.125rem;
     padding: var(--space-8);
-    border-right: 1px solid var(--color-border);
+  }
+
+  /* The divider and tint run the full height of the panel, not just the pinned column. */
+  .panel {
+    background: linear-gradient(to right, transparent calc(45% - 1px), var(--color-border) calc(45% - 1px), var(--color-border) 45%, transparent 45%),
+      var(--color-surface);
   }
 
   .main {
-    padding: var(--space-16) var(--space-10) var(--space-10);
+    padding: var(--space-10) var(--space-10) var(--space-12);
   }
 }
+
 /* Short screens: let the left column scroll with the rest so none of it is hidden. */
 @media (min-width: 60rem) and (max-height: 50rem) {
   .aside {
     position: static;
+    min-height: 0;
   }
 }
 
@@ -277,6 +545,14 @@
     max-height: 92dvh;
     margin: auto 0 0;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .pager {
+    grid-template-columns: 1fr;
+  }
+
+  .pagerButton[data-direction="next"] {
+    grid-column: 1;
   }
 
   @keyframes dialog-in {

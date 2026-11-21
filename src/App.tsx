@@ -114,9 +114,20 @@ export default function App() {
           intro="Each project states what I built, who I built it with, and how it was tested. Open a case study for the details."
         >
           <ul role="list" className={styles.projectGrid}>
-            {projects.map((project, index) => (
-              <ProjectCard key={project.slug} project={project} index={index} />
-            ))}
+            {projects.map((project, index) => {
+              const neighbour = (i: number) =>
+                projects[i] ? { slug: projects[i].slug, title: projects[i].title } : undefined
+              return (
+                <ProjectCard
+                  key={project.slug}
+                  project={project}
+                  index={index}
+                  total={projects.length}
+                  previous={neighbour(index - 1)}
+                  next={neighbour(index + 1)}
+                />
+              )
+            })}
           </ul>
         </Section>
 
