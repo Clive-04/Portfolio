@@ -56,11 +56,11 @@ export const projects: Project[] = [
     slug: 'pasa-buy',
     title: 'Pasa-Buy',
     summary: 'A community platform where people request or deliver nearby items.',
-    teamLabel: 'With one collaborator',
+    teamLabel: 'Client project · with one collaborator',
     problem: 'People need a simple way to ask others to buy or deliver items and to coordinate those errands.',
     role: 'Built the frontend and most backend features: profiles, messaging with attachments, notifications, wallet, user search, ratings, and referrals.',
     collaboration:
-      'Built with one collaborator, who wrote the core authentication and request backend. The repository was re-created after completion, so the original history is kept in a separate repository.',
+      'Client project, built with one collaborator, who wrote the core authentication and request backend. The repository was re-created after completion, so the original history is kept in a separate repository.',
     status: 'completed',
     featured: true,
     stack: [
