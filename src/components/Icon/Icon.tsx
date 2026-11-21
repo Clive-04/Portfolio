@@ -18,6 +18,13 @@ const lineIcons = {
   lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z',
   pause: 'M9 6v12M15 6v12',
   play: 'M8 5.5v13l10-6.5z',
+  // Certification motifs (used as large card watermarks).
+  network:
+    'M12 7a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM5 22a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM19 22a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM12 7v5M12 12l-5.3 5.3M12 12l5.3 5.3M7.5 19.5h9',
+  code: 'M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16',
+  database:
+    'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
+  timeline: 'M3 3v18h18M7 7h6M9 11h8M8 15h5M14 15h4',
 } as const
 
 /** Brand marks (GitHub Invertocat and the LinkedIn "in" logo), as filled 24×24 paths. */

@@ -54,17 +54,35 @@
   opacity: 0.8;
 }
 
-/* Faint oversized seal watermark in the corner. Decorative. */
-.card::after {
-  content: "";
+/*
+ * Oversized line motif in the corner, matched to the certification
+ * (network, code, database, timeline). Decorative and behind the content:
+ * `isolation` on the card lets z-index -1 sit above the card's own fill.
+ */
+.card {
+  isolation: isolate;
+}
+
+.watermark {
   position: absolute;
-  right: -3rem;
-  bottom: -3rem;
-  width: 10rem;
-  height: 10rem;
-  border: 1.5rem solid rgb(46 196 176 / 0.05);
-  border-radius: var(--radius-full);
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: -1;
+  width: 5.5rem;
+  height: 5.5rem;
+  color: var(--color-accent);
+  opacity: 0.16;
+  stroke-width: 1.1;
+  transform: rotate(-8deg);
   pointer-events: none;
+  transition: opacity 400ms var(--motion-ease-out), transform 500ms var(--motion-ease-out);
+}
+
+@media (hover: hover) {
+  .card:hover .watermark {
+    opacity: 0.32;
+    transform: rotate(0deg) scale(1.08);
+  }
 }
 
 .badge {

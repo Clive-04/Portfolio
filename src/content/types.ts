@@ -59,6 +59,8 @@ export interface Certification {
   issuer: string
   /** Short mark shown in the issuer seal, e.g. "PMI". */
   issuerMark: string
+  /** Line motif drawn as the card's background watermark. */
+  motif?: 'network' | 'code' | 'database' | 'timeline'
   kind: CredentialKind
   /** ISO date, e.g. `2026-05-01`. Omit if the issuer does not show one. */
   issued?: string

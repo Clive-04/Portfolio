@@ -38,6 +38,9 @@ export function CertificationList({ items, variant = 'featured' }: Certification
           data-spotlight
           style={{ '--reveal-delay': `${(index % 3) * 70}ms` } as CSSProperties}
         >
+          {/* Background watermark that matches what the certification covers. */}
+          {!compact && item.motif && <Icon name={item.motif} className={styles.watermark} />}
+
           {/* Issuer seal: a ringed monogram with a small verified tick. */}
           <span className={styles.seal} aria-hidden="true">
             <span className={styles.sealInner}>{item.issuerMark}</span>

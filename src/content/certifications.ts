@@ -14,6 +14,7 @@ export const credlyProfile = 'https://www.credly.com/users/clive-owen-benito/bad
 export const certifications: Certification[] = [
   {
     name: 'Cisco Certified Support Technician (CCST) Networking',
+    motif: 'network',
     verificationUrl: credly('bd7c6120-fa9a-47ab-b367-327c216dffd1'),
     issuer: 'Cisco',
     issuerMark: 'Cisco',
@@ -24,6 +25,7 @@ export const certifications: Certification[] = [
   },
   {
     name: 'IT Specialist – Python',
+    motif: 'code',
     verificationUrl: credly('5e4510fd-fadb-4ab5-9a49-f717d9ec87c7'),
     issuer: 'Certiport (Pearson VUE)',
     issuerMark: 'IT',
@@ -34,6 +36,7 @@ export const certifications: Certification[] = [
   },
   {
     name: 'IT Specialist – Databases',
+    motif: 'database',
     issuer: 'Certiport (Pearson VUE)',
     issuerMark: 'IT',
     kind: 'certification',
@@ -45,6 +48,7 @@ export const certifications: Certification[] = [
   },
   {
     name: 'PMI Project Management Ready',
+    motif: 'timeline',
     verificationUrl: credly('ee568e26-980d-4921-8366-cd714a79ef1c'),
     issuer: 'Project Management Institute',
     issuerMark: 'PMI',
