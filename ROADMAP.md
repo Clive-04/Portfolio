@@ -23,7 +23,7 @@ The Projects page shows all four. The Home page highlights CareerTrack and Pasa-
 
 - [ ] Public résumé PDF without phone number or home address (metadata checked).
 - [x] Certifications: name, issuer, and dates added. Cisco Networking Academy entries are labelled as course badges.
-- [ ] Public verification links for certifications (for example, a Credly profile).
+- [x] Public verification links for certifications: Credly badge pages, and Certiport for IT Specialist – Databases.
 - [x] LinkedIn URL.
 - [x] Public contact email.
 - [x] Project screenshots for CareerTrack, Pedalya, and SmartFeather. Pasa-Buy has none (not deployed).
