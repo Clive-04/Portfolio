@@ -1,5 +1,8 @@
 import type { CSSProperties } from 'react'
+import { AboutBento } from './components/AboutBento/AboutBento'
 import { ButtonLink } from './components/ButtonLink/ButtonLink'
+import { KineticName } from './components/KineticName/KineticName'
+import { TechMarquee } from './components/TechMarquee/TechMarquee'
 import { CertificationList } from './components/CertificationList/CertificationList'
 import { Pending } from './components/Pending/Pending'
 import { ProjectCard } from './components/ProjectCard/ProjectCard'
@@ -12,13 +15,14 @@ import { profile } from './content/profile'
 import { projects } from './content/projects'
 import { skillGroups } from './content/skills'
 import { useReveal } from './lib/useReveal'
+import { useSpotlight } from './lib/useSpotlight'
 import styles from './App.module.css'
 
 const published = certifications.filter((item) => item.published)
 const examCertifications = published.filter((item) => item.kind === 'certification')
 const courseBadges = published.filter((item) => item.kind === 'course-badge')
 
-// Counts shown in the hero card come from the content files, so they stay accurate.
+// Counts shown in the About tiles come from the content files, so they stay accurate.
 const liveCount = projects.filter((project) => project.links.live).length
 const stats = [
   { value: projects.length, label: projects.length === 1 ? 'Project' : 'Projects' },
@@ -31,8 +35,12 @@ const email = profile.email ? `${profile.email.user}@${profile.email.domain}` : 
 
 const { github, linkedin, resume } = profile.links
 
+// The ticker shows each technology once, in the order the skills list them.
+const marqueeItems = [...new Set(skillGroups.flatMap((group) => group.items))]
+
 export default function App() {
   useReveal()
+  useSpotlight()
 
   return (
     <>
@@ -46,9 +54,7 @@ export default function App() {
                 <span className={styles.statusDot} aria-hidden="true" />
                 Open to internship opportunities
               </p>
-              <h1 id="hero-heading" className={styles.heroTitle}>
-                {profile.name}
-              </h1>
+              <KineticName id="hero-heading" name={profile.name} className={styles.heroTitle} />
               <p className={styles.eyebrow}>{profile.targetRoles.join(' · ')}</p>
               <p className={styles.headline}>{profile.headline}</p>
               <div className={styles.actions}>
@@ -89,35 +95,15 @@ export default function App() {
                 {profile.education.program}
                 <span>{profile.education.years}</span>
               </p>
-              <dl className={styles.stats}>
-                {stats.map((stat) => (
-                  <div key={stat.label}>
-                    <dt>{stat.label}</dt>
-                    <dd>{stat.value}</dd>
-                  </div>
-                ))}
-              </dl>
               <p className={styles.heroCardStack}>{profile.supportingLine}</p>
             </aside>
           </div>
         </section>
 
+        <TechMarquee items={marqueeItems} />
+
         <Section id="about" index="01" title="About">
-          <div className={styles.about}>
-            <div className={styles.aboutText} data-reveal>
-              {profile.about.map((paragraph) => (
-                <p key={paragraph.slice(0, 24)}>{paragraph}</p>
-              ))}
-            </div>
-            <dl className={styles.facts} data-reveal style={{ '--reveal-delay': '120ms' } as CSSProperties}>
-              {profile.facts.map((fact) => (
-                <div key={fact.label}>
-                  <dt>{fact.label}</dt>
-                  <dd>{fact.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+          <AboutBento profile={profile} stats={stats} />
         </Section>
 
         <Section
@@ -145,19 +131,19 @@ export default function App() {
 
         <Section id="resume" index="04" title="Résumé">
           <div className={styles.resume}>
-            <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '0ms' } as CSSProperties}>
+            <div className={styles.resumeBlock} data-reveal data-spotlight style={{ '--reveal-delay': '0ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Education</h3>
               <p className={styles.resumeStrong}>{profile.education.school}</p>
               <p>{profile.education.program}</p>
               <p className={styles.muted}>{profile.education.years}</p>
             </div>
-            <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '100ms' } as CSSProperties}>
+            <div className={styles.resumeBlock} data-reveal data-spotlight style={{ '--reveal-delay': '100ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Affiliations</h3>
               {profile.affiliations.map((item) => (
                 <p key={item}>{item}</p>
               ))}
             </div>
-            <div className={styles.resumeBlock} data-reveal style={{ '--reveal-delay': '200ms' } as CSSProperties}>
+            <div className={styles.resumeBlock} data-reveal data-spotlight style={{ '--reveal-delay': '200ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Credentials</h3>
               <p>
                 {examCertifications.length} certifications and {courseBadges.length} Cisco Networking Academy course

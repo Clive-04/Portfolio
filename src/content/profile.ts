@@ -13,13 +13,8 @@ export const profile: Profile = {
     'My strongest work is on the frontend: turning requirements into clear, accessible interfaces. I’m growing into full-stack development. My solo project, CareerTrack, covers the whole path: a Next.js frontend, a FastAPI backend with PostgreSQL, AI résumé analysis with the Gemini API, security hardening, automated tests, and deployment.',
     'I work in small, documented steps: confirm the requirements, build, test, and record what changed. On team projects I own a clear part of the system and coordinate with the people building the rest.',
   ],
-  facts: [
-    { label: 'Looking for', value: 'Full-stack or front-end developer internship' },
-    { label: 'School', value: 'FEU – Institute of Technology' },
-    { label: 'Studying', value: 'BSIT – Web and Mobile Applications' },
-    { label: 'Focus', value: 'React, TypeScript, and accessible UI' },
-    { label: 'Based in', value: 'Manila, Philippines' },
-  ],
+  lookingFor: 'A full-stack or front-end developer internship',
+  focus: ['React', 'TypeScript', 'FastAPI', 'Accessible UI'],
   education: {
     school: 'FEU – Institute of Technology',
     program: 'BS Information Technology – Web and Mobile Applications',

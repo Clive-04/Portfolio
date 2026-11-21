@@ -17,6 +17,7 @@ export function SkillsGrid({ groups }: SkillsGridProps) {
           key={group.title}
           className={styles.group}
           data-reveal
+          data-spotlight
           style={{ '--reveal-delay': `${(index % 3) * 80}ms` } as CSSProperties}
         >
           <div className={styles.top}>

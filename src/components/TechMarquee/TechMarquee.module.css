@@ -1,0 +1,82 @@
+.marquee {
+  display: grid;
+  gap: var(--space-3);
+  padding-block: var(--space-6);
+  overflow: hidden;
+  border-block: 1px solid var(--color-border);
+  background: var(--color-surface);
+  /* Fade both edges so the rows dissolve instead of being cut off. */
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-6);
+  width: max-content;
+}
+
+.row[data-direction="right"] {
+  margin-left: -40%;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  color: var(--color-text);
+  font-size: clamp(1.5rem, 1rem + 2.4vw, 3rem);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-display);
+  white-space: nowrap;
+}
+
+/*
+ * Second row: lighter weight in slate. (Outlined text was tried, but the
+ * variable font's overlapping contours show through a stroke.)
+ */
+.row[data-direction="right"] .item {
+  color: var(--color-slate);
+  font-weight: var(--weight-regular);
+  font-style: italic;
+}
+
+.star {
+  color: var(--color-accent);
+  font-size: 0.5em;
+  font-style: normal;
+}
+
+/*
+ * Scroll-driven motion: the rows translate while the strip crosses the
+ * viewport. Where unsupported, or with reduced motion, they stay still.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .row {
+      animation: slide linear both;
+      animation-timeline: view();
+    }
+
+    .row[data-direction="right"] {
+      animation-name: slide-reverse;
+    }
+  }
+}
+
+@keyframes slide {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: -25% 0;
+  }
+}
+
+@keyframes slide-reverse {
+  from {
+    translate: -25% 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}

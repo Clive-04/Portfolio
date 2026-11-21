@@ -18,7 +18,7 @@
 }
 
 .section[data-tone="ink"] {
-  background: var(--gradient-ink);
+  background: var(--texture-grain-light), var(--gradient-ink);
   color: var(--color-on-ink);
 }
 
@@ -29,7 +29,50 @@
 }
 
 .header {
+  position: relative;
+  isolation: isolate;
   margin-bottom: var(--space-10);
+}
+
+/*
+ * Oversized outlined section number behind the heading. Decorative; it
+ * drifts upward slightly while the section scrolls past (where supported).
+ */
+.bigIndex {
+  position: absolute;
+  top: -0.32em;
+  right: 0;
+  z-index: -1;
+  color: transparent;
+  font-size: clamp(6rem, 4rem + 10vw, 12rem);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-display);
+  line-height: 1;
+  -webkit-text-stroke: 1.5px var(--color-border-strong);
+  user-select: none;
+  pointer-events: none;
+}
+
+.section[data-tone="ink"] .bigIndex {
+  -webkit-text-stroke-color: rgb(255 255 255 / 0.14);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bigIndex {
+      animation: drift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+@keyframes drift {
+  from {
+    translate: 0 30%;
+  }
+  to {
+    translate: 0 -30%;
+  }
 }
 
 /* "01 ────" label: a short gradient rule after the number. */

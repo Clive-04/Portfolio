@@ -91,7 +91,10 @@ export interface Profile {
   supportingLine: string
   targetRoles: string[]
   about: string[]
-  facts: { label: string; value: string }[]
+  /** One line for the highlighted "Looking for" tile. */
+  lookingFor: string
+  /** Short focus areas shown as tags. */
+  focus: string[]
   education: { school: string; program: string; years: string }
   affiliations: string[]
   /** Split so the full address never appears as one string in the page source. */

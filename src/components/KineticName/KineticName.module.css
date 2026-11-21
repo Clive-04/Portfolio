@@ -1,0 +1,59 @@
+.name {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.02;
+}
+
+.letters {
+  display: block;
+}
+
+/* Words never break in the middle. */
+.word {
+  display: inline-block;
+}
+
+/*
+ * Each letter carries the gradient itself (sized to the whole line), so the
+ * colour stays continuous while individual letters change weight.
+ */
+.letter {
+  display: inline-block;
+  font-variation-settings: "wght" 800;
+  background: var(--gradient-name);
+  background-size: 22ch 100%;
+  background-repeat: no-repeat;
+  background-position: calc(var(--i, 0) * -1ch) 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  transition: font-variation-settings 380ms var(--motion-ease-out), translate 380ms var(--motion-ease-out),
+    color 380ms var(--motion-ease-out);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* The hovered letter thins out and lifts; its neighbours follow partway. */
+  .letter:hover {
+    font-variation-settings: "wght" 250;
+    translate: 0 -0.06em;
+  }
+
+  .letter:has(+ .letter:hover),
+  .letter:hover + .letter {
+    font-variation-settings: "wght" 450;
+  }
+
+  .letter:has(+ .letter + .letter:hover),
+  .letter:hover + .letter + .letter {
+    font-variation-settings: "wght" 650;
+  }
+}
+
+/* Windows High Contrast and other forced-colour modes ignore background-clip text. */
+@media (forced-colors: active) {
+  .letter {
+    background: none;
+    color: CanvasText;
+  }
+}

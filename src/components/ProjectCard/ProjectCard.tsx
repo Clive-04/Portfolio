@@ -137,6 +137,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
       id={`project-${project.slug}`}
       className={styles.card}
       data-reveal
+      data-spotlight
       style={{ '--reveal-delay': `${(index % 2) * 100}ms` } as CSSProperties}
     >
       {/* The cover is an extra mouse target; keyboard users use the button below. */}

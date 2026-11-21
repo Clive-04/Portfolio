@@ -118,6 +118,21 @@ ul[role="list"] {
   border: 0;
 }
 
+/*
+ * Cursor spotlight (see src/lib/useSpotlight.ts): a soft teal glow that
+ * follows the pointer across cards. It is an extra background-image layer,
+ * so each card keeps its own background colour.
+ */
+@media (hover: hover) {
+  [data-spotlight]:hover {
+    background-image: radial-gradient(
+      22rem circle at var(--mx, 50%) var(--my, 50%),
+      rgb(1 121 111 / 0.09),
+      transparent 60%
+    );
+  }
+}
+
 /* Plain text links: the underline settles in a little lower on hover. */
 a:not([class]) {
   text-decoration-thickness: 1px;

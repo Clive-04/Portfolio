@@ -20,6 +20,11 @@ export function Section({ id, title, index, intro, tone = 'plain', children }: S
       <div className={styles.inner}>
         <header className={styles.header} data-reveal>
           {index && (
+            <span className={styles.bigIndex} aria-hidden="true">
+              {index}
+            </span>
+          )}
+          {index && (
             <p className={styles.index} aria-hidden="true">
               <span>{index}</span>
             </p>

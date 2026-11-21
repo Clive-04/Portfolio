@@ -27,6 +27,7 @@ export function CertificationList({ items, layout = 'list' }: CertificationListP
           key={item.name}
           className={styles.item}
           data-reveal
+          data-spotlight
           style={{ '--reveal-delay': `${(index % 4) * 60}ms` } as CSSProperties}
         >
           <span className={styles.chip} aria-hidden="true">
