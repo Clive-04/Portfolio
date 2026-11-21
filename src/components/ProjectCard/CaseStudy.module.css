@@ -117,10 +117,11 @@
   place-items: center;
   width: 2.5rem;
   height: 2.5rem;
-  border: 1px solid var(--color-border);
+  /* Light icon on a raised fill with a control-strength outline, so it reads on the dark bar. */
+  border: 1px solid var(--color-border-control);
   border-radius: var(--radius-full);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
   cursor: pointer;
   transition: transform var(--motion-duration-base) var(--motion-ease-out),
     background-color var(--motion-duration-base) var(--motion-ease-out),
@@ -128,8 +129,9 @@
 }
 
 .close:hover {
-  background: var(--color-ink);
-  color: var(--color-on-ink);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   transform: rotate(90deg);
 }
 
@@ -505,36 +507,49 @@
 
 /* ---------- Wide screens: two columns ---------- */
 
+/*
+ * Wide screens: the dialog is a fixed-height frame (top bar + two columns)
+ * and each column scrolls on its own. The summary on the left stays in view
+ * while you read the story on the right; the left column only scrolls if
+ * its own content is taller than the dialog.
+ * `[open]` matters: a plain `display` rule would override the browser's
+ * `display: none` for closed dialogs.
+ */
 @media (min-width: 60rem) {
+  .dialog[open] {
+    display: flex;
+    flex-direction: column;
+    height: min(calc(100dvh - 3rem), 56rem);
+    overflow: hidden;
+  }
+
+  .topbar {
+    flex-shrink: 0;
+  }
+
   .panel {
     display: grid;
+    flex: 1;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    align-items: start;
+    min-height: 0;
+  }
+
+  .aside,
+  .main {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
   }
 
   .aside {
-    position: sticky;
-    /* Below the sticky top bar. */
-    top: 4.125rem;
     padding: var(--space-8);
-  }
-
-  /* The divider and tint run the full height of the panel, not just the pinned column. */
-  .panel {
-    background: linear-gradient(to right, transparent calc(45% - 1px), var(--color-border) calc(45% - 1px), var(--color-border) 45%, transparent 45%),
-      var(--color-surface);
+    border-right: 1px solid var(--color-border);
   }
 
   .main {
     padding: var(--space-10) var(--space-10) var(--space-12);
-  }
-}
-
-/* Short screens: let the left column scroll with the rest so none of it is hidden. */
-@media (min-width: 60rem) and (max-height: 50rem) {
-  .aside {
-    position: static;
-    min-height: 0;
   }
 }
 

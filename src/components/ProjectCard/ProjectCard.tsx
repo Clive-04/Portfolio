@@ -34,6 +34,14 @@ function setName(element: HTMLElement | null, value: string) {
   if (element) element.style.viewTransitionName = value
 }
 
+/** True when an element is at least partly inside a container's visible box. */
+function isVisibleIn(element: HTMLElement | null, container: HTMLElement) {
+  if (!element) return false
+  const rect = element.getBoundingClientRect()
+  const box = container.getBoundingClientRect()
+  return rect.bottom > box.top && rect.top < box.bottom
+}
+
 function isOnScreen(element: HTMLElement | null) {
   if (!element) return false
   const rect = element.getBoundingClientRect()
@@ -66,6 +74,15 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
   const dialogRef = useRef<HTMLDialogElement>(null)
   const panelCoverRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const asideRef = useRef<HTMLDivElement>(null)
+  const mainRef = useRef<HTMLDivElement>(null)
+
+  /** Every open starts at the top of both columns (and of the sheet on phones). */
+  function resetScroll(dialog: HTMLDialogElement) {
+    dialog.scrollTop = 0
+    asideRef.current?.scrollTo(0, 0)
+    mainRef.current?.scrollTo(0, 0)
+  }
 
   const status = statusBadge[project.status]
   const visibleTags = project.stack.slice(0, VISIBLE_TAGS)
@@ -86,7 +103,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
       if ((event as CustomEvent<string>).detail !== project.slug || !dialog || dialog.open) return
       if (document.documentElement.dataset.caseDirection) setName(dialog, 'case-switch')
       dialog.showModal()
-      dialog.scrollTop = 0
+      resetScroll(dialog)
     }
     window.addEventListener(OPEN_EVENT, onOpen)
     return () => window.removeEventListener(OPEN_EVENT, onOpen)
@@ -99,7 +116,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
     if (!canMorph()) {
       if (!prefersReducedMotion()) dialog.dataset.anim = 'in'
       dialog.showModal()
-      dialog.scrollTop = 0
+      resetScroll(dialog)
       return
     }
 
@@ -111,7 +128,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
       setName(dialog, panelName)
       setName(panelCoverRef.current, coverName)
       dialog.showModal()
-      dialog.scrollTop = 0
+      resetScroll(dialog)
     })
     transition.finished.finally(() => {
       setName(dialog, '')
@@ -142,7 +159,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
 
     // Morph back into the card only if the card is on screen (after Previous / Next it may not be).
     const cardVisible = isOnScreen(cardRef.current)
-    const coverInView = cardVisible && dialog.scrollTop < (panelCoverRef.current?.offsetHeight ?? 0)
+    const coverInView = cardVisible && isVisibleIn(panelCoverRef.current, dialog)
     if (cardVisible) setName(dialog, panelName)
     if (coverInView) setName(panelCoverRef.current, coverName)
     const transition = document.startViewTransition(() => {
@@ -267,7 +284,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
             </ButtonLink>
           )}
           {project.links.repository && (
-            <ButtonLink href={project.links.repository} variant="secondary" size="sm" external>
+            <ButtonLink href={project.links.repository} variant="secondary" size="sm" leadingIcon="github" external>
               Code{forProject}
             </ButtonLink>
           )}
@@ -315,7 +332,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
 
         <div className={dialogStyles.panel}>
           {/* Left on wide screens: stays in place while the story scrolls. */}
-          <div className={dialogStyles.aside}>
+          <div ref={asideRef} className={dialogStyles.aside}>
             <figure className={dialogStyles.browser}>
               <div className={dialogStyles.chrome} aria-hidden="true">
                 <span className={dialogStyles.dots}>
@@ -350,12 +367,24 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
                 </ButtonLink>
               )}
               {project.links.repository && (
-                <ButtonLink href={project.links.repository} variant="secondary" size="sm" external>
+                <ButtonLink
+                  href={project.links.repository}
+                  variant="secondary"
+                  size="sm"
+                  leadingIcon="github"
+                  external
+                >
                   View code
                 </ButtonLink>
               )}
               {project.links.history && (
-                <ButtonLink href={project.links.history} variant="secondary" size="sm" external>
+                <ButtonLink
+                  href={project.links.history}
+                  variant="secondary"
+                  size="sm"
+                  leadingIcon="github"
+                  external
+                >
                   Original history
                 </ButtonLink>
               )}
@@ -363,7 +392,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
 
           </div>
 
-          <div className={dialogStyles.main}>
+          <div ref={mainRef} className={dialogStyles.main}>
             <dl className={dialogStyles.meta}>
               <div>
                 <dt>Status</dt>

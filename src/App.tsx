@@ -207,12 +207,12 @@ export default function App() {
               </ButtonLink>
             )}
             {linkedin.href && (
-              <ButtonLink href={linkedin.href} variant="ghost" external>
+              <ButtonLink href={linkedin.href} variant="ghost" leadingIcon="linkedin" external>
                 {linkedin.label}
               </ButtonLink>
             )}
             {github.href && (
-              <ButtonLink href={github.href} variant="ghost" external>
+              <ButtonLink href={github.href} variant="ghost" leadingIcon="github" external>
                 {github.label}
               </ButtonLink>
             )}

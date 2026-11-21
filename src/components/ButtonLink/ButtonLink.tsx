@@ -10,6 +10,8 @@ interface ButtonLinkProps {
   size?: 'md' | 'sm'
   /** Trailing icon. External links get the "external" arrow automatically. */
   icon?: IconName
+  /** Icon before the label, e.g. a brand logo. */
+  leadingIcon?: IconName
   /** Opens in a new tab. `noopener noreferrer` stops the new page from controlling this one. */
   external?: boolean
   download?: boolean
@@ -21,6 +23,7 @@ export function ButtonLink({
   variant = 'primary',
   size = 'md',
   icon,
+  leadingIcon,
   external = false,
   download = false,
 }: ButtonLinkProps) {
@@ -33,6 +36,7 @@ export function ButtonLink({
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
       {...(download && { download: true })}
     >
+      {leadingIcon && <Icon name={leadingIcon} className={styles.leading} />}
       <span className={styles.label}>{children}</span>
       {trailing && <Icon name={trailing} className={styles.icon} />}
       {external && <span className="visually-hidden"> (opens in a new tab)</span>}

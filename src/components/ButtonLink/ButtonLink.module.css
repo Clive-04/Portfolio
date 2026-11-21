@@ -33,6 +33,21 @@
   position: relative;
 }
 
+/* Leading brand logo: a little larger than the trailing arrow, and it pops slightly on hover. */
+.leading {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.15em;
+  height: 1.15em;
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+
+@media (hover: hover) {
+  .button:hover .leading {
+    transform: scale(1.12) rotate(-6deg);
+  }
+}
+
 .icon {
   position: relative;
   flex-shrink: 0;
@@ -138,7 +153,8 @@
 }
 
 .light:hover {
-  background: var(--color-accent-soft);
+  /* Pale teal: stays light so the ink text keeps its contrast. */
+  background: #c9efe8;
   color: var(--color-ink);
 }
 
