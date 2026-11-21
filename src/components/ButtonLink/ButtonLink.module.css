@@ -10,7 +10,8 @@
   font-weight: var(--weight-semibold);
   text-decoration: none;
   transition: background-color var(--motion-duration-fast) var(--motion-ease-out), border-color var(--motion-duration-fast) var(--motion-ease-out),
-    color var(--motion-duration-fast) var(--motion-ease-out), transform var(--motion-duration-fast) var(--motion-ease-out);
+    color var(--motion-duration-fast) var(--motion-ease-out), transform var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-base) var(--motion-ease-out);
 }
 
 /* Immediate press feedback; no transition delay on the way down. */
@@ -44,4 +45,37 @@
 .secondary:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
+}
+
+.primary,
+.light {
+  box-shadow: var(--shadow-md);
+}
+
+.primary:hover,
+.light:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* On ink: solid white with ink text (14.57:1). */
+.light {
+  background: var(--color-on-ink);
+  color: var(--color-ink);
+}
+
+.light:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+}
+
+/* On ink: outlined, light text. */
+.ghost {
+  border-color: rgb(255 255 255 / 0.45);
+  color: var(--color-on-ink);
+}
+
+.ghost:hover {
+  border-color: var(--color-on-ink-accent);
+  background: rgb(255 255 255 / 0.06);
+  color: var(--color-on-ink-accent);
 }

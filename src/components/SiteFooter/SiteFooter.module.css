@@ -1,8 +1,21 @@
+/* Continues the ink of the contact panel above it. */
 .footer {
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+  background: var(--color-ink);
+  color: var(--color-on-ink-muted);
   font-size: var(--text-sm);
+}
+
+.footer a {
+  color: var(--color-on-ink-accent);
+}
+
+.footer a:hover {
+  color: var(--color-on-ink);
+}
+
+.footer :focus-visible {
+  outline-color: var(--color-on-ink-accent);
 }
 
 .inner {

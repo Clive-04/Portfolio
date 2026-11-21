@@ -16,6 +16,13 @@ const published = certifications.filter((item) => item.published)
 const examCertifications = published.filter((item) => item.kind === 'certification')
 const courseBadges = published.filter((item) => item.kind === 'course-badge')
 
+// Counts shown in the hero card come from the content files, so they stay accurate.
+const stats = [
+  { value: projects.length, label: 'Projects' },
+  { value: published.length, label: 'Credentials' },
+  { value: projects.filter((project) => project.links.live).length, label: 'Live app' },
+]
+
 // Assembled at render time so the full address is never a single string in the page source.
 const email = profile.email ? `${profile.email.user}@${profile.email.domain}` : undefined
 
@@ -29,28 +36,52 @@ export default function App() {
       <main id="main" tabIndex={-1} className={styles.main}>
         <section id="top" aria-labelledby="hero-heading" className={styles.hero}>
           <div className={styles.heroInner}>
-            <p className={styles.eyebrow}>{profile.targetRoles.join(' · ')}</p>
-            <h1 id="hero-heading" className={styles.heroTitle}>
-              {profile.name}
-            </h1>
-            <p className={styles.headline}>{profile.headline}</p>
-            <p className={styles.supporting}>{profile.supportingLine}</p>
-            <div className={styles.actions}>
-              <ButtonLink href="#projects">View projects</ButtonLink>
-              {resume.href ? (
-                <ButtonLink href={resume.href} variant="secondary" download>
-                  {resume.label}
-                </ButtonLink>
-              ) : (
-                <ButtonLink href="#contact" variant="secondary">
-                  Contact me
-                </ButtonLink>
-              )}
+            <div className={styles.heroText}>
+              <p className={styles.status}>
+                <span className={styles.statusDot} aria-hidden="true" />
+                Open to internship opportunities
+              </p>
+              <h1 id="hero-heading" className={styles.heroTitle}>
+                {profile.name}
+              </h1>
+              <p className={styles.eyebrow}>{profile.targetRoles.join(' · ')}</p>
+              <p className={styles.headline}>{profile.headline}</p>
+              <div className={styles.actions}>
+                <ButtonLink href="#projects">View projects</ButtonLink>
+                {resume.href ? (
+                  <ButtonLink href={resume.href} variant="secondary" download>
+                    {resume.label}
+                  </ButtonLink>
+                ) : (
+                  <ButtonLink href="#contact" variant="secondary">
+                    Contact me
+                  </ButtonLink>
+                )}
+              </div>
             </div>
+
+            <aside className={styles.heroCard} aria-label="At a glance">
+              <p className={styles.heroCardLabel}>At a glance</p>
+              <p className={styles.heroCardSchool}>
+                {profile.education.program}
+                <span>
+                  {profile.education.school} · {profile.education.years}
+                </span>
+              </p>
+              <dl className={styles.stats}>
+                {stats.map((stat) => (
+                  <div key={stat.label}>
+                    <dt>{stat.label}</dt>
+                    <dd>{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className={styles.heroCardStack}>{profile.supportingLine}</p>
+            </aside>
           </div>
         </section>
 
-        <Section id="about" title="About">
+        <Section id="about" index="01" title="About">
           <div className={styles.about}>
             <div className={styles.aboutText}>
               {profile.about.map((paragraph) => (
@@ -70,7 +101,9 @@ export default function App() {
 
         <Section
           id="projects"
-          title="Projects"
+          index="02"
+          tone="band"
+          title="Selected projects"
           intro="Each project states what I built, who I built it with, and how it was tested. Open a case study for the details."
         >
           <ul role="list" className={styles.projectGrid}>
@@ -82,32 +115,34 @@ export default function App() {
 
         <Section
           id="skills"
+          index="03"
           title="Skills"
           intro="Grouped by what I can do, with the projects that show it. No self-rated skill bars."
         >
           <SkillsGrid groups={skillGroups} />
         </Section>
 
-        <Section id="resume" title="Résumé">
+        <Section id="resume" index="04" tone="band" title="Résumé">
           <div className={styles.resume}>
-            <div>
-              <h3 className={styles.subheading}>Education</h3>
+            <div className={styles.resumeBlock}>
+              <h3 className={styles.resumeLabel}>Education</h3>
               <p className={styles.resumeStrong}>{profile.education.school}</p>
               <p>{profile.education.program}</p>
               <p className={styles.muted}>{profile.education.years}</p>
             </div>
-            <div>
-              <h3 className={styles.subheading}>Affiliations</h3>
+            <div className={styles.resumeBlock}>
+              <h3 className={styles.resumeLabel}>Affiliations</h3>
               {profile.affiliations.map((item) => (
                 <p key={item}>{item}</p>
               ))}
             </div>
-            <div>
-              <h3 className={styles.subheading}>Credentials</h3>
+            <div className={styles.resumeBlock}>
+              <h3 className={styles.resumeLabel}>Credentials</h3>
               <p>
                 {examCertifications.length} certifications and {courseBadges.length} Cisco Networking Academy course
-                badges. <a href="#certifications">See the list</a>.
+                badges.
               </p>
+              <a href="#certifications">See the list</a>
             </div>
           </div>
           {resume.href ? (
@@ -123,39 +158,50 @@ export default function App() {
 
         <Section
           id="certifications"
+          index="05"
           title="Certifications"
           intro="Each entry links to its public verification page, so anyone can confirm it."
         >
-          <div className={styles.actions}>
+          <div className={styles.certHeader}>
+            <h3 className={styles.subheading}>Certifications</h3>
             <ButtonLink href={credlyProfile} variant="secondary" size="sm" external>
-              View all badges on Credly
+              View all on Credly
             </ButtonLink>
           </div>
-          <h3 className={`${styles.subheading} ${styles.spaced}`}>Certifications</h3>
           <CertificationList items={examCertifications} />
           <h3 className={`${styles.subheading} ${styles.spaced}`}>Course badges</h3>
           <p className={styles.note}>
             Verified Cisco Networking Academy badges for completing each course. These are course completions, not
             Cisco exam certifications.
           </p>
-          <CertificationList items={courseBadges} />
+          <CertificationList items={courseBadges} layout="grid" />
         </Section>
 
-        <Section id="contact" title="Contact" intro="Open to internship opportunities. Email is the fastest way to reach me.">
+        <Section
+          id="contact"
+          index="06"
+          tone="ink"
+          title="Let’s work together"
+          intro="I’m looking for a full-stack or front-end developer internship. Email is the fastest way to reach me."
+        >
           <div className={styles.actions}>
-            {email && <ButtonLink href={`mailto:${email}`}>Email me</ButtonLink>}
+            {email && (
+              <ButtonLink href={`mailto:${email}`} variant="light">
+                Email me
+              </ButtonLink>
+            )}
             {linkedin.href && (
-              <ButtonLink href={linkedin.href} variant="secondary" external>
+              <ButtonLink href={linkedin.href} variant="ghost" external>
                 {linkedin.label}
               </ButtonLink>
             )}
             {github.href && (
-              <ButtonLink href={github.href} variant="secondary" external>
+              <ButtonLink href={github.href} variant="ghost" external>
                 {github.label}
               </ButtonLink>
             )}
           </div>
-          {email && <p className={styles.muted}>{email}</p>}
+          {email && <p className={styles.contactEmail}>{email}</p>}
         </Section>
       </main>
 

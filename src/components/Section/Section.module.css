@@ -1,6 +1,14 @@
 .section {
-  padding-block: var(--space-16);
-  border-top: 1px solid var(--color-border);
+  padding-block: var(--section-space);
+}
+
+.section[data-tone="band"] {
+  background: var(--color-band);
+}
+
+.section[data-tone="ink"] {
+  background: var(--gradient-ink);
+  color: var(--color-on-ink);
 }
 
 .inner {
@@ -9,9 +17,33 @@
   padding-inline: var(--gutter);
 }
 
+.header {
+  margin-bottom: var(--space-10);
+}
+
+/* "01 ────" label: a short gradient rule after the number. */
+.index {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.index::after {
+  content: "";
+  width: 3rem;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-rule);
+}
+
 .title {
   font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-extrabold);
 }
 
 .intro {
@@ -21,7 +53,19 @@
   font-size: var(--text-lg);
 }
 
-.title + *:not(.intro),
-.intro + * {
-  margin-top: var(--space-8);
+.section[data-tone="ink"] .index {
+  color: var(--color-on-ink-accent);
+}
+
+.section[data-tone="ink"] .intro {
+  color: var(--color-on-ink-muted);
+}
+
+/* The default blue focus ring is too dark on ink; use the bright teal instead (8.04:1). */
+.section[data-tone="ink"] :focus-visible {
+  outline-color: var(--color-on-ink-accent);
+}
+
+.section[data-tone="ink"] a:not([class]) {
+  color: var(--color-on-ink-accent);
 }

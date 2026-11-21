@@ -4,7 +4,8 @@ import styles from './ButtonLink.module.css'
 interface ButtonLinkProps {
   href: string
   children: ReactNode
-  variant?: 'primary' | 'secondary'
+  /** `light` and `ghost` are for dark (ink) backgrounds. */
+  variant?: 'primary' | 'secondary' | 'light' | 'ghost'
   size?: 'md' | 'sm'
   /** Opens in a new tab. `noopener noreferrer` stops the new page from controlling this one. */
   external?: boolean

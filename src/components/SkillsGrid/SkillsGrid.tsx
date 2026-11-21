@@ -14,9 +14,13 @@ export function SkillsGrid({ groups }: SkillsGridProps) {
       {groups.map((group) => (
         <li key={group.title} className={styles.group}>
           <h3 className={styles.title}>{group.title}</h3>
-          <p className={styles.items}>{group.items.join(' · ')}</p>
+          <ul role="list" className={styles.items}>
+            {group.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
           <p className={styles.usedIn}>
-            Used in:{' '}
+            <span className={styles.usedInLabel}>Used in</span>
             {group.projects.map((slug, index) => (
               <span key={slug}>
                 {index > 0 && ', '}

@@ -37,10 +37,27 @@
   padding-inline: var(--gutter);
 }
 
+.mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(140deg, var(--color-accent), var(--color-ink));
+  color: var(--color-on-accent);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: 0.02em;
+}
+
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
   /* Pushes the menu button and the navigation to the right edge. */
   margin-right: auto;
   color: var(--color-text);
+  letter-spacing: var(--tracking-heading);
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   text-decoration: none;

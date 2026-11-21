@@ -4,13 +4,28 @@ import styles from './CertificationList.module.css'
 
 interface CertificationListProps {
   items: Certification[]
+  /** `grid` lays smaller items out in two columns on wide screens. */
+  layout?: 'list' | 'grid'
 }
 
-export function CertificationList({ items }: CertificationListProps) {
+/** Short issuer monogram for the decorative chip, e.g. "Cisco Networking Academy" → "CN". */
+function monogram(issuer: string) {
+  const words = issuer.replace(/\(.*?\)/g, '').split(/\s+/).filter(Boolean)
+  return words
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
+}
+
+export function CertificationList({ items, layout = 'list' }: CertificationListProps) {
   return (
-    <ul role="list" className={styles.list}>
+    <ul role="list" className={styles.list} data-layout={layout}>
       {items.map((item) => (
         <li key={item.name} className={styles.item}>
+          <span className={styles.chip} aria-hidden="true">
+            {monogram(item.issuer)}
+          </span>
           <div className={styles.main}>
             <h4 className={styles.name}>{item.name}</h4>
             <p className={styles.issuer}>{item.issuer}</p>
@@ -21,11 +36,11 @@ export function CertificationList({ items }: CertificationListProps) {
             {item.expires && <p>Valid until {formatMonthYear(item.expires)}</p>}
             {item.credentialId && (
               <p>
-                Credential ID <code>{item.credentialId}</code>
+                ID <code>{item.credentialId}</code>
               </p>
             )}
             {item.verificationUrl && (
-              <a href={item.verificationUrl} target="_blank" rel="noopener noreferrer">
+              <a className={styles.verify} href={item.verificationUrl} target="_blank" rel="noopener noreferrer">
                 Verify<span aria-hidden="true"> ↗</span>
                 <span className="visually-hidden"> {item.name} (opens in a new tab)</span>
               </a>

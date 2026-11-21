@@ -6,15 +6,17 @@
 :root {
   /*
    * Colour: Figma's "Mountain mist" palette (slate #6D8196, misty blue
-   * #B0C4DE, pine teal #01796F) on neutral slate surfaces.
-   * Text pairs meet WCAG AA; control borders meet 3:1.
+   * #B0C4DE, pine teal #01796F) on neutral slate surfaces, with a deep
+   * pine "ink" for the closing panel. Every text pair below meets WCAG AA;
+   * control borders meet 3:1.
    */
   --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-muted: #f1f5f9;
+  --color-band: #eef3f8; /* mist-tinted section band */
   --color-border: #e2e8f0;
   --color-border-strong: #cbd5e1;
-  /* Outlines of interactive controls: at least 3:1 against bg and surface (WCAG 1.4.11). */
+  /* Outlines of interactive controls: at least 3:1 against bg, band, and surface (WCAG 1.4.11). */
   --color-border-control: #6d8196;
   --color-text: #0f172a;
   --color-text-muted: #475569;
@@ -22,8 +24,21 @@
   --color-accent-hover: #016159; /* accent darkened 20% */
   --color-accent-soft: #dfe7f2; /* misty blue lightened 60%; accent-hover text on it 5.90:1 */
   --color-mist: #b0c4de; /* decorative only (1.78:1), never for text */
+  --color-slate: #6d8196;
   --color-on-accent: #ffffff;
   --color-focus: #1d4ed8;
+
+  /* Deep pine surface for the contact panel and footer. */
+  --color-ink: #0b2e2c;
+  --color-ink-raised: #10403d;
+  --color-on-ink: #ffffff; /* 14.57:1 */
+  --color-on-ink-muted: #a7c4c2; /* 7.85:1 */
+  --color-on-ink-accent: #5fd3c3; /* 8.04:1; also the focus ring on ink */
+
+  /* Technology tags. */
+  --color-tag-bg: #eef3f8;
+  --color-tag-border: #dfe7f2;
+  --color-tag-text: #334155; /* 9.28:1 */
 
   /* Status colours for evidence and project badges. */
   --color-status-done-bg: #dcfce7;
@@ -33,24 +48,41 @@
   --color-status-pending-bg: #e2e8f0;
   --color-status-pending-text: #334155;
 
-  /* Typography: system fonts, so no external font requests. */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Decorative gradients (never behind body text without a contrast check). */
+  --gradient-hero: radial-gradient(60rem 32rem at 90% -20%, rgb(176 196 222 / 0.55), transparent 62%),
+    radial-gradient(44rem 26rem at -15% 0%, rgb(1 121 111 / 0.1), transparent 60%);
+  --gradient-name: linear-gradient(120deg, var(--color-text) 35%, var(--color-accent) 100%);
+  --gradient-rule: linear-gradient(90deg, var(--color-accent), var(--color-mist));
+  --gradient-ink: radial-gradient(40rem 20rem at 100% 0%, rgb(95 211 195 / 0.16), transparent 60%),
+    linear-gradient(160deg, var(--color-ink-raised), var(--color-ink));
+
+  /* Typography: Plus Jakarta Sans, self-hosted, with system fallbacks. */
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+    sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
 
+  --text-xs: 0.8125rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
   --text-xl: 1.25rem;
-  --text-2xl: clamp(1.5rem, 1.3rem + 0.9vw, 1.875rem);
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
   --text-3xl: clamp(2rem, 1.6rem + 2vw, 3rem);
+  --text-4xl: clamp(2.5rem, 1.7rem + 3.6vw, 4.5rem);
 
-  --leading-tight: 1.2;
-  --leading-normal: 1.6;
+  --leading-tight: 1.15;
+  --leading-normal: 1.65;
 
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* Large display text reads better with slightly tighter tracking. */
+  --tracking-display: -0.03em;
+  --tracking-heading: -0.02em;
+  --tracking-label: 0.08em;
 
   /* Spacing scale (4px base). */
   --space-1: 0.25rem;
@@ -64,33 +96,37 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
+  --space-24: 6rem;
 
   /* Shape and depth. */
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
   --radius-full: 999px;
   --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
-  --shadow-md: 0 4px 12px rgb(15 23 42 / 0.08);
+  --shadow-md: 0 6px 16px -4px rgb(15 23 42 / 0.1), 0 2px 4px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 18px 40px -12px rgb(11 46 44 / 0.22), 0 4px 10px rgb(15 23 42 / 0.05);
 
   /* Motion: short and subtle. Turned off under reduced motion in global.css. */
   --motion-duration-fast: 120ms;
-  --motion-duration-base: 200ms;
+  --motion-duration-base: 220ms;
   --motion-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* Press feedback: a small, immediate scale-down on :active. */
   --motion-press-scale: 0.97;
-
-  /* Large display text reads better with slightly tighter tracking. */
-  --tracking-display: -0.02em;
+  /* Hover lift for cards. */
+  --motion-lift: -3px;
 
   /* Layout. */
   --content-max: 72rem;
   --gutter: var(--space-4);
   --header-height: 4rem;
+  --section-space: var(--space-16);
 }
 
 @media (min-width: 48rem) {
   :root {
     --gutter: var(--space-8);
+    --section-space: var(--space-24);
   }
 }

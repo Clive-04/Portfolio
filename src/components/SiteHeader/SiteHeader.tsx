@@ -2,6 +2,12 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { sections } from '../../content/sections'
 import styles from './SiteHeader.module.css'
 
+/** "Clive Owen S. Benito" → "CB": first and last name initials. */
+function initials(name: string) {
+  const parts = name.split(' ').filter((part) => !part.endsWith('.'))
+  return `${parts[0]?.[0] ?? ''}${parts.at(-1)?.[0] ?? ''}`
+}
+
 interface SiteHeaderProps {
   name: string
 }
@@ -31,6 +37,9 @@ export function SiteHeader({ name }: SiteHeaderProps) {
       </a>
       <div className={styles.inner}>
         <a className={styles.brand} href="#top">
+          <span className={styles.mark} aria-hidden="true">
+            {initials(name)}
+          </span>
           {name}
         </a>
 

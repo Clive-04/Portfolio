@@ -10,9 +10,9 @@
 }
 
 .neutral {
-  background: var(--color-surface-muted);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  border: 1px solid var(--color-tag-border);
 }
 
 .done {
