@@ -240,10 +240,6 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
         ) : (
           cover
         )}
-        <span className={styles.coverHint} aria-hidden="true">
-          <Icon name="expand" />
-          View case study
-        </span>
       </div>
 
       <div className={styles.body}>

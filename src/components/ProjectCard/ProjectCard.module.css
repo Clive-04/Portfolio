@@ -22,13 +22,8 @@
     transform: scale(1.05);
   }
 
-  .card:hover .cover::after,
-  .card:hover .coverHint {
+  .card:hover .cover::after {
     opacity: 1;
-  }
-
-  .card:hover .coverHint {
-    transform: translate(-50%, -50%) scale(1);
   }
 
   .card:hover .title {
@@ -68,33 +63,6 @@
   opacity: 0;
   transition: opacity 320ms var(--motion-ease-out);
   pointer-events: none;
-}
-
-/* "View case study" chip that pops into the centre of the cover on hover. */
-.coverHint {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 0.95);
-  color: var(--color-ink);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  box-shadow: var(--shadow-lg);
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.85);
-  transition: opacity 320ms var(--motion-ease-out), transform 320ms var(--motion-ease-out);
-  pointer-events: none;
-}
-
-.coverHint svg {
-  width: 1rem;
-  height: 1rem;
 }
 
 /* Status badge floats on the cover. */
