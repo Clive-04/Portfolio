@@ -23,7 +23,7 @@ Every external URL in `src/` was requested with `curl -L`.
 |---|---|
 | CareerTrack live site, SmartFeather live site | Passed (200) |
 | GitHub: profile, CareerTrack, Pedalya, SmartFeather, Pasa-Buy-Project | Passed (200) |
-| **GitHub: `Clive-04/Pasa-Buy`** | **Failed (404)** — the repository is no longer public. Open item below. |
+| GitHub: `Clive-04/Pasa-Buy` | Failed (404) at first; the owner made the repository public again the same day, and it now returns 200 (Passed) |
 | Credly profile and all 8 Credly badge pages | Passed (200) |
 | Certiport verification | Passed (200) |
 | LinkedIn | Not verifiable by script (LinkedIn answers bots with status 999); check by hand |
@@ -84,4 +84,4 @@ Desktop CLS is 0.075 (the "good" threshold is 0.1), coming from the tech ticker 
 
 ## Open items found
 
-- **`github.com/Clive-04/Pasa-Buy` returns 404.** It was public on 2026-11-21 and no longer appears in the public repository list (deleted, renamed, or made private). The Pasa-Buy card's "Code" button and the case study link to it. Decide: make it public again, or point the card at `Clive-04/Pasa-Buy-Project`.
+- ~~`github.com/Clive-04/Pasa-Buy` returns 404.~~ Resolved on 2026-11-22: the owner made the repository public again, and the link returns 200.
