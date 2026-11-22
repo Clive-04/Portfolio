@@ -6,7 +6,7 @@ The site presents selected projects, skills, certifications, and contact details
 
 ## Status
 
-**Content and design complete; validation and deployment next.** All sections are built with verified content. The résumé download and the social-sharing image are pending. See [ROADMAP.md](ROADMAP.md) for the checklist.
+**Content and design complete; validation and deployment next.** All sections are built with verified content. The social-sharing image is pending. See [ROADMAP.md](ROADMAP.md) for the checklist.
 
 ## Version-one scope
 

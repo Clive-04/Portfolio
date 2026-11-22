@@ -20,7 +20,7 @@ This is the working checklist for version one. It follows the phases in the port
 
 ## Content still pending
 
-- [ ] Public résumé PDF without phone number or home address (metadata checked). Set `links.resume.href` in `src/content/profile.ts` to turn on the download buttons.
+- [x] Résumé PDF published at `public/Clive-Owen-Benito-Resume.pdf` (2026-11-22). By the owner's choice it is the full version, including phone, street address, and school email. Metadata checked: author name and template title only.
 - [ ] Social-sharing image (`og:image`) and canonical URL, added once the production URL exists.
 - [ ] Higher-resolution profile photo (600px or larger); the current one is 299px and looks slightly soft on high-density screens.
 - [x] Certifications with Credly verification links (Certiport for IT Specialist – Databases).

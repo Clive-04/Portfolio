@@ -24,7 +24,7 @@ export const profile: Profile = {
   links: {
     github: { label: 'GitHub', href: 'https://github.com/Clive-04' },
     linkedin: { label: 'LinkedIn', href: 'https://www.linkedin.com/in/clive04/' },
-    // Pending: a public résumé without phone number or home address.
-    resume: { label: 'Download résumé (PDF)' },
+    // Published as-is at the user's request (2026-11-22), including phone, address, and school email.
+    resume: { label: 'Download résumé (PDF)', href: '/Clive-Owen-Benito-Resume.pdf' },
   },
 }
