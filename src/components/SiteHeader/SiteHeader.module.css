@@ -115,6 +115,32 @@
   }
 }
 
+/* Safety net: if the name still doesn't fit, it shrinks with an ellipsis instead of pushing the menu button off screen. */
+.brand {
+  min-width: 0;
+}
+
+.brandName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Very narrow screens (320px phones, or 400% zoom on a laptop): only the "CB"
+ * mark shows. The name is hidden visually but stays in the link, so screen
+ * readers still announce "Clive Owen S. Benito".
+ */
+@media (max-width: 22rem) {
+  .brandName {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 /* ---------- Mobile toggle ---------- */
 
 .toggle {

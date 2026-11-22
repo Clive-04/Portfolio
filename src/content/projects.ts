@@ -44,7 +44,7 @@ export const projects: Project[] = [
     },
     screenshots: [
       {
-        src: '/projects/careertrack.jpg',
+        src: '/projects/careertrack.webp',
         alt: 'CareerTrack landing page: the headline “Organize your job search” beside a dashboard preview with application counts and an AI résumé match score.',
         width: 1600,
         height: 768,
@@ -115,7 +115,7 @@ export const projects: Project[] = [
     },
     screenshots: [
       {
-        src: '/projects/pedalya.jpg',
+        src: '/projects/pedalya.webp',
         alt: 'Pedalya landing page: the headline “Book smarter. Ride sooner.” beside a bicycle illustration and booking-status cards.',
         width: 1600,
         height: 768,
@@ -154,7 +154,7 @@ export const projects: Project[] = [
     },
     screenshots: [
       {
-        src: '/projects/smartfeather.jpg',
+        src: '/projects/smartfeather.webp',
         alt: 'SmartFeather landing page: the headline “SmartFeather for MJBJ Corporation” over a photo of chickens in tall grass.',
         width: 1600,
         height: 768,

@@ -205,8 +205,18 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
     })
   }
 
+  // Lazy: closed dialogs would otherwise download every screenshot on page load.
+  // The card cover uses the same file, so by the time a visitor opens the
+  // dialog the image is usually already cached.
   const cover = screenshot ? (
-    <img src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} />
+    <img
+      src={screenshot.src}
+      alt={screenshot.alt}
+      width={screenshot.width}
+      height={screenshot.height}
+      loading="lazy"
+      decoding="async"
+    />
   ) : (
     // No screenshot: a decorative cover built from the project name.
     <div className={styles.placeholder} aria-hidden="true">
