@@ -4,9 +4,11 @@ Personal portfolio website for Clive Owen S. Benito, a full-stack and front-end 
 
 The site presents selected projects, skills, certifications, and contact details for job applications. Every project claim is backed by repository evidence, with work clearly labeled as completed or in progress.
 
+**Live site: [clive-benito.vercel.app](https://clive-benito.vercel.app/)**
+
 ## Status
 
-**Content and design complete; validation and deployment next.** All sections are built with verified content. The social-sharing image is pending. See [ROADMAP.md](ROADMAP.md) for the checklist.
+**Live.** Deployed on Vercel from `main`; every push redeploys automatically. Automated validation is complete (see [docs/validation.md](docs/validation.md)); manual screen-reader and real-device checks are still open. See [ROADMAP.md](ROADMAP.md) for the checklist.
 
 ## Version-one scope
 

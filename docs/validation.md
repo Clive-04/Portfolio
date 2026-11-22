@@ -73,7 +73,42 @@ Desktop CLS is 0.075 (the "good" threshold is 0.1), coming from the tech ticker 
 3. **Screenshots converted from JPG to WebP** (same 1600×768): 294 KiB → 131 KiB.
 4. **No `robots.txt`**, so the HTML page was served in its place. Added `public/robots.txt`, and SEO is now 100.
 
+## Run 2 — 2026-11-22 (pre-deploy CSP check and production)
+
+### CSP before deploying
+
+`dist/` was served locally with the exact headers from `vercel.json`, and every interactive part of the page was exercised while listening for `securitypolicyviolation` events.
+
+- **Found:** Vite inlined the 1.7 KB Cyrillic-ext font subset as a `data:` URI, which `font-src 'self'` blocks (a console error on the live site).
+- **Fixed** in `vite.config.ts`: fonts are never inlined.
+- **After the fix:** 0 violations, 0 console errors, and 48/48 checks pass under the real headers.
+
+### Production: https://clive-benito.vercel.app/
+
+| Check | Result |
+|---|---|
+| HTTPS | Passed |
+| `http://` → `https://` | Passed (308 permanent redirect) |
+| Security headers: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS | Passed (all six served) |
+| Deployed build matches `main` | Passed (asset hashes identical to the local build of `b5a1f9b`) |
+| Résumé PDF, sharing image, robots.txt, screenshots, favicon | Passed (200 with correct types) |
+| Compression | Passed (JS served at 85 KB) |
+| Full suite against production (Edge and Chrome) | Passed (48/48 each) |
+| CSP violations / console errors on production | Passed (none) |
+| PageSpeed Insights API | Not run — the shared anonymous API quota was exhausted; run it at pagespeed.web.dev |
+
+Lighthouse 12.6 from the test machine against production:
+
+| | Performance | Accessibility | Best practices | SEO | FCP | LCP | CLS |
+|---|---|---|---|---|---|---|---|
+| Mobile (3 runs) | 67–73 | 100 | 100 | 100 | 1.4–1.5 s | 1.6–1.7 s | 0 |
+| Desktop | 79 | 100 | 100 | 100 | 0.4 s | 0.4 s | 0.075 |
+
+Load metrics are good: 170 KiB in total and LCP under 2 s on simulated slow 4G. The performance score is again pulled down only by Total Blocking Time, which swung from 1.5 s to 4.6 s across identical runs. This is the local-CPU noise described in Run 1.
+
 ## Not yet done — needs a person or a device
+
+- [ ] **PageSpeed Insights** at https://pagespeed.web.dev/ for https://clive-benito.vercel.app/ (mobile and desktop) — the representative performance score.
 
 - [ ] **NVDA (Windows):** headings list (H key), the skills tabs and table, the case-study title on open, and "opens in a new tab" announcements.
 - [ ] **Real phone:** menu, bottom-sheet case study, skills table, résumé download, and overall smoothness of the motion.

@@ -21,7 +21,7 @@ This is the working checklist for version one. It follows the phases in the port
 ## Content still pending
 
 - [x] Résumé PDF published at `public/Clive-Owen-Benito-Resume.pdf` (2026-11-22). By the owner's choice it is the full version, including phone, street address, and school email. Metadata checked: author name and template title only.
-- [ ] Social-sharing image (`og:image`) and canonical URL, added once the production URL exists.
+- [x] Social-sharing image (`public/og-image.jpg`, 1200×630) with `og:url`, `og:image` and canonical URL set to the production address.
 - [ ] Higher-resolution profile photo (600px or larger); the current one is 299px and looks slightly soft on high-density screens.
 - [x] Certifications with Credly verification links (Certiport for IT Specialist – Databases).
 - [x] LinkedIn URL and public contact email.
@@ -44,7 +44,7 @@ These are outside this repository, but the portfolio links to them.
 - [x] Phase 4: all sections built with verified content, plus page metadata.
 - [x] Design iterations: dark theme, case-study dialog, bento About, skills matrix, certification redesign, motion and hover polish (see the changes list in the wireframes file).
 - [ ] Phase 5: keyboard, screen-reader, responsive, reduced-motion, contrast, link, and performance checks across browsers. Automated run done on 2026-11-22 (48/48 in Edge and Chrome; Lighthouse a11y, best practices and SEO all 100). Manual checks are still open; see [docs/validation.md](docs/validation.md).
-- [ ] Phase 6: deploy to Vercel; verify HTTPS, security headers, and the public URL; add the sharing image; put the URL on the résumé and profiles.
+- [ ] Phase 6: deploy to Vercel; verify HTTPS, security headers, and the public URL; add the sharing image; put the URL on the résumé and profiles. Deployed on 2026-11-22 to https://clive-benito.vercel.app/ (Git-connected: every push to `main` redeploys). HTTPS, the HTTP→HTTPS redirect, all six security headers, and the sharing image are verified. Still to do: put the URL on the résumé, LinkedIn, and the GitHub profile.
 
 ## Validation
 
