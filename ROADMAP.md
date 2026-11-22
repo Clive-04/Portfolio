@@ -43,7 +43,7 @@ These are outside this repository, but the portfolio links to them.
 - [x] Phase 3: Vite, React, and TypeScript scaffold; layout; navigation; design tokens; base components; typed content model; CI workflow; `vercel.json` security headers.
 - [x] Phase 4: all sections built with verified content, plus page metadata.
 - [x] Design iterations: dark theme, case-study dialog, bento About, skills matrix, certification redesign, motion and hover polish (see the changes list in the wireframes file).
-- [ ] Phase 5: keyboard, screen-reader, responsive, reduced-motion, contrast, link, and performance checks across browsers.
+- [ ] Phase 5: keyboard, screen-reader, responsive, reduced-motion, contrast, link, and performance checks across browsers. Automated run done on 2026-11-22 (48/48 in Edge and Chrome; Lighthouse a11y, best practices and SEO all 100). Manual checks are still open; see [docs/validation.md](docs/validation.md).
 - [ ] Phase 6: deploy to Vercel; verify HTTPS, security headers, and the public URL; add the sharing image; put the URL on the résumé and profiles.
 
 ## Validation
