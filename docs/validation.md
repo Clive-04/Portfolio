@@ -106,16 +106,33 @@ Lighthouse 12.6 from the test machine against production:
 
 Load metrics are good: 170 KiB in total and LCP under 2 s on simulated slow 4G. The performance score is again pulled down only by Total Blocking Time, which swung from 1.5 s to 4.6 s across identical runs. This is the local-CPU noise described in Run 1.
 
-## Not yet done — needs a person or a device
+## Run 3 — 2026-11-22 (manual, by the owner)
 
-- [ ] **PageSpeed Insights** at https://pagespeed.web.dev/ for https://clive-benito.vercel.app/ (mobile and desktop) — the representative performance score.
+| Check | Result |
+|---|---|
+| NVDA (Windows): headings list, skills tabs and table, case-study title on open, "opens in a new tab" announcements | Passed |
+| Real phone: menu, bottom-sheet case study, skills table, résumé download, motion smoothness | Passed |
+| LinkedIn link, opened by hand | Passed |
+| Browser zoom to 400% on a laptop | Passed — nothing cut off |
+| Windows "Animation effects" off (Settings → Accessibility → Visual effects), browser restarted | Passed — sections appear without fading or sliding, the ticker is still and its pause button is hidden, and the case study opens and closes instantly |
+| Firefox and Safari/iOS | Not run — skipped by the owner; Chromium (Edge, Chrome) and the phone browser were covered |
 
-- [ ] **NVDA (Windows):** headings list (H key), the skills tabs and table, the case-study title on open, and "opens in a new tab" announcements.
-- [ ] **Real phone:** menu, bottom-sheet case study, skills table, résumé download, and overall smoothness of the motion.
-- [ ] **Firefox** (not installed on the test machine) and **Safari/iOS**.
-- [ ] **Windows "Show animations" off:** confirm that reduced motion applies on a real setting, not just the emulation.
-- [ ] **LinkedIn link:** open it by hand.
-- [ ] **Browser zoom to 400%** on a laptop: confirm that nothing is cut off.
+### PageSpeed Insights
+
+[Mobile report](https://pagespeed.web.dev/analysis/https-clive-benito-vercel-app/8k6gdzlxz2?form_factor=mobile) · [Desktop report](https://pagespeed.web.dev/analysis/https-clive-benito-vercel-app/8k6gdzlxz2?form_factor=desktop), captured 2026-11-22 1:41 PM GMT+8 with Lighthouse 13.6.0.
+
+| | Performance | Accessibility | Best practices | SEO | FCP | LCP | TBT | CLS | Speed Index |
+|---|---|---|---|---|---|---|---|---|---|
+| Mobile (Moto G Power, slow 4G) | 100 | 100 | 100 | 100 | 0.9 s | 1.5 s | 0 ms | 0 | 1.1 s |
+| Desktop | 100 | 100 | 100 | 100 | 0.2 s | 0.3 s | 0 ms | 0 | 0.4 s |
+
+This settles the Total Blocking Time question from Runs 1 and 2. On Google's hardware TBT is 0 ms, so the 1–4.6 s seen locally came from the test machine drawing in software, not from the site. There is no field (CrUX) data yet, because the site is too new to have enough real-visitor traffic.
+
+Remaining suggestions (none affect the score): about 38 KiB of unused JavaScript, possible image savings (29 KiB on mobile, 116 KiB on desktop), and one render-blocking request (about 150 ms on mobile).
+
+## Result
+
+Phase 5 is complete. Every check passed except Firefox and Safari/iOS, which the owner chose to skip.
 
 ## Open items found
 
