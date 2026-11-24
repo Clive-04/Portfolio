@@ -247,7 +247,6 @@
 
 /* Used: a glowing teal dot. Not used: a faint pip. */
 .dot,
-.ring,
 .empty {
   display: inline-block;
   vertical-align: middle;
@@ -262,13 +261,23 @@
   box-shadow: 0 0 0 4px rgb(46 196 176 / 0.12), 0 0 14px var(--glow-accent);
 }
 
-/* AI-assisted: same size as a built dot, but a hollow teal ring (7.6:1 against the card). */
-.ring {
-  width: 0.875rem;
-  height: 0.875rem;
-  border: 2px solid var(--color-accent);
-  background: transparent;
-  box-shadow: 0 0 0 4px rgb(46 196 176 / 0.08);
+/* AI-assisted: a small labelled pill (accent-hover text on soft teal, 7.5:1). */
+.aiTag {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0.125rem var(--space-2);
+  border: 1px solid rgb(46 196 176 / 0.45);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.aiShort {
+  display: none;
 }
 
 .empty {
@@ -277,8 +286,7 @@
   background: var(--color-border-strong);
 }
 
-.matrix tbody tr:hover .dot,
-.matrix tbody tr:hover .ring {
+.matrix tbody tr:hover .dot {
   transform: scale(1.25);
 }
 
@@ -299,8 +307,7 @@
   gap: var(--space-2);
 }
 
-.key .dot,
-.key .ring {
+.key .dot {
   width: 0.625rem;
   height: 0.625rem;
   box-shadow: none;
@@ -329,6 +336,19 @@
 @media (max-width: 39.99rem) {
   .full {
     display: none;
+  }
+
+  .aiFull {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .aiShort {
+    display: inline;
   }
 
   .code {

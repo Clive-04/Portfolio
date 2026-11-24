@@ -143,12 +143,21 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
                 {columns.map((column) => {
                   const used = skill.projects.includes(column.slug)
                   const assisted = used && (skill.assisted?.includes(column.slug) ?? false)
-                  const state = assisted ? 'AI-assisted' : used ? 'Used' : 'Not used'
                   return (
                     <td key={column.slug} className={styles.cell}>
-                      <span className={assisted ? styles.ring : used ? styles.dot : styles.empty}>
-                        <span className="visually-hidden">{state}</span>
-                      </span>
+                      {assisted ? (
+                        // A labelled pill instead of a dot: "AI-assisted" on wide screens, "AI" on narrow ones.
+                        <span className={styles.aiTag}>
+                          <span className={styles.aiFull}>AI-assisted</span>
+                          <span className={styles.aiShort} aria-hidden="true">
+                            AI
+                          </span>
+                        </span>
+                      ) : (
+                        <span className={used ? styles.dot : styles.empty}>
+                          <span className="visually-hidden">{used ? 'Used' : 'Not used'}</span>
+                        </span>
+                      )}
                     </td>
                   )
                 })}
@@ -157,13 +166,13 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
           </tbody>
         </table>
 
-        {/* Key for the two kinds of dot. Cells announce their own state, so this is visual only. */}
+        {/* Explains the label once. Visual only: the cells already read "Used" or "AI-assisted". */}
         <p className={styles.key} aria-hidden="true">
           <span>
-            <span className={styles.dot} /> Built
+            <span className={styles.dot} /> Built myself
           </span>
           <span>
-            <span className={styles.ring} /> AI-assisted: directed and reviewed, not hand-written
+            <span className={styles.aiTag}>AI-assisted</span> Directed and reviewed by me, not hand-written
           </span>
         </p>
 
