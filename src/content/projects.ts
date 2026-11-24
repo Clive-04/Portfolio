@@ -57,10 +57,10 @@ export const projects: Project[] = [
   {
     slug: 'pasa-buy',
     title: 'Pasa-Buy',
-    summary: 'A community errand app: neighbours post what they need from nearby stores, and runners buy and deliver it.',
+    summary: 'A community errand app: neighbors post what they need from nearby stores, and runners buy and deliver it.',
     teamLabel: 'Client project · with one collaborator',
     problem: 'People need a simple way to ask others to buy or deliver items and to coordinate those errands.',
-    role: 'Built the frontend and most backend features: profiles, messaging with attachments, notifications, wallet, user search, ratings, and referrals. Later led a hardening and deployment pass: receipt-based price approval, real-time chat, admin tools, security, automated tests, CI, and deployment.',
+    role: 'Built the frontend and most backend features: profiles, messaging with attachments, notifications, wallet, user search, ratings, and referrals. Later led an AI-assisted hardening and deployment pass: receipt-based price approval, real-time chat, admin tools, security, automated tests, CI, and deployment.',
     collaboration:
       'Client project, built with one collaborator, who wrote the core authentication and request backend. The later hardening pass was carried out with AI coding agents (Claude Code and Codex) under my direction and review. The repository was re-created after completion, so the original history is kept in a separate repository.',
     status: 'completed',

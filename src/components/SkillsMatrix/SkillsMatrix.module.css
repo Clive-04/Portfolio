@@ -247,6 +247,7 @@
 
 /* Used: a glowing teal dot. Not used: a faint pip. */
 .dot,
+.ring,
 .empty {
   display: inline-block;
   vertical-align: middle;
@@ -261,14 +262,48 @@
   box-shadow: 0 0 0 4px rgb(46 196 176 / 0.12), 0 0 14px var(--glow-accent);
 }
 
+/* AI-assisted: same size as a built dot, but a hollow teal ring (7.6:1 against the card). */
+.ring {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid var(--color-accent);
+  background: transparent;
+  box-shadow: 0 0 0 4px rgb(46 196 176 / 0.08);
+}
+
 .empty {
   width: 0.375rem;
   height: 0.375rem;
   background: var(--color-border-strong);
 }
 
-.matrix tbody tr:hover .dot {
+.matrix tbody tr:hover .dot,
+.matrix tbody tr:hover .ring {
   transform: scale(1.25);
+}
+
+/* Dot key under the matrix, on every screen size. */
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.key > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.key .dot,
+.key .ring {
+  width: 0.625rem;
+  height: 0.625rem;
+  box-shadow: none;
 }
 
 /* Rows slide in one after another when a category opens. */

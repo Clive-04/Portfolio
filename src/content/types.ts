@@ -78,6 +78,12 @@ export interface Skill {
   name: string
   /** Project slugs whose repositories show this skill. Titles come from projects.ts. */
   projects: string[]
+  /**
+   * The subset of `projects` where this skill came from AI-assisted work
+   * (directed and reviewed by Clive, not hand-written). Shown as a hollow ring
+   * instead of a filled dot.
+   */
+  assisted?: string[]
 }
 
 export interface SkillGroup {

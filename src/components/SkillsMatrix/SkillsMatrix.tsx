@@ -142,10 +142,12 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
                 </th>
                 {columns.map((column) => {
                   const used = skill.projects.includes(column.slug)
+                  const assisted = used && (skill.assisted?.includes(column.slug) ?? false)
+                  const state = assisted ? 'AI-assisted' : used ? 'Used' : 'Not used'
                   return (
                     <td key={column.slug} className={styles.cell}>
-                      <span className={used ? styles.dot : styles.empty}>
-                        <span className="visually-hidden">{used ? 'Used' : 'Not used'}</span>
+                      <span className={assisted ? styles.ring : used ? styles.dot : styles.empty}>
+                        <span className="visually-hidden">{state}</span>
                       </span>
                     </td>
                   )
@@ -154,6 +156,16 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
             ))}
           </tbody>
         </table>
+
+        {/* Key for the two kinds of dot. Cells announce their own state, so this is visual only. */}
+        <p className={styles.key} aria-hidden="true">
+          <span>
+            <span className={styles.dot} /> Built
+          </span>
+          <span>
+            <span className={styles.ring} /> AI-assisted: directed and reviewed, not hand-written
+          </span>
+        </p>
 
         {/* Key for the short column codes on small screens. */}
         <p className={styles.legend} aria-hidden="true">

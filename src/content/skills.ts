@@ -4,6 +4,9 @@ import type { SkillGroup } from './types'
  * Skills grouped by capability, each mapped to the projects whose
  * repositories show it (checked 2026-11-21/22; Pasa-Buy additions 2026-11-25). Technologies without
  * project evidence are left out. Project slugs match projects.ts.
+ * Pasa-Buy's later hardening pass was carried out with AI coding agents under
+ * Clive's direction and review; skills from that pass list Pasa-Buy under
+ * ssisted, which the matrix shows as a hollow ring rather than a filled dot.
  */
 export const skillGroups: SkillGroup[] = [
   {
@@ -27,8 +30,8 @@ export const skillGroups: SkillGroup[] = [
       { name: 'PHP · CodeIgniter 4', projects: ['pasa-buy'] },
       { name: 'PHP · Laravel', projects: ['smartfeather'] },
       { name: 'REST APIs', projects: ['careertrack'] },
-      { name: 'Payment integration (test mode)', projects: ['pasa-buy'] },
-      { name: 'Real-time chat', projects: ['pasa-buy'] },
+      { name: 'Payment integration (test mode)', projects: ['pasa-buy'], assisted: ['pasa-buy'] },
+      { name: 'Real-time chat', projects: ['pasa-buy'], assisted: ['pasa-buy'] },
       { name: 'JWT authentication', projects: ['careertrack'] },
     ],
   },
@@ -40,7 +43,7 @@ export const skillGroups: SkillGroup[] = [
       { name: 'MySQL', projects: ['pasa-buy'] },
       { name: 'SQLAlchemy', projects: ['careertrack'] },
       { name: 'Alembic migrations', projects: ['careertrack'] },
-      { name: 'Transactions & row locking', projects: ['pasa-buy'] },
+      { name: 'Transactions & row locking', projects: ['pasa-buy'], assisted: ['pasa-buy'] },
     ],
   },
   {
@@ -49,20 +52,20 @@ export const skillGroups: SkillGroup[] = [
     skills: [
       { name: 'Vitest', projects: ['careertrack'] },
       { name: 'Playwright', projects: ['careertrack'] },
-      { name: 'PHPUnit', projects: ['pasa-buy'] },
+      { name: 'PHPUnit', projects: ['pasa-buy'], assisted: ['pasa-buy'] },
       { name: 'k6 load testing', projects: ['pedalya'] },
-      { name: 'Security hardening', projects: ['careertrack', 'pasa-buy'] },
-      { name: 'CI with GitHub Actions', projects: ['pasa-buy'] },
+      { name: 'Security hardening', projects: ['careertrack', 'pasa-buy'], assisted: ['pasa-buy'] },
+      { name: 'CI with GitHub Actions', projects: ['pasa-buy'], assisted: ['pasa-buy'] },
     ],
   },
   {
     title: 'UI/UX & responsive',
     blurb: 'Layouts and flows that work on any screen.',
     skills: [
-      { name: 'Responsive layouts', projects: ['careertrack', 'pasa-buy', 'pedalya', 'smartfeather'] },
+      { name: 'Responsive layouts', projects: ['careertrack', 'pasa-buy', 'pedalya', 'smartfeather'], assisted: ['pasa-buy'] },
       { name: 'Responsive navigation', projects: ['pedalya', 'smartfeather'] },
-      { name: 'Form validation', projects: ['careertrack', 'pasa-buy', 'pedalya'] },
-      { name: 'Dashboard interfaces', projects: ['careertrack', 'pasa-buy', 'pedalya', 'smartfeather'] },
+      { name: 'Form validation', projects: ['careertrack', 'pasa-buy', 'pedalya'], assisted: ['pasa-buy'] },
+      { name: 'Dashboard interfaces', projects: ['careertrack', 'pasa-buy', 'pedalya', 'smartfeather'], assisted: ['pasa-buy'] },
     ],
   },
   {
