@@ -222,8 +222,9 @@
   color: var(--color-accent);
 }
 
+/* Same 25:12 shape as the screenshots (1600×768), so the whole image shows. */
 .cover {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 25 / 12;
   overflow: hidden;
   background: var(--color-band);
 }

@@ -36,10 +36,14 @@
   border-color: var(--color-accent);
 }
 
-/* Cover: the project screenshot, cropped from the top. */
+/*
+ * Cover: the project screenshot, shown whole. The frame matches the
+ * screenshots' own shape (1600×768 = 25:12), so nothing is cropped.
+ * Keep new screenshots at 1600×768.
+ */
 .cover {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 25 / 12;
   overflow: hidden;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-band);
