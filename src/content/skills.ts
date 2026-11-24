@@ -2,7 +2,7 @@ import type { SkillGroup } from './types'
 
 /**
  * Skills grouped by capability, each mapped to the projects whose
- * repositories show it (checked 2026-11-21/22). Technologies without
+ * repositories show it (checked 2026-11-21/22; Pasa-Buy additions 2026-11-25). Technologies without
  * project evidence are left out. Project slugs match projects.ts.
  */
 export const skillGroups: SkillGroup[] = [
@@ -27,6 +27,8 @@ export const skillGroups: SkillGroup[] = [
       { name: 'PHP · CodeIgniter 4', projects: ['pasa-buy'] },
       { name: 'PHP · Laravel', projects: ['smartfeather'] },
       { name: 'REST APIs', projects: ['careertrack'] },
+      { name: 'Payment integration (test mode)', projects: ['pasa-buy'] },
+      { name: 'Real-time chat', projects: ['pasa-buy'] },
       { name: 'JWT authentication', projects: ['careertrack'] },
     ],
   },
@@ -38,6 +40,7 @@ export const skillGroups: SkillGroup[] = [
       { name: 'MySQL', projects: ['pasa-buy'] },
       { name: 'SQLAlchemy', projects: ['careertrack'] },
       { name: 'Alembic migrations', projects: ['careertrack'] },
+      { name: 'Transactions & row locking', projects: ['pasa-buy'] },
     ],
   },
   {
@@ -46,18 +49,20 @@ export const skillGroups: SkillGroup[] = [
     skills: [
       { name: 'Vitest', projects: ['careertrack'] },
       { name: 'Playwright', projects: ['careertrack'] },
+      { name: 'PHPUnit', projects: ['pasa-buy'] },
       { name: 'k6 load testing', projects: ['pedalya'] },
-      { name: 'Security hardening', projects: ['careertrack'] },
+      { name: 'Security hardening', projects: ['careertrack', 'pasa-buy'] },
+      { name: 'CI with GitHub Actions', projects: ['pasa-buy'] },
     ],
   },
   {
     title: 'UI/UX & responsive',
     blurb: 'Layouts and flows that work on any screen.',
     skills: [
-      { name: 'Responsive layouts', projects: ['careertrack', 'pedalya', 'smartfeather'] },
+      { name: 'Responsive layouts', projects: ['careertrack', 'pasa-buy', 'pedalya', 'smartfeather'] },
       { name: 'Responsive navigation', projects: ['pedalya', 'smartfeather'] },
-      { name: 'Form validation', projects: ['careertrack', 'pedalya'] },
-      { name: 'Dashboard interfaces', projects: ['careertrack', 'pedalya', 'smartfeather'] },
+      { name: 'Form validation', projects: ['careertrack', 'pasa-buy', 'pedalya'] },
+      { name: 'Dashboard interfaces', projects: ['careertrack', 'pasa-buy', 'pedalya', 'smartfeather'] },
     ],
   },
   {
@@ -68,6 +73,7 @@ export const skillGroups: SkillGroup[] = [
       { name: 'Docker', projects: ['careertrack'] },
       { name: 'Vercel & Render', projects: ['careertrack'] },
       { name: 'Gemini API', projects: ['careertrack'] },
+      { name: 'AI coding agents (Claude Code, Codex)', projects: ['pasa-buy'] },
     ],
   },
 ]

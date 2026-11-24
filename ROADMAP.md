@@ -14,7 +14,7 @@ This is the working checklist for version one. It follows the phases in the port
 | Project | Type | Role | Repository | Live |
 |---|---|---|---|---|
 | CareerTrack | Solo project | Full stack: Next.js frontend, FastAPI backend, AI résumé analysis, security hardening, tests, deployment | [Clive-04/CareerTrack](https://github.com/Clive-04/CareerTrack) | [career-track-bice.vercel.app](https://career-track-bice.vercel.app/) |
-| Pasa-Buy | Client project, one collaborator | Frontend and most backend features; the collaborator built the core auth and request backend | [Clive-04/Pasa-Buy](https://github.com/Clive-04/Pasa-Buy) (history in [Pasa-Buy-Project](https://github.com/Clive-04/Pasa-Buy-Project)) | — |
+| Pasa-Buy | Client project, one collaborator | Frontend and most backend features; the collaborator built the core auth and request backend. Later led an AI-assisted hardening and deployment pass (tests, CI, security, payments, chat, admin) | [Clive-04/Pasa-Buy](https://github.com/Clive-04/Pasa-Buy) (history in [Pasa-Buy-Project](https://github.com/Clive-04/Pasa-Buy-Project)) | [pasa-buy.infinityfree.io](https://pasa-buy.infinityfree.io/) (demo, temporary free host) |
 | Pedalya | Team project | Customer-side frontend and a k6 load test; teammates did backend integration and tests | [Alcoreza/Pedalya](https://github.com/Alcoreza/Pedalya) | — |
 | SmartFeather | Capstone, team of four | Manager and admin frontend, built with one groupmate | [Alcoreza/SmartFeather](https://github.com/Alcoreza/SmartFeather) | [smartfeather.org](https://smartfeather.org/) |
 
@@ -25,14 +25,14 @@ This is the working checklist for version one. It follows the phases in the port
 - [ ] Higher-resolution profile photo (600px or larger); the current one is 299px and looks slightly soft on high-density screens.
 - [x] Certifications with Credly verification links (Certiport for IT Specialist – Databases).
 - [x] LinkedIn URL and public contact email.
-- [x] Project screenshots for CareerTrack, Pedalya, and SmartFeather. Pasa-Buy has none (not deployed).
+- [x] Project screenshots for all four projects. Pasa-Buy's was captured from its live demo on 2026-11-25.
 
 ## Before sharing the project repositories widely
 
 These are outside this repository, but the portfolio links to them.
 
 - [ ] SmartFeather: the repository owner should complete the security cleanup reported privately.
-- [ ] Pasa-Buy: review committed user uploads and team photos, and remove anything that should not be public.
+- [x] Pasa-Buy: the seven committed legacy user images were removed from the current tree on 2026-11-24 (they remain in Git history; a history purge was not approved).
 - [ ] SmartFeather: replace the default Laravel README with a project description.
 
 ## Phase checklist

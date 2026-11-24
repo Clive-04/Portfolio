@@ -2,7 +2,9 @@ import type { Project } from './types'
 
 /**
  * Every claim here was checked against the project's repository
- * history on 2026-11-21/22. Update only after verified milestones.
+ * history on 2026-11-21/22 (Pasa-Buy re-checked 2026-11-25 against
+ * Clive-04/Pasa-Buy main 9b29641 and its live demo). Update only after
+ * verified milestones.
  */
 export const projects: Project[] = [
   {
@@ -55,12 +57,12 @@ export const projects: Project[] = [
   {
     slug: 'pasa-buy',
     title: 'Pasa-Buy',
-    summary: 'A community platform where people request or deliver nearby items.',
+    summary: 'A community errand app: neighbours post what they need from nearby stores, and runners buy and deliver it.',
     teamLabel: 'Client project · with one collaborator',
     problem: 'People need a simple way to ask others to buy or deliver items and to coordinate those errands.',
-    role: 'Built the frontend and most backend features: profiles, messaging with attachments, notifications, wallet, user search, ratings, and referrals.',
+    role: 'Built the frontend and most backend features: profiles, messaging with attachments, notifications, wallet, user search, ratings, and referrals. Later led a hardening and deployment pass: receipt-based price approval, real-time chat, admin tools, security, automated tests, CI, and deployment.',
     collaboration:
-      'Client project, built with one collaborator, who wrote the core authentication and request backend. The repository was re-created after completion, so the original history is kept in a separate repository.',
+      'Client project, built with one collaborator, who wrote the core authentication and request backend. The later hardening pass was carried out with AI coding agents (Claude Code and Codex) under my direction and review. The repository was re-created after completion, so the original history is kept in a separate repository.',
     status: 'completed',
     featured: true,
     stack: [
@@ -69,20 +71,42 @@ export const projects: Project[] = [
       { name: 'MySQL', evidence: 'confirmed' },
       { name: 'JavaScript', evidence: 'confirmed' },
       { name: 'CSS', evidence: 'confirmed' },
+      // Added in the AI-assisted hardening pass (directed and reviewed, not hand-written).
+      { name: 'PHPUnit', evidence: 'qualified' },
+      { name: 'TalkJS', evidence: 'qualified' },
+      { name: 'Xendit (test mode)', evidence: 'qualified' },
+      { name: 'Turbo', evidence: 'qualified' },
+      { name: 'GitHub Actions', evidence: 'qualified' },
     ],
     features: [
-      'Post, browse, filter, and accept requests',
-      'User profiles with photo upload and public profile pages',
-      'Direct messaging with attachments and notifications',
-      'Wallet, ratings, and referrals',
+      'Post, browse, filter, and accept errands, with a step-by-step status tracker',
+      'Receipt-backed approval of the actual price before any payment, and a wallet with a full ledger',
+      'Real-time chat with block, report, and an admin moderation queue',
+      'Admin dashboard with charts, user suspension, request filters, and CSV export',
     ],
-    validation: [],
+    validation: [
+      '233 automated PHPUnit tests, including concurrency races for payments and price approval',
+      'GitHub Actions CI on PHP 8.2 and 8.3 against MySQL 8 and MariaDB 10.6',
+      'Staging rehearsals of fresh install, upgrade, backup restore, and rollback',
+      'Content-Security-Policy with no inline scripts, verified with zero violations',
+    ],
     links: {
       repository: 'https://github.com/Clive-04/Pasa-Buy',
       history: 'https://github.com/Clive-04/Pasa-Buy-Project',
+      live: 'https://pasa-buy.infinityfree.io/',
     },
-    screenshots: [],
-    limitations: ['Not currently deployed.', 'No automated tests.'],
+    screenshots: [
+      {
+        src: '/projects/pasa-buy.webp',
+        alt: 'Pasa-Buy log-in page: the headline “Errands done by your neighbours” beside a store-to-home delivery illustration and the log-in form.',
+        width: 1600,
+        height: 768,
+      },
+    ],
+    limitations: [
+      'Runs as a demo on free hosting: payments use test mode and wallet credits are simulated.',
+      'The free host blocks incoming webhooks, so top-ups are confirmed with a “Check payment” step.',
+    ],
   },
   {
     slug: 'pedalya',
