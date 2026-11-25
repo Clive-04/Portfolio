@@ -588,3 +588,18 @@
 :global(html[data-design="pixel"]) .certStats div:first-child dd {
   color: var(--pixel-vermilion);
 }
+
+/* Save file: keyline blocks with a cobalt edge, like two save slots. */
+:global(html[data-design="pixel"]) .resumeBlock {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-left-width: 6px;
+  border-left-color: var(--pixel-cobalt);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .resumeLabel {
+  color: var(--pixel-vermilion);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+}

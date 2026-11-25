@@ -18,3 +18,14 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
 }
+
+/* Pixel design: square dashed box and chip. */
+:global(html[data-design="pixel"]) .pending {
+  border: var(--pixel-line) dashed var(--color-border-strong);
+  border-radius: 0;
+}
+
+:global(html[data-design="pixel"]) .label {
+  border-radius: 0;
+  font-family: var(--font-display);
+}
