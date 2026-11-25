@@ -32,6 +32,9 @@ export function measureObstacles(): Rect[] {
       for (const r of range.getClientRects()) if (r.width && r.height) out.push(toDocument(r, PAD.text))
     }
     for (const el of scope.querySelectorAll(`${CONTROLS}, ${MEDIA}`)) {
+      // A focusable card he may stand on (the Skills panel) is not an obstacle to itself; its
+      // focus ring is handled live instead: he steps out of view while focus would touch him.
+      if (el.matches('[data-companion-anchor]')) continue
       const r = el.getBoundingClientRect()
       if (r.width && r.height) out.push(toDocument(r, el.matches(MEDIA) ? PAD.media : PAD.control))
     }

@@ -117,6 +117,30 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     sprite.style.transform = `translate(${snap(x, dpr)}px, ${snap(y - box.h, dpr)}px)`
     sprite.toggleAttribute('data-dark', dark)
     followSpeech()
+    yieldToFocus()
+  }
+
+  /**
+   * Never over a focus indicator: while a keyboard focus ring would touch
+   * him (3 px outline + 2 px offset, plus a pixel), he and his bubble step
+   * out of view, and come back when focus moves on.
+   */
+  const FOCUS_RING = 6
+  function yieldToFocus() {
+    const el = document.activeElement
+    let touches = false
+    if (el && el !== document.body && el.matches(':focus-visible')) {
+      const f = el.getBoundingClientRect()
+      const s = sprite.getBoundingClientRect()
+      touches =
+        f.width > 0 &&
+        f.left - FOCUS_RING < s.right &&
+        s.left < f.right + FOCUS_RING &&
+        f.top - FOCUS_RING < s.bottom &&
+        s.top < f.bottom + FOCUS_RING
+    }
+    sprite.style.visibility = touches ? 'hidden' : ''
+    bubble.style.visibility = touches ? 'hidden' : ''
   }
 
   function wake() {
@@ -442,6 +466,8 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('resize', remeasure)
   document.addEventListener('click', onClick, true)
+  document.addEventListener('focusin', yieldToFocus)
+  document.addEventListener('focusout', yieldToFocus)
   void document.fonts?.ready.then(remeasure)
   measure()
   checkOverlays()
@@ -461,6 +487,8 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', remeasure)
       document.removeEventListener('click', onClick, true)
+      document.removeEventListener('focusin', yieldToFocus)
+      document.removeEventListener('focusout', yieldToFocus)
       delete root.dataset.companion
     },
   }

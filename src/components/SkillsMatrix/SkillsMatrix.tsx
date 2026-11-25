@@ -68,7 +68,7 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
   const usedIn = new Set(group.skills.flatMap((skill) => skill.projects))
 
   return (
-    <div className={styles.layout} data-reveal data-companion-anchor="skills" data-companion-place="top below" data-companion-act>
+    <div className={styles.layout} data-reveal>
       <div role="tablist" aria-label="Skill categories" className={styles.tabs}>
         {groups.map((item, index) => (
           <button
@@ -105,6 +105,9 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
         tabIndex={0}
         className={styles.panel}
         data-spotlight
+        data-companion-anchor="skills"
+        data-companion-place="top below"
+        data-companion-act
       >
         <div className={styles.panelHead}>
           <div>
