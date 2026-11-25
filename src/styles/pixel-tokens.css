@@ -47,6 +47,21 @@
 
   --sidebar-width: 15rem;
 
+  /*
+   * Hover (and keyboard focus inside cards): one shared, clearly visible
+   * effect. Cards rise 4px onto a deep hard shadow with a cobalt keyline;
+   * buttons rise 2px. Under reduced motion the change is instant.
+   */
+  --hover-shift: -4px;
+  --hover-shift-sm: -2px;
+  --shadow-hover: 8px 8px 0 var(--pixel-shadow);
+  --shadow-hover-sm: 4px 4px 0 var(--pixel-shadow);
+  --hover-keyline: var(--color-accent);
+  --hover-transition: translate var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-out),
+    border-color var(--motion-duration-fast) var(--motion-ease-out),
+    background-color var(--motion-duration-fast) var(--motion-ease-out);
+
   /* Flat textures and gradients: the pixel look avoids soft noise. */
   --texture-grain: none;
   --texture-grain-light: none;
@@ -169,6 +184,9 @@
   --pixel-on-vermilion: #101a33; /* 6.71:1 on coral */
   --halftone-ink: rgb(5 10 24 / 0.9);
   --pixel-shadow: #050a18;
+  /* Near-black shadows vanish on navy, so hover lifts onto a mid blue instead. */
+  --shadow-hover: 8px 8px 0 #34558f;
+  --shadow-hover-sm: 4px 4px 0 #34558f;
 
   --glow-accent: rgb(114 167 255 / 0.3);
   --shadow-sm: 2px 2px 0 var(--pixel-shadow);

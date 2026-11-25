@@ -603,3 +603,17 @@
   font-family: var(--font-display);
   font-size: var(--text-sm);
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+:global(html[data-design="pixel"]) .resumeBlock {
+  transition: var(--hover-transition);
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .resumeBlock:hover {
+    translate: var(--hover-shift) var(--hover-shift);
+    border-color: var(--hover-keyline);
+    border-left-color: var(--pixel-cobalt);
+    box-shadow: var(--shadow-hover);
+  }
+}

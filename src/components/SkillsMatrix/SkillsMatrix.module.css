@@ -492,3 +492,16 @@
 :global(html[data-design="pixel"]) .legend b {
   font-family: var(--font-display);
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+:global(html[data-design="pixel"]) .tab {
+  transition: var(--hover-transition);
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .tab:hover {
+    translate: var(--hover-shift-sm) var(--hover-shift-sm);
+    border-color: var(--hover-keyline);
+    box-shadow: var(--shadow-hover-sm);
+  }
+}

@@ -254,3 +254,17 @@
   color: var(--color-on-ink-accent);
   box-shadow: none;
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .button:hover {
+    translate: var(--hover-shift-sm) var(--hover-shift-sm);
+    box-shadow: var(--shadow-hover-sm);
+  }
+
+  /* On the ink panel the shadow is yellow, so it stays visible on navy. */
+  :global(html[data-design="pixel"]) .light:hover,
+  :global(html[data-design="pixel"]) .ghost:hover {
+    box-shadow: 4px 4px 0 var(--color-on-ink-accent);
+  }
+}

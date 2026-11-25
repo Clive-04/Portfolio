@@ -344,3 +344,22 @@
   flex: none;
   color: var(--pixel-cobalt);
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+:global(html[data-design="pixel"]) .tile {
+  transition: var(--hover-transition);
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .tile:hover,
+  :global(html[data-design="pixel"]) .bio:hover {
+    translate: var(--hover-shift) var(--hover-shift);
+    border-color: var(--hover-keyline);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* The cobalt tile keeps a navy keyline so the edge stays visible on cobalt. */
+  :global(html[data-design="pixel"]) .look:hover {
+    border-color: var(--color-border-strong);
+  }
+}

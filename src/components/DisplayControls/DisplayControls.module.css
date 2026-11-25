@@ -127,3 +127,11 @@
 :global(html[data-design="pixel"]) .state {
   border-radius: 0;
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .button:hover {
+    translate: var(--hover-shift-sm) var(--hover-shift-sm);
+    box-shadow: var(--shadow-hover-sm);
+  }
+}

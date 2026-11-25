@@ -74,3 +74,11 @@
   transform: translate(2px, 2px);
   box-shadow: none;
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+@media (hover: hover) {
+  .button:hover {
+    translate: var(--hover-shift-sm) var(--hover-shift-sm);
+    box-shadow: var(--shadow-hover-sm);
+  }
+}

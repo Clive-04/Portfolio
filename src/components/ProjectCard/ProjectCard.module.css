@@ -203,3 +203,17 @@
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .card:hover {
+    translate: var(--hover-shift) var(--hover-shift);
+    border-color: var(--hover-keyline);
+    box-shadow: var(--shadow-hover);
+  }
+}
+
+:global(html[data-design="pixel"]) .card:focus-within {
+  translate: var(--hover-shift) var(--hover-shift);
+  box-shadow: var(--shadow-hover);
+}

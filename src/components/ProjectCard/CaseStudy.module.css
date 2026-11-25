@@ -785,3 +785,16 @@
     box-shadow: none;
   }
 }
+
+/* ---------- Stronger hover (shared tokens in pixel-tokens.css) ---------- */
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .pagerButton:hover,
+  :global(html[data-design="pixel"]) .close:hover {
+    translate: var(--hover-shift-sm) var(--hover-shift-sm);
+    box-shadow: var(--shadow-hover-sm);
+  }
+
+  :global(html[data-design="pixel"]) .list li:hover {
+    border-color: var(--hover-keyline);
+  }
+}
