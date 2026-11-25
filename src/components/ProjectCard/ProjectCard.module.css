@@ -136,3 +136,70 @@
   margin-top: auto;
   padding-top: var(--space-3);
 }
+
+/* ==========================================================================
+   Pixel design: keyline cards with a hard shadow. The screenshot stays whole
+   (25:12); no zoom or wash on hover, just a one-step lift of the shadow.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .card {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+  transition: translate var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .card:hover {
+    transform: none;
+    translate: -2px -2px;
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-lg);
+  }
+
+  :global(html[data-design="pixel"]) .card:hover .cover img {
+    transform: none;
+  }
+
+  :global(html[data-design="pixel"]) .card:hover .cover::after {
+    opacity: 0;
+  }
+}
+
+/* Keyboard focus inside the card: the keyline turns cobalt (bright blue at Night). */
+:global(html[data-design="pixel"]) .card:focus-within {
+  border-color: var(--color-accent);
+}
+
+:global(html[data-design="pixel"]) .cover {
+  border-bottom: var(--pixel-line) solid var(--color-border-strong);
+}
+
+:global(html[data-design="pixel"]) .coverBadge {
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .placeholder {
+  background: radial-gradient(color-mix(in srgb, var(--pixel-cobalt) 22%, transparent) 1px, transparent 1.5px) 0 0 / 8px
+      8px,
+    var(--color-band);
+}
+
+:global(html[data-design="pixel"]) .placeholder span {
+  color: var(--pixel-cobalt);
+  font-family: var(--font-display);
+}
+
+/* "Solo project" and similar: vermilion pixel label (5.21:1 or better on the card). */
+:global(html[data-design="pixel"]) .team {
+  color: var(--pixel-vermilion);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+}
+
+:global(html[data-design="pixel"]) .title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
