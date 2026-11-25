@@ -335,3 +335,25 @@ Owner request: replace the color fade when switching Day/Night. The new theme is
 | Halfway screenshot | The diamond edge is visible part-way across the page |
 
 Found during the check: the first version sized the diamond at 300vmax, so it covered the screen within one step; the radius is now computed from the button to the farthest screen corner. Browsers without View Transitions (including current Firefox) switch instantly. Automated Firefox checks are possible with Playwright's Firefox build if the owner approves downloading it.
+
+## Run 15 — 2026-11-25 (scrolling pixel companion, local motion preview, automated)
+
+Owner approved sprite sheet v7.2; this run covers the integration on `feature/pixel-companion` for the next checkpoint (local Day/Night motion preview). Not merged, pushed, or deployed. Headless Edge driven over the DevTools protocol (scratch script), dev server, 1280 × 800 unless noted.
+
+| Check | Result |
+|---|---|
+| `npm run lint` / `npm test` / `npm run build` | Passed / 91 of 91 (19 new route tests) / Passed |
+| Route at 1280 | Ledges found: hero/marquee edge, Projects, the Pasa-Buy card top, Skills, Résumé, Certifications, Contact, footer. Skipped as unsafe: About (no clear 64 px above), CareerTrack and the second card row (gap smaller than the sprite). Walks down where the lane is clear (Projects → card, Résumé → Certifications, Contact → footer); teleports elsewhere |
+| Never covers content | Every route box is checked against every text line (6 px margin), link/button/control (8 px, for focus rings) and image (2 px). Card screenshot: feet on the card border, clear of the "Completed" badge and the intro text |
+| Day / Night | Day: no rim needed. Night: 1-sprite-pixel light rim visible on the route and in the sidebar slot |
+| Bottom of page | Teleports into the sidebar mark: "CB" tile hidden, thumbs-up sprite at 1× beside the name; brand link and name unchanged |
+| Scrolling back up | 400 px up: slot plays the teleport out, "CB" returns exactly as before, the sprite reappears on the route |
+| Fallbacks | 800 px wide, reduced motion (also at the bottom), and Classic: no sprite, no `data-companion`, "CB" visible. Live switch wide → narrow → wide stops and restarts cleanly |
+| Keyboard / screen reader | Sprite is one empty `aria-hidden` element, not focusable; tab stops unchanged (52) |
+| Case-study dialog | Opens as modal above the sprite (top element at the sprite's position is the dialog) |
+| 125% display scaling | 3 device pixels per sprite pixel (2.4 CSS px), positions snapped to device pixels |
+| Layout shift / overflow | CLS 0.0011 with and without the companion (already present before it); no horizontal overflow |
+| Performance (same scripted scroll to the bottom and back, 2 runs each, baseline = commit 37999fe) | No long tasks either way. Script 96 → 109 ms, style 185 → 205 ms, all tasks 1468 → 1640 ms over ~15 s of scrolling. Route measure ≈ 5 ms, only on resize/layout change (debounced). JS bundle 88.45 → 94.96 kB gzip (sprite sheet inlined) |
+| Console / CSP | 0 errors in every scenario |
+
+Not yet checked: Firefox and Safari/iOS (not installed), a real screen reader, 320 px / 400% zoom (the companion is off below 56rem, so these fall under the narrow fallback). No teleport sound was added; the optional sound cue is still open.
