@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel companion review (v7.1)</title>
+<title>Pixel companion review (v7.2)</title>
 <!--
   Review sheet for the companion sprite. Open it through the dev server
   (npm run dev → /docs/design/companion/companion-review-sheet.html): the
@@ -59,7 +59,7 @@
 </head>
 <body>
 <main>
-  <h1>Pixel companion · review sheet (v7.1)</h1>
+  <h1>Pixel companion · review sheet (v7.2)</h1>
   <p class="lede">An original 24 × 32 sprite of Clive drawn from his formal portrait (<code>public/profile.jpg</code>), made to the pixel-art standard: silhouette first, top-left light, hard 1-bit edges, 14 colours, one fixed cell size, explicit timings, integer scaling only. Not traced from the photo; not taken from or modelled on any game sprite. Every image here is drawn from the exported production file <code>companion-sprites.png</code> (2.6 KB, transparent, 4-bit indexed).</p>
 
   <h2>1 · Portrait and pixel interpretation</h2>
@@ -135,7 +135,7 @@
   <h2>10 · Specification</h2>
   <div class="cols">
     <ul>
-      <li><b>Grid: 24 × 32.</b> The likeness lives in the vertical: hair volume, face, collar-and-tie, suit. 24 wide holds two eyes 4 px apart, and ears; 32 tall leaves 13 rows for the head and 19 for the suit and legs. In profile the head is 13 px deep (plus the nose), about the depth of the body and arm, so it doesn't overhang the shoulders. A 32 × 32 cell would only add empty columns to the front view.</li>
+      <li><b>Grid: 24 × 32.</b> The likeness lives in the vertical: hair volume, face, collar-and-tie, suit. 24 wide holds two eyes 4 px apart, and ears; 32 tall leaves 13 rows for the head and 19 for the suit and legs. In profile the head is 13 px deep (plus the nose), about the depth of the body and arm, and it sits straight over the shoulders (back of the head in line with the back), so it doesn't overhang or lean forward. A 32 × 32 cell would only add empty columns to the front view.</li>
       <li><b>Sizes:</b> 2× (48 × 64) on the route, 1× (24 × 32) in the sidebar. Whole-number scales only, <code>image-rendering: pixelated</code>, positions rounded to whole CSS pixels.</li>
       <li><b>Light:</b> top left. Lapels and the left sleeve catch it; the right side and the far leg drop to the suit shade. No pillow shading.</li>
       <li><b>Edges:</b> 1 px near-black outline on the outside; no semi-transparent pixels, so no halos on either theme.</li>
