@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
-import { sections } from '../../content/sections'
+import { sections, type SectionId } from '../../content/sections'
+import { PixelIcon } from '../PixelIcon/PixelIcon'
+import type { PixelIconName } from '../PixelIcon/bitmaps'
 import styles from './SiteHeader.module.css'
 
 /** "Clive Owen S. Benito" → "CB": first and last name initials. */
@@ -12,10 +14,25 @@ function initials(name: string) {
 const navLinks = sections.slice(0, -1)
 const ctaSection = sections[sections.length - 1]
 
+/** Pixel design only: the icon beside each navigation link. */
+const sectionIcons: Record<SectionId, PixelIconName> = {
+  about: 'person',
+  projects: 'monitor',
+  skills: 'bag',
+  resume: 'disk',
+  certifications: 'emblem',
+  contact: 'envelope',
+}
+
 interface SiteHeaderProps {
   name: string
 }
 
+/**
+ * The site header. Classic shows it as a sticky top bar; the pixel design
+ * shows the same markup as a fixed sidebar on wide screens. On narrow
+ * screens both use the same accessible menu button.
+ */
 export function SiteHeader({ name }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -108,35 +125,46 @@ export function SiteHeader({ name }: SiteHeaderProps) {
           {menuOpen ? 'Close' : 'Menu'}
         </button>
 
-        <nav aria-label="Main">
-          <ul id={menuId} role="list" className={styles.list} data-open={menuOpen}>
-            {navLinks.map((section, index) => (
-              <li key={section.id} style={{ '--i': index } as CSSProperties}>
+        {/* Everything the menu button shows and hides on narrow screens. */}
+        <div id={menuId} className={styles.panel} data-open={menuOpen}>
+          {/* Pixel design only: a small "World map" caption. The nav keeps its "Main" label. */}
+          <p className={styles.mapLabel} aria-hidden="true">
+            World map
+          </p>
+          <nav aria-label="Main">
+            <ul role="list" className={styles.list}>
+              {navLinks.map((section, index) => (
+                <li key={section.id} style={{ '--i': index } as CSSProperties}>
+                  <a
+                    className={styles.link}
+                    href={`#${section.id}`}
+                    data-icon={sectionIcons[section.id]}
+                    aria-current={activeId === section.id ? 'location' : undefined}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <PixelIcon name={sectionIcons[section.id]} size={32} className={styles.linkIcon} />
+                    {section.label}
+                  </a>
+                </li>
+              ))}
+              <li style={{ '--i': navLinks.length } as CSSProperties}>
                 <a
-                  className={styles.link}
-                  href={`#${section.id}`}
-                  aria-current={activeId === section.id ? 'location' : undefined}
+                  className={styles.cta}
+                  href={`#${ctaSection.id}`}
+                  data-icon={sectionIcons[ctaSection.id]}
+                  aria-current={activeId === ctaSection.id ? 'location' : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
-                  {section.label}
+                  <PixelIcon name={sectionIcons[ctaSection.id]} size={32} className={styles.linkIcon} />
+                  {ctaSection.label}
+                  <span className={styles.ctaArrow} aria-hidden="true">
+                    →
+                  </span>
                 </a>
               </li>
-            ))}
-            <li style={{ '--i': navLinks.length } as CSSProperties}>
-              <a
-                className={styles.cta}
-                href={`#${ctaSection.id}`}
-                aria-current={activeId === ctaSection.id ? 'location' : undefined}
-                onClick={() => setMenuOpen(false)}
-              >
-                {ctaSection.label}
-                <span className={styles.ctaArrow} aria-hidden="true">
-                  →
-                </span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        </div>
       </div>
       <span ref={progressRef} className={styles.progress} aria-hidden="true" />
     </header>

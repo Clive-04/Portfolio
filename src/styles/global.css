@@ -226,3 +226,17 @@ a:not([class]):hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Pixel design: the header becomes a fixed sidebar from 56rem, so the page
+ * shifts right by its width and section jumps no longer clear a top bar.
+ */
+@media (min-width: 56rem) {
+  html[data-design="pixel"] {
+    --header-height: 0rem;
+  }
+
+  html[data-design="pixel"] body {
+    padding-inline-start: var(--sidebar-width);
+  }
+}
