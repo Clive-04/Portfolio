@@ -137,3 +137,38 @@ Phase 5 is complete. Every check passed except Firefox and Safari/iOS, which the
 ## Open items found
 
 - ~~`github.com/Clive-04/Pasa-Buy` returns 404.~~ Resolved on 2026-11-22: the owner made the repository public again, and the link returns 200.
+
+## Run 4 — 2026-11-25 (pixel redesign shell, branch `feature/pixel-theme`, automated)
+
+Scope: the pixel shell only (tokens, fonts, sidebar, mobile menu, display controls, sound switch, first-visit sound prompt). The page sections are not restyled yet, so this is not the release gate; the full Phase 5 set (NVDA, real phone, 400% zoom, PageSpeed, Firefox/Safari decision) is repeated for Day and Night before Pixel ships.
+
+### Commands
+
+| Command | Result |
+|---|---|
+| `npm run lint` (oxlint, `--deny-warnings`) | Passed, 0 warnings |
+| `npm test` (Node test runner) | Passed, 27/27 |
+| `npm run build` (`tsc -b && vite build`) | Passed |
+
+### Browser checks (headless Edge, Playwright + axe-core 4.10, `dist/` served with the `vercel.json` headers)
+
+Three looks (Classic, Pixel Day, Pixel Night) × three widths (1280, 390, 320 px), plus reduced motion at 1280 px: 12 runs, **137 checks passed, 0 failed**.
+
+| Check | Result |
+|---|---|
+| `data-design` / `data-color-theme` applied from saved choices before React loads | Passed |
+| CSP violations, console errors | 0 in every run |
+| Horizontal scrolling at 1280, 390, 320 px | None |
+| axe-core WCAG 2.0/2.1/2.2 A and AA | 0 violations in every run |
+| Skip link is the first Tab stop and moves focus to `main` | Passed |
+| Narrow menu: hidden links leave the Tab order, Tab enters the open menu, Escape closes it and returns focus to the button | Passed (Classic and Pixel) |
+| Pixel header controls at least 44 px tall | Passed after fix `fc086ea` (brand link was 36 px) |
+| Pixel: fixed 240 px sidebar at 1280 px, top bar with menu button at 390/320 px | Passed |
+| Pixel: Pixelify Sans on `h1`, Plus Jakarta Sans on paragraphs | Passed |
+| No `AudioContext` created on page load (sound never autoplays) | Passed in every run |
+| First-visit sound prompt shown in Pixel, never in Classic | Passed |
+| Reduced motion: no running animations | Passed |
+
+Also checked by hand in the in-app browser: the Pixel mode switch keeps keyboard focus when the layout changes; Day/Night and sound choices persist across reloads; "Not now" removes the prompt, moves focus to `main`, and it stays dismissed after reload; turning Sound on creates the audio context inside that click, and each action plays its own cue (dialog open 3 notes, close 2, section link 1). Sound output itself was not listened to.
+
+Known and expected at this stage: the hero, sections, and footer still use Classic shapes and a few hard-coded teal decorative colors (orbit rings, glows, status pill) until the R4 section restyle.
