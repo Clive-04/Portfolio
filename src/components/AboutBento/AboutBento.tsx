@@ -50,14 +50,14 @@ export function AboutBento({ profile, stats }: AboutBentoProps) {
 
   return (
     <div className={styles.grid}>
-      <article className={`${styles.tile} ${styles.bio}`} data-reveal data-companion-ledge="about" data-spotlight style={tile(0)}>
+      <article className={`${styles.tile} ${styles.bio}`} data-reveal data-companion-anchor="about" data-companion-place="top beside below" data-companion-act data-spotlight style={tile(0)}>
         <PixelIcon name="card" size={48} className={styles.cornerIcon} />
         {profile.about.map((paragraph) => (
           <p key={paragraph.slice(0, 24)}>{paragraph}</p>
         ))}
       </article>
 
-      <section className={`${styles.tile} ${styles.look}`} data-reveal data-companion-ledge="about" style={tile(1)} aria-label="Looking for">
+      <section className={`${styles.tile} ${styles.look}`} data-reveal data-companion-anchor="about" data-companion-place="top below beside" style={tile(1)} aria-label="Looking for">
         <p className={styles.label}>
           <span className={styles.dot} aria-hidden="true" />
           <PixelIcon name="briefcase" className={styles.labelIcon} />
@@ -66,7 +66,7 @@ export function AboutBento({ profile, stats }: AboutBentoProps) {
         <p className={styles.lookText}>{profile.lookingFor}</p>
       </section>
 
-      <section className={`${styles.tile} ${styles.clock}`} data-reveal data-companion-ledge="about" style={tile(2)} aria-label="Location">
+      <section className={`${styles.tile} ${styles.clock}`} data-reveal data-companion-anchor="about" data-companion-place="top below beside" style={tile(2)} aria-label="Location">
         <p className={styles.label}>
           <PixelIcon name="pin" className={styles.labelIcon} />
           Based in
@@ -77,7 +77,7 @@ export function AboutBento({ profile, stats }: AboutBentoProps) {
         </p>
       </section>
 
-      <section className={`${styles.tile} ${styles.stats}`} data-reveal data-companion-ledge="about" data-spotlight style={tile(3)} aria-label="In numbers">
+      <section className={`${styles.tile} ${styles.stats}`} data-reveal data-companion-anchor="about" data-companion-place="top below beside" data-spotlight style={tile(3)} aria-label="In numbers">
         <dl className={styles.statList}>
           {stats.map((stat) => (
             <div key={stat.label}>
@@ -88,7 +88,7 @@ export function AboutBento({ profile, stats }: AboutBentoProps) {
         </dl>
       </section>
 
-      <section className={`${styles.tile} ${styles.focus}`} data-reveal data-companion-ledge="about" data-spotlight style={tile(4)} aria-label="Focus">
+      <section className={`${styles.tile} ${styles.focus}`} data-reveal data-companion-anchor="about" data-companion-place="top below beside" data-spotlight style={tile(4)} aria-label="Focus">
         <p className={styles.label}>
           <PixelIcon name="star" className={styles.labelIcon} />
           Focus

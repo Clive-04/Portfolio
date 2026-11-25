@@ -159,13 +159,13 @@ export default function App() {
 
         <Section id="resume" index="04" title="Résumé">
           <div className={styles.resume}>
-            <div className={styles.resumeBlock} data-companion-ledge="resume" data-reveal data-spotlight style={{ '--reveal-delay': '0ms' } as CSSProperties}>
+            <div className={styles.resumeBlock} data-companion-anchor="resume" data-companion-place="top below" data-companion-act data-reveal data-spotlight style={{ '--reveal-delay': '0ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Education</h3>
               <p className={styles.resumeStrong}>{profile.education.school}</p>
               <p>{profile.education.program}</p>
               <p className={styles.muted}>{profile.education.years}</p>
             </div>
-            <div className={styles.resumeBlock} data-companion-ledge="resume" data-reveal data-spotlight style={{ '--reveal-delay': '100ms' } as CSSProperties}>
+            <div className={styles.resumeBlock} data-companion-anchor="resume" data-companion-place="top below" data-companion-act data-reveal data-spotlight style={{ '--reveal-delay': '100ms' } as CSSProperties}>
               <h3 className={styles.resumeLabel}>Organization</h3>
               {profile.affiliations.map((item) => (
                 <p key={item}>{item}</p>
@@ -226,7 +226,7 @@ export default function App() {
           title="Let’s work together"
           intro="Email is the fastest way to reach me. You can also find me on LinkedIn and GitHub."
         >
-          <div className={styles.actions}>
+          <div className={styles.actions} data-companion-anchor="contact" data-companion-place="beside below" data-companion-act>
             {email && (
               <ButtonLink href={`mailto:${email}`} variant="light" icon="mail">
                 Email me

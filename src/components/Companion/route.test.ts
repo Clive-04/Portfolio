@@ -8,6 +8,10 @@ import {
   companionEnabled,
   docked,
   isClear,
+  layoutFor,
+  modesFor,
+  resolveAnchor,
+  type Anchor,
   pixelScale,
   placeBubble,
   positionAt,
@@ -202,10 +206,70 @@ describe('pixelScale', () => {
 })
 
 describe('when the companion runs', () => {
-  it('runs only in Pixel, beside the sidebar, with motion allowed', () => {
-    assert.equal(companionEnabled({ pixel: true, wide: true, reducedMotion: false }), true)
-    assert.equal(companionEnabled({ pixel: false, wide: true, reducedMotion: false }), false, 'Classic')
-    assert.equal(companionEnabled({ pixel: true, wide: false, reducedMotion: false }), false, 'narrow')
-    assert.equal(companionEnabled({ pixel: true, wide: true, reducedMotion: true }), false, 'reduced motion')
+  it('runs only in Pixel with motion allowed, at every width', () => {
+    assert.equal(companionEnabled({ pixel: true, reducedMotion: false }), true)
+    assert.equal(companionEnabled({ pixel: false, reducedMotion: false }), false, 'Classic')
+    assert.equal(companionEnabled({ pixel: true, reducedMotion: true }), false, 'reduced motion')
+  })
+})
+
+describe('layouts', () => {
+  it('splits desktop (sidebar), tablet, and phone', () => {
+    assert.equal(layoutFor(1280), 'desktop')
+    assert.equal(layoutFor(800), 'tablet')
+    assert.equal(layoutFor(375), 'phone')
+  })
+
+  it('never places him beside a card on narrow screens', () => {
+    assert.ok(modesFor('desktop').includes('beside'))
+    assert.ok(!modesFor('tablet').includes('beside'))
+    assert.ok(!modesFor('phone').includes('beside'))
+  })
+})
+
+describe('resolveAnchor', () => {
+  const card: Anchor = { id: 'projects', rect: { x: 300, y: 1000, w: 400, h: 300 }, modes: ['top', 'below', 'beside'] }
+  const bounds = { x0: 240, x1: 1260 }
+  const all = modesFor('desktop')
+
+  it('stands on the top border when there is room, feet exactly on the edge', () => {
+    const { placement } = resolveAnchor(card, [], bounds, all)
+    assert.equal(placement?.mode, 'top')
+    assert.equal(placement?.y, 1000)
+    assert.ok(placement!.x >= 300 && placement!.x + SPRITE_BOX.w <= 700)
+  })
+
+  it('goes below the card when its top is crowded (a badge or a heading above it)', () => {
+    const heading: Rect = { x: 280, y: 930, w: 440, h: 60 }
+    const { placement, attempts } = resolveAnchor(card, [heading], bounds, all)
+    assert.equal(placement?.mode, 'below')
+    assert.equal(placement?.y, 1000 + 300 + 8 + SPRITE_BOX.h)
+    assert.deepEqual(attempts.map((a) => [a.mode, a.ok]), [['top', false], ['below', true]])
+  })
+
+  it('needs walking room on top, not just a gap his own width', () => {
+    const narrow: Anchor = { ...card, rect: { x: 300, y: 1000, w: SPRITE_BOX.w + 4, h: 300 }, modes: ['top'] }
+    assert.equal(resolveAnchor(narrow, [], bounds, all).placement, null)
+  })
+
+  it('stands beside it, feet level with its bottom, when above and below are taken', () => {
+    const blocked: Rect[] = [{ x: 280, y: 900, w: 440, h: 95 }, { x: 280, y: 1302, w: 440, h: 120 }]
+    const { placement } = resolveAnchor(card, blocked, bounds, all)
+    assert.equal(placement?.mode, 'beside')
+    assert.equal(placement?.y, 1300)
+    assert.ok(placement!.x >= 700 || placement!.x + SPRITE_BOX.w <= 300)
+  })
+
+  it('skips beside on a phone, and skips the anchor when nothing is safe', () => {
+    const blocked: Rect[] = [{ x: 280, y: 900, w: 440, h: 95 }, { x: 280, y: 1302, w: 440, h: 120 }]
+    const { placement, attempts } = resolveAnchor(card, blocked, bounds, modesFor('phone'))
+    assert.equal(placement, null)
+    assert.ok(attempts.every((a) => !a.ok))
+  })
+
+  it('never leaves the content column', () => {
+    const edge: Anchor = { ...card, rect: { x: 1100, y: 1000, w: 160, h: 200 }, modes: ['beside'] }
+    const { placement } = resolveAnchor(edge, [], { x0: 240, x1: 1270 }, all)
+    assert.ok(!placement || (placement.x >= 240 && placement.x + SPRITE_BOX.w <= 1270))
   })
 })

@@ -20,6 +20,27 @@
 }
 
 /*
+ * Ground contact: a one-sprite-pixel shadow on the surface right under his
+ * feet, so he stands on the card rather than floating over it. Day only; at
+ * Night the light rim already marks his edge, and would outline the shadow.
+ */
+.sprite::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 25%;
+  width: 50%;
+  height: var(--rim-step, 2px);
+  background: rgb(23 50 77 / 0.3);
+}
+
+.sprite[data-seated]::after,
+.sprite[data-dark]::after,
+:global(html[data-color-theme="night"]) .sprite::after {
+  display: none;
+}
+
+/*
  * Speech bubble: placed by engine.ts only where it covers nothing. The tail
  * is a stepped pixel wedge pointing at the companion; --at is its offset
  * along the bubble edge.

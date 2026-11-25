@@ -20,7 +20,7 @@ export function Section({ id, title, index, intro, tone = 'plain', children }: S
   return (
     <section id={id} aria-labelledby={headingId} className={styles.section} data-tone={tone}>
       <div className={styles.inner}>
-        <header className={styles.header} data-reveal data-companion-ledge={id}>
+        <header className={styles.header} data-reveal data-companion-anchor={id} data-companion-place="ledge">
           {index && (
             <span className={styles.bigIndex} aria-hidden="true">
               {index}

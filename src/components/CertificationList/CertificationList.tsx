@@ -34,7 +34,9 @@ export function CertificationList({ items, variant = 'featured' }: Certification
         <li
           key={item.name}
           className={compact ? styles.badge : styles.card}
-          data-companion-ledge="certifications"
+          data-companion-anchor="certifications"
+          data-companion-place="top below beside"
+          data-companion-act
           data-reveal
           data-spotlight
           style={{ '--reveal-delay': `${(index % 3) * 70}ms` } as CSSProperties}

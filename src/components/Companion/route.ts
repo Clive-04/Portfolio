@@ -25,8 +25,101 @@ export interface Ledge {
   x1: number
   /** The sprite would stand over a dark panel, so it needs its light rim even in Day. */
   dark?: boolean
-  /** The ledge's name (its `data-companion-ledge` value), used to pick what the companion says there. */
+  /** The section the place belongs to, used to pick what the companion says and does there. */
   id?: string
+  mode?: Mode
+  /** His section action may play here. */
+  acts?: boolean
+}
+
+/**
+ * How the companion relates to an anchor (a card or block):
+ * top — standing on its top border; ledge — on a decorative edge (a band
+ * or section boundary); below — in the whitespace under it; beside — in
+ * the whitespace next to it, feet level with its bottom edge.
+ */
+export type Mode = 'top' | 'ledge' | 'below' | 'beside'
+
+/** A measured card or block, the positions it allows (in order of preference), and its section. */
+export interface Anchor {
+  id: string
+  rect: Rect
+  modes: Mode[]
+  dark?: boolean
+  acts?: boolean
+}
+
+export interface Attempt {
+  mode: Mode
+  /** The sprite box that was tried, or null when the mode had no room at all. */
+  box: Rect | null
+  ok: boolean
+}
+
+export interface Placement {
+  id: string
+  mode: Mode
+  x: number
+  /** Feet line. */
+  y: number
+  dark: boolean
+  acts: boolean
+}
+
+export type Layout = 'desktop' | 'tablet' | 'phone'
+
+/** Desktop has the fixed sidebar (56rem and up); tablets and phones get the top bar and a single column. */
+export const layoutFor = (width: number, remPx = 16): Layout =>
+  width >= 56 * remPx ? 'desktop' : width >= 40 * remPx ? 'tablet' : 'phone'
+
+/** On narrow screens he stands above or below cards, never beside them. */
+export const modesFor = (layout: Layout): Mode[] =>
+  layout === 'desktop' ? ['top', 'ledge', 'below', 'beside'] : ['top', 'ledge', 'below']
+
+/** Walking room a card top needs beyond his own width before he will stand there. */
+export const TOP_ROOM = 24
+const SIDE_GAP = 12
+const BELOW_GAP = 8
+
+/**
+ * Where the companion can stand for an anchor: the first allowed mode whose
+ * sprite box is clear of every obstacle and inside the content bounds.
+ * Returns every attempt too, so the placement review can show the fallbacks.
+ */
+export function resolveAnchor(
+  anchor: Anchor,
+  obstacles: readonly Rect[],
+  bounds: { x0: number; x1: number },
+  allowed: readonly Mode[],
+  box = SPRITE_BOX,
+): { placement: Placement | null; attempts: Attempt[] } {
+  const attempts: Attempt[] = []
+  const { rect } = anchor
+  const inBounds = (b: Rect) => b.x >= bounds.x0 && b.x + b.w <= bounds.x1
+  const done = (mode: Mode, x: number, y: number) => {
+    attempts.push({ mode, box: sweep(x, y, x, y, box), ok: true })
+    return { placement: { id: anchor.id, mode, x, y, dark: Boolean(anchor.dark), acts: Boolean(anchor.acts) }, attempts }
+  }
+
+  for (const mode of anchor.modes.filter((m) => allowed.includes(m))) {
+    if (mode === 'top' || mode === 'ledge' || mode === 'below') {
+      const y = mode === 'below' ? rect.y + rect.h + BELOW_GAP + box.h : rect.y
+      const x0 = Math.max(rect.x, bounds.x0)
+      const x1 = Math.min(rect.x + rect.w, bounds.x1)
+      const run = clearRun({ y, x0, x1 }, obstacles, box)
+      const room = run ? run[1] - run[0] : -1
+      if (run && (mode !== 'top' || room >= TOP_ROOM)) return done(mode, run[1], y)
+      attempts.push({ mode, box: x1 - x0 >= box.w ? sweep(x1 - box.w, y, x1 - box.w, y, box) : null, ok: false })
+    } else {
+      const y = rect.y + rect.h
+      for (const x of [rect.x + rect.w + SIDE_GAP, rect.x - SIDE_GAP - box.w]) {
+        const b = sweep(x, y, x, y, box)
+        if (inBounds(b) && isClear(b, obstacles)) return done(mode, x, y)
+      }
+      attempts.push({ mode, box: null, ok: false })
+    }
+  }
+  return { placement: null, attempts }
 }
 
 export interface RoutePoint {
@@ -38,6 +131,8 @@ export interface RoutePoint {
   blink: boolean
   dark: boolean
   ledge?: string
+  mode?: Mode
+  acts?: boolean
 }
 
 /** Boxes that only touch, or meet within half a pixel of rounding, do not overlap. */
@@ -97,7 +192,7 @@ export function buildRoute(
     const prev = points.at(-1)
     if (prev && ledge.y - prev.y < box.h) continue // too close to the last ledge to read as a step
 
-    const shared = { dark: Boolean(ledge.dark), ledge: ledge.id }
+    const shared = { dark: Boolean(ledge.dark), ledge: ledge.id, mode: ledge.mode, acts: ledge.acts }
     const [left, right] = run
     // Stand at the clear spot nearest where he already is, so the path runs straight down rather than zig-zagging.
     const enter = prev ? Math.min(right, Math.max(left, prev.x)) : right
@@ -275,6 +370,5 @@ export const pixelScale = (target: number, devicePixelRatio: number) =>
 /** Round a CSS length to the device-pixel grid. */
 export const snap = (value: number, devicePixelRatio: number) => Math.round(value * devicePixelRatio) / devicePixelRatio
 
-/** The companion runs only in the Pixel design, beside the fixed sidebar, with motion allowed. */
-export const companionEnabled = (o: { pixel: boolean; wide: boolean; reducedMotion: boolean }) =>
-  o.pixel && o.wide && !o.reducedMotion
+/** The companion runs only in the Pixel design with motion allowed (every width; the route adapts to the layout). */
+export const companionEnabled = (o: { pixel: boolean; reducedMotion: boolean }) => o.pixel && !o.reducedMotion

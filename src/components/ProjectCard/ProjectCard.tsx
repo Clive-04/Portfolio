@@ -232,7 +232,9 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
       ref={cardRef}
       id={`project-${project.slug}`}
       className={styles.card}
-      data-companion-ledge="projects"
+      data-companion-anchor="projects"
+      data-companion-place="top below beside"
+      data-companion-act
       data-reveal
       data-spotlight
       style={{ '--reveal-delay': `${(index % 2) * 100}ms` } as CSSProperties}
