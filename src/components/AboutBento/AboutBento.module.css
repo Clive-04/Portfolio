@@ -232,7 +232,19 @@
     grid-template-areas:
       "bio bio bio look"
       "bio bio bio clock"
-      "bio bio bio focus";
+      "focus focus focus focus";
+  }
+
+  /* A wide Focus row: label and chips side by side instead of a tall stack. */
+  :global(html[data-design="pixel"]) .focus {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  :global(html[data-design="pixel"]) .focus .focusList {
+    margin-top: 0;
   }
 }
 
