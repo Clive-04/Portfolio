@@ -66,8 +66,15 @@ export const cues: Record<SoundName, readonly Note[]> = {
   ],
 }
 
-/** Quiet on purpose: interface sounds should sit well under speech and music. */
-export const VOLUME = 0.05
+/**
+ * Master level. 0.05 was only audible at 60–80% system volume (owner
+ * feedback, 2026-11-25), so it is now 3× louder: clear at about 30% while
+ * still short and well below full scale.
+ */
+export const VOLUME = 0.15
+
+/** Triangle waves sound much softer than square waves at the same level, so they get a lift. */
+const WAVE_GAIN = { square: 1, triangle: 1.6 } as const
 
 let enabled = false
 let context: AudioContext | null = null
@@ -110,7 +117,7 @@ export function playNotes(notes: readonly Note[], volume = VOLUME) {
       if (note.to) osc.frequency.exponentialRampToValueAtTime(note.to, t + note.dur)
       // A tiny attack and a fast decay avoid clicks at the start and end of each note.
       env.gain.setValueAtTime(0, t)
-      env.gain.linearRampToValueAtTime(1, t + 0.005)
+      env.gain.linearRampToValueAtTime(WAVE_GAIN[note.wave], t + 0.005)
       env.gain.exponentialRampToValueAtTime(0.001, t + note.dur)
       osc.connect(env).connect(master)
       osc.start(t)

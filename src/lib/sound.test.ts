@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { cues, isSoundEnabled, playSound, setSoundEnabled } from './sound.ts'
+import { VOLUME, cues, isSoundEnabled, playSound, setSoundEnabled } from './sound.ts'
+
+describe('sound level', () => {
+  it('is loud enough to hear at moderate system volume but well below full scale', () => {
+    assert.ok(VOLUME >= 0.12 && VOLUME <= 0.25, `VOLUME is ${VOLUME}`)
+  })
+})
 
 describe('sound', () => {
   it('is off until explicitly enabled', () => {

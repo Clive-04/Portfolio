@@ -145,7 +145,7 @@ if (root) {
       element(
         'div',
         { className: 'lab-row' },
-        slider('Volume', 0, 0.15, 0.005, volume, (value) => (volume = value)),
+        slider('Volume', 0, 0.4, 0.01, volume, (value) => (volume = value)),
         playAll,
       ),
       ...cueBlocks,
