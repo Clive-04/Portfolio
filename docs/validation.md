@@ -320,4 +320,18 @@ Pixel is now the default for first-time visitors (`28e9fff`), and Classic is a "
 | Browser suite, now with a first-visit run (nothing saved) at 1280, 390, and 320 px | **212 passed, 0 failed**; first visit lands on Pixel with the sound prompt |
 | Design button, keyboard only | Enter switches Pixel → Classic → Pixel, focus stays on the button, its label updates, the choice is saved and survives a reload, 44 px tall |
 
-Remaining: Firefox is untested on real hardware. Automated Firefox checks are possible with Playwright's Firefox build if the owner approves downloading it.
+Remaining: Firefox is untested on real hardware.
+
+## Run 14 — 2026-11-25 (Day/Night diamond wipe, automated)
+
+Owner request: replace the color fade when switching Day/Night. The new theme is now revealed through a diamond that grows from the pressed button in ten steps over 600 ms (View Transitions API); color transitions are switched off during the change so nothing fades.
+
+| Check | Result |
+|---|---|
+| `npm run lint` / `npm test` / `npm run build` | Passed / 47 of 47 / Passed |
+| Browser suite and sound click-through | **212 passed, 0 failed** and **22 passed, 0 failed** |
+| Wipe, motion allowed (headless Edge) | One view transition with the `theme-diamond-wipe` animation (600 ms); color transitions `0s` during the switch; Night applied and saved; the switching flag is removed afterwards; 0 CSP violations, 0 errors |
+| Wipe, reduced motion | No view transition; the switch is instant (no fade); Night applied and saved |
+| Halfway screenshot | The diamond edge is visible part-way across the page |
+
+Found during the check: the first version sized the diamond at 300vmax, so it covered the screen within one step; the radius is now computed from the button to the farthest screen corner. Browsers without View Transitions (including current Firefox) switch instantly. Automated Firefox checks are possible with Playwright's Firefox build if the owner approves downloading it.
