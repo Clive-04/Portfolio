@@ -1,8 +1,8 @@
 /**
  * Display preferences, kept as two separate concerns:
  *
- * 1. Design mode (`data-design` on <html>): `classic` is the current site and
- *    the default during the rollout; `pixel` is the 8-bit redesign.
+ * 1. Design mode (`data-design` on <html>): `pixel` is the main 8-bit design
+ *    and the default; `classic` is the original look, chosen from a button.
  * 2. Color theme (`data-color-theme` on <html>): `day` (light) or `night`
  *    (dark). Only the pixel design reads it; both themes share one layout.
  *
@@ -25,7 +25,8 @@ export const STORAGE_KEYS = {
   soundPromptDismissed: 'portfolio:sound-prompt-dismissed',
 } as const
 
-export const DEFAULT_DESIGN: DesignMode = 'classic'
+/** Pixel is the main design (2026-11-25); Classic stays available from a button. */
+export const DEFAULT_DESIGN: DesignMode = 'pixel'
 
 export interface Preferences {
   design: DesignMode

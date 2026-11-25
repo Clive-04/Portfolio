@@ -38,13 +38,17 @@ describe('loadPreferences', () => {
   it('uses the defaults on a first visit', () => {
     const prefs = loadPreferences(memoryStorage(), false)
     assert.deepEqual(prefs, {
-      design: 'classic',
+      design: 'pixel',
       colorTheme: 'day',
       colorThemeChosen: false,
       sound: false,
       soundPromptDismissed: false,
     })
-    assert.equal(DEFAULT_DESIGN, 'classic')
+    assert.equal(DEFAULT_DESIGN, 'pixel')
+  })
+
+  it('keeps a saved Classic choice', () => {
+    assert.equal(loadPreferences(memoryStorage({ [STORAGE_KEYS.design]: 'classic' }), false).design, 'classic')
   })
 
   it('follows the system dark setting until a theme is chosen', () => {
@@ -79,7 +83,7 @@ describe('loadPreferences', () => {
       [STORAGE_KEYS.sound]: 'yes',
     })
     const prefs = loadPreferences(storage, false)
-    assert.equal(prefs.design, 'classic')
+    assert.equal(prefs.design, 'pixel')
     assert.equal(prefs.colorTheme, 'day')
     assert.equal(prefs.colorThemeChosen, false)
     assert.equal(prefs.sound, false)
@@ -88,7 +92,7 @@ describe('loadPreferences', () => {
   it('keeps sound off when storage is unavailable or throws', () => {
     assert.equal(loadPreferences(null, false).sound, false)
     assert.equal(loadPreferences(throwingStorage, false).sound, false)
-    assert.equal(loadPreferences(throwingStorage, false).design, 'classic')
+    assert.equal(loadPreferences(throwingStorage, false).design, 'pixel')
   })
 })
 
@@ -123,7 +127,7 @@ describe('public/theme-init.js', () => {
     assert.ok(script.includes(`'${STORAGE_KEYS.colorTheme}'`))
   })
 
-  it('defaults to the classic design', () => {
-    assert.match(script, /design = 'classic'/)
+  it('defaults to the pixel design, like DEFAULT_DESIGN', () => {
+    assert.match(script, new RegExp(`design = '${DEFAULT_DESIGN}'`))
   })
 })

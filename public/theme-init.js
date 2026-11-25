@@ -16,7 +16,7 @@
   } catch {
     // Storage blocked: use the defaults below.
   }
-  if (design !== 'classic' && design !== 'pixel') design = 'classic'
+  if (design !== 'classic' && design !== 'pixel') design = 'pixel'
   if (theme !== 'day' && theme !== 'night') {
     theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'
   }
