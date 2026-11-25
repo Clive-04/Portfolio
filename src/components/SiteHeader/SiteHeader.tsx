@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import { sections, type SectionId } from '../../content/sections'
+import { DisplayControls } from '../DisplayControls/DisplayControls'
 import { PixelIcon } from '../PixelIcon/PixelIcon'
 import type { PixelIconName } from '../PixelIcon/bitmaps'
 import styles from './SiteHeader.module.css'
@@ -164,6 +165,7 @@ export function SiteHeader({ name }: SiteHeaderProps) {
               </li>
             </ul>
           </nav>
+          <DisplayControls />
         </div>
       </div>
       <span ref={progressRef} className={styles.progress} aria-hidden="true" />

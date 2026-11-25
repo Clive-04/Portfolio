@@ -1,0 +1,114 @@
+/* ---------- Classic ---------- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out),
+    transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.button:hover {
+  background: var(--color-surface-muted);
+}
+
+.button:active {
+  transform: scale(var(--motion-press-scale));
+  transition-duration: 0s;
+}
+
+.icon {
+  flex: none;
+}
+
+/* "On"/"Off" tag inside a switch; the state itself comes from aria-checked. */
+.state {
+  min-width: 2.25em;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.switch[aria-checked="true"] .state {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+@media (min-width: 56rem) {
+  .controls {
+    margin-top: 0;
+  }
+}
+
+/* ---------- Pixel ---------- */
+
+:global(html[data-design="pixel"]) .controls {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--pixel-line) solid var(--color-border-strong);
+}
+
+:global(html[data-design="pixel"]) .segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+:global(html[data-design="pixel"]) .button {
+  width: 100%;
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface);
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .button:hover {
+  background: var(--color-surface-muted);
+}
+
+/* Pressed: the shadow disappears and the button sits one step lower. */
+:global(html[data-design="pixel"]) .button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+:global(html[data-design="pixel"]) .button[aria-pressed="true"] {
+  background: var(--color-selected);
+}
+
+:global(html[data-design="pixel"]) .button[aria-pressed="true"] .icon {
+  color: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .switch {
+  justify-content: space-between;
+}
+
+:global(html[data-design="pixel"]) .state {
+  border-radius: 0;
+}
