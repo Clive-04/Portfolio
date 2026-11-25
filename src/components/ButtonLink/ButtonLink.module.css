@@ -169,3 +169,88 @@
   background: rgb(255 255 255 / 0.08);
   color: var(--color-on-ink-accent);
 }
+
+/* ==========================================================================
+   Pixel design: square keyline buttons with a hard shadow that "presses in".
+   No light sweep or lift; the shadow step is the feedback.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .button {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .button::after {
+  display: none;
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .button:hover {
+    translate: -1px -1px;
+    box-shadow: var(--shadow-md);
+  }
+
+  :global(html[data-design="pixel"]) .button:hover .leading {
+    transform: none;
+  }
+}
+
+:global(html[data-design="pixel"]) .button:active {
+  translate: 2px 2px;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Cobalt with white text (6.82:1 Day); bright blue with navy text (7.13:1 Night). */
+:global(html[data-design="pixel"]) .primary,
+:global(html[data-design="pixel"]) .primary:hover {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+:global(html[data-design="pixel"]) .primary:hover {
+  background: var(--color-accent-hover);
+}
+
+:global(html[data-design="pixel"]) .secondary,
+:global(html[data-design="pixel"]) .secondary:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+:global(html[data-design="pixel"]) .secondary:hover {
+  background: var(--color-surface-muted);
+}
+
+/* On the ink panel: cream button, yellow on hover (ink text 8.23:1 or better). */
+:global(html[data-design="pixel"]) .light {
+  border-color: var(--color-on-ink);
+  background: var(--color-on-ink);
+  color: var(--color-ink);
+  box-shadow: 3px 3px 0 var(--color-on-ink-accent);
+}
+
+:global(html[data-design="pixel"]) .light:hover {
+  background: var(--color-on-ink-accent);
+  color: var(--color-ink);
+}
+
+:global(html[data-design="pixel"]) .ghost {
+  border-color: var(--color-on-ink);
+  background: transparent;
+  color: var(--color-on-ink);
+  box-shadow: none;
+}
+
+:global(html[data-design="pixel"]) .ghost:hover {
+  border-color: var(--color-on-ink-accent);
+  background: transparent;
+  color: var(--color-on-ink-accent);
+  box-shadow: none;
+}
