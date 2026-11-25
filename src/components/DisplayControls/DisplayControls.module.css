@@ -135,3 +135,16 @@
     box-shadow: var(--shadow-hover-sm);
   }
 }
+
+/* "Switch to Classic": an alternative look, so a quieter dashed button (still a 44px target). */
+:global(html[data-design="pixel"]) .designButton {
+  border-style: dashed;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  box-shadow: none;
+}
+
+:global(html[data-design="pixel"]) .designButton:hover {
+  border-style: solid;
+  color: var(--color-text);
+}

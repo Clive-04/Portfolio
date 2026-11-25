@@ -8,10 +8,11 @@ import styles from './DisplayControls.module.css'
  *
  * - Day / Night: the pixel color theme (pixel design only).
  * - Sound: off by default; always visible in the pixel design.
- * - "Pixel mode" switch: Classic ↔ Pixel (shown in both designs during the rollout).
+ * - "Switch to Classic" / "Switch to Pixel": Pixel is the main design;
+ *   Classic stays available as an alternative look.
  *
- * Switches use role="switch" with a fixed name, so screen readers announce
- * "Sound, switch, off" and the name never changes with the state.
+ * The Sound switch uses role="switch" with a fixed name, so screen readers
+ * announce "Sound, switch, off" and the name never changes with the state.
  */
 export function DisplayControls() {
   const { design, colorTheme, sound, setDesign, setColorTheme, setSound } = usePreferences()
@@ -83,17 +84,9 @@ export function DisplayControls() {
         </>
       )}
 
-      <button
-        type="button"
-        role="switch"
-        aria-checked={isPixel}
-        className={`${styles.button} ${styles.switch}`}
-        onClick={toggleDesign}
-      >
-        Pixel mode
-        <span className={styles.state} aria-hidden="true">
-          {isPixel ? 'On' : 'Off'}
-        </span>
+      {/* An action button that names where it goes, so its label changing is expected. */}
+      <button type="button" className={`${styles.button} ${styles.designButton}`} onClick={toggleDesign}>
+        {isPixel ? 'Switch to Classic' : 'Switch to Pixel'}
       </button>
     </div>
   )
