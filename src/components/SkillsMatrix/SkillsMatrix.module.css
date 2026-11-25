@@ -366,3 +366,129 @@
     color: var(--color-accent);
   }
 }
+
+/* ==========================================================================
+   Pixel design: Inventory. Category tabs are "pockets"; the matrix keeps its
+   real table. Built = filled pixel circle; AI-Assisted = hollow pixel ring
+   (same key and announcements as Classic).
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .tab {
+  border: var(--pixel-line) solid var(--color-border);
+  border-radius: 0;
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+}
+
+:global(html[data-design="pixel"]) .tab:hover {
+  border-color: var(--color-border-strong);
+}
+
+:global(html[data-design="pixel"]) .tab[aria-selected="true"] {
+  border-color: var(--color-border-strong);
+  background: var(--color-selected);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .tabIndex {
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .tabCount {
+  border-radius: 0;
+}
+
+@media (min-width: 56rem) {
+  :global(html[data-design="pixel"]) .tab {
+    border-radius: 0;
+  }
+
+  /* The selected pocket gets the same stepped cursor as the sidebar, on the left edge. */
+  :global(html[data-design="pixel"]) .tab::before {
+    top: 50%;
+    bottom: auto;
+    left: -14px;
+    width: 8px;
+    height: 12px;
+    border-radius: 0;
+    background: var(--color-text);
+    clip-path: polygon(0 0, 50% 0, 50% 17%, 75% 17%, 75% 33%, 100% 33%, 100% 67%, 75% 67%, 75% 83%, 50% 83%, 50% 100%, 0 100%);
+    transform: translateY(-50%) scaleY(0);
+  }
+
+  :global(html[data-design="pixel"]) .tab[aria-selected="true"]::before {
+    transform: translateY(-50%);
+  }
+}
+
+:global(html[data-design="pixel"]) .panel {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+}
+
+:global(html[data-design="pixel"]) .panelHead {
+  border-bottom: var(--pixel-line) solid var(--color-border-strong);
+  background: var(--color-band);
+}
+
+:global(html[data-design="pixel"]) .panelTitle {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+}
+
+:global(html[data-design="pixel"]) .summary strong {
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .skillHead,
+:global(html[data-design="pixel"]) .projectHead {
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .matrix thead tr {
+  border-bottom: var(--pixel-line) solid var(--color-border-strong);
+}
+
+/* Pixel circles: a 2px notch at each corner of a square reads as a round pixel dot. */
+:global(html[data-design="pixel"]) .dot,
+:global(html[data-design="pixel"]) .ring {
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px, 100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%, 0 calc(100% - 2px), 0 2px);
+}
+
+:global(html[data-design="pixel"]) .dot {
+  background: var(--color-accent);
+}
+
+/* Hollow ring: cobalt keyline (3:1+ for a graphic), empty centre. */
+:global(html[data-design="pixel"]) .ring {
+  border: 2px solid var(--color-accent);
+  background: transparent;
+}
+
+:global(html[data-design="pixel"]) .empty {
+  border-radius: 0;
+}
+
+/* Integer sizes only: no scaling on row hover. */
+:global(html[data-design="pixel"]) .matrix tbody tr:hover .dot,
+:global(html[data-design="pixel"]) .matrix tbody tr:hover .ring {
+  transform: none;
+}
+
+:global(html[data-design="pixel"]) .key {
+  border-top: var(--pixel-line) dashed var(--color-border);
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .legend {
+  border-top-style: dashed;
+}
+
+:global(html[data-design="pixel"]) .legend b {
+  font-family: var(--font-display);
+}
