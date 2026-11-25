@@ -1,0 +1,30 @@
+/*
+ * The travelling sprite: one absolutely placed box in document coordinates,
+ * moved only with transform, so it never affects layout. Its size, sheet,
+ * and frame are set from engine.ts.
+ */
+.sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5; /* above page content, below the header (10) and dialogs */
+  pointer-events: none;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  will-change: transform;
+}
+
+.sprite[hidden] {
+  display: none;
+}
+
+/*
+ * Night, or a dark panel in Day: a 1-sprite-pixel light rim keeps the dark
+ * suit readable (#9fb3d6 is 8.1:1 on Night navy). --rim-step is one sprite
+ * pixel at the current scale, set by engine.ts.
+ */
+:global(html[data-color-theme="night"]) .sprite,
+.sprite[data-dark] {
+  filter: drop-shadow(var(--rim-step) 0 0 #9fb3d6) drop-shadow(calc(var(--rim-step) * -1) 0 0 #9fb3d6)
+    drop-shadow(0 var(--rim-step) 0 #9fb3d6) drop-shadow(0 calc(var(--rim-step) * -1) 0 #9fb3d6);
+}

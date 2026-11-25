@@ -22,7 +22,7 @@ export function TechMarquee({ items }: TechMarqueeProps) {
   const rows = [items.slice(0, half), items.slice(half)]
 
   return (
-    <div className={styles.marquee} data-paused={paused}>
+    <div className={styles.marquee} data-paused={paused} data-companion-ledge>
       <div className={styles.rows} aria-hidden="true">
         {rows.map((row, rowIndex) => (
           <div key={rowIndex} className={styles.track} data-direction={rowIndex === 0 ? 'left' : 'right'}>

@@ -4,6 +4,7 @@ import { ButtonLink } from './components/ButtonLink/ButtonLink'
 import { KineticName } from './components/KineticName/KineticName'
 import { TechMarquee } from './components/TechMarquee/TechMarquee'
 import { CertificationList } from './components/CertificationList/CertificationList'
+import { Companion } from './components/Companion/Companion'
 import { Pending } from './components/Pending/Pending'
 import { PixelIcon } from './components/PixelIcon/PixelIcon'
 import type { PixelIconName } from './components/PixelIcon/bitmaps'
@@ -247,6 +248,7 @@ export default function App() {
       </main>
 
       <SiteFooter name={profile.name} />
+      <Companion />
     </>
   )
 }

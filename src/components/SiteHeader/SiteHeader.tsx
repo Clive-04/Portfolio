@@ -106,6 +106,8 @@ export function SiteHeader({ name }: SiteHeaderProps) {
         <a className={styles.brand} href="#top">
           <span className={styles.mark} aria-hidden="true">
             {initials(name)}
+            {/* Pixel companion slot: shown only after it teleports here (html[data-companion="sidebar"]). */}
+            <span className={styles.companionSlot} data-companion-slot />
           </span>
           <span className={styles.brandName}>{name}</span>
         </a>

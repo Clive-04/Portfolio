@@ -9,7 +9,7 @@ interface SiteFooterProps {
 
 export function SiteFooter({ name }: SiteFooterProps) {
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-companion-ledge>
       <div className={styles.inner}>
         <p>
           © {currentYear} {name}. All rights reserved.

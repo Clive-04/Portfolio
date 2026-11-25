@@ -446,6 +446,39 @@
   transform: translate(-1px, -1px);
 }
 
+/*
+ * Pixel companion in the brand slot (set by Companion/engine.ts at the bottom
+ * of the page). The tile and "CB" step aside; the sprite stands on the slot's
+ * baseline. Without the attribute (Classic, narrow, reduced motion, errors),
+ * nothing here applies and "CB" shows as before.
+ */
+.companionSlot {
+  display: none;
+}
+
+:global(html[data-companion="sidebar"]) .mark {
+  position: relative;
+  border-color: transparent;
+  background: none;
+  color: transparent;
+  box-shadow: none;
+}
+
+:global(html[data-companion="sidebar"]) .companionSlot {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  translate: -50% 0;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+:global(html[data-companion="sidebar"][data-color-theme="night"]) .companionSlot {
+  filter: drop-shadow(var(--rim-step) 0 0 #9fb3d6) drop-shadow(calc(var(--rim-step) * -1) 0 0 #9fb3d6)
+    drop-shadow(0 var(--rim-step) 0 #9fb3d6) drop-shadow(0 calc(var(--rim-step) * -1) 0 #9fb3d6);
+}
+
 /* ---------- Menu button and narrow-screen panel ---------- */
 
 :global(html[data-design="pixel"]) .toggle {
