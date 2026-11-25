@@ -276,4 +276,20 @@ Owner request: the sounds felt repetitive; links that open another tab and the S
 
 How the cues sound has still not been judged by ear; the owner tunes them in the sound lab.
 
+## Run 11 — 2026-11-25 (About icons, stronger hover, pixel favicon; automated)
+
+Owner request before shipping: icons on the About section, a more noticeable hover on cards and buttons, and a favicon that matches the design. Commits `b303a2c`, `745dfa2`, `b1fb018`, and `b75c2fc`.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 45/45 (eight new icon grids) |
+| `npm run build` | Passed; `dist/favicon.svg` present |
+| Browser suite (as in Run 6) | **155 passed, 0 failed** |
+| Sound click-through (as in Run 10) | **22 passed, 0 failed** |
+
+- About (Pixel only, decorative, hidden from assistive technology): ID card, briefcase, map pin, and star icons, plus generic symbols on the focus chips (atom, TS block, bolt, accessibility figure). Icons were reviewed on a sheet at 16, 32, and 64 px; the first atom drawing was redrawn twice before it read clearly. Classic About was checked to be unchanged.
+- Hover (Pixel only): cards lift 4 px onto an 8 px hard shadow with a cobalt keyline, also on keyboard focus inside a card; buttons and small controls lift 2 px onto a 4 px shadow. Screenshots mid-hover were reviewed in Day and Night; Night uses a mid-blue hover shadow because the near-black one was not visible on navy.
+- Favicon: a 16 × 16 pixel "CB" tile in the approved palette, reviewed at 16, 32, and 64 px on light and dark browser tabs.
+
 Remaining before release (R6): sound audition and tuning (local test page), then the full manual set for Day and Night (NVDA, real phone including the dialog's scrollbar strip, 400% zoom, Windows animation setting, PageSpeed, Firefox; Safari/iOS if available).
