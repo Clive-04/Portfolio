@@ -426,6 +426,7 @@
 /* ---------- Brand ---------- */
 
 :global(html[data-design="pixel"]) .brand {
+  min-height: 44px;
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
 }
