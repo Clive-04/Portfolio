@@ -13,16 +13,16 @@ export interface ClickTarget {
   expanded?: string | null
 }
 
-const names: readonly SoundName[] = ['navigate', 'confirm', 'back', 'open', 'download']
+const names: readonly SoundName[] = ['navigate', 'confirm', 'back', 'open', 'download', 'external', 'tab', 'page']
 
 /**
  * The cue for a click, or null for none. Controls that play their own sound
  * (display controls, the sound prompt) and dialogs (handled by their
  * open/close events) match no rule here, so nothing plays twice.
  *
- * - `data-sound="…"` wins (e.g. Previous/Next, the pause button).
- * - Links: download → download; `#section` → navigate; email or an external
- *   page (Verify, Credly, LinkedIn, GitHub, Live, Code) → confirm.
+ * - `data-sound="…"` wins (e.g. Previous/Next → page, the pause button → confirm).
+ * - Links: download → download; `#section` → navigate; opens another browser
+ *   tab (Verify, Credly, LinkedIn, GitHub, Live, Code) → external; email → confirm.
  * - Buttons with `aria-expanded` (the phone menu): open when expanding, back when collapsing.
  */
 export function soundFor(target: ClickTarget): SoundName | null {
@@ -33,7 +33,8 @@ export function soundFor(target: ClickTarget): SoundName | null {
     const href = target.href ?? ''
     if (target.download) return 'download'
     if (href.startsWith('#')) return 'navigate'
-    if (href.startsWith('mailto:') || target.newTab || /^https?:\/\//.test(href)) return 'confirm'
+    if (target.newTab) return 'external'
+    if (href.startsWith('mailto:') || /^https?:\/\//.test(href)) return 'confirm'
     return null
   }
   if (target.expanded === 'true') return 'back'

@@ -37,9 +37,9 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
   const tabId = (index: number) => `${baseId}-tab-${index}`
   const panelId = `${baseId}-panel`
 
-  /** Switch pocket; plays the navigate cue (silent unless sound is on) when the tab changes. */
+  /** Switch pocket; plays the tab cue (silent unless sound is on) when the tab changes. */
   function choose(index: number) {
-    if (index !== active) playSound('navigate')
+    if (index !== active) playSound('tab')
     setActive(index)
   }
 

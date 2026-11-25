@@ -11,10 +11,18 @@ describe('soundFor', () => {
     assert.equal(soundFor({ tag: 'a', href: '/Clive-Owen-Benito-Resume.pdf', download: true }), 'download')
   })
 
-  it('plays confirm for email and external links (Contact, Verify, Credly, Live, Code)', () => {
+  it('plays external for links that open another browser tab (LinkedIn, GitHub, Verify, Credly, Live, Code)', () => {
+    assert.equal(soundFor({ tag: 'a', href: 'https://www.credly.com/x', newTab: true }), 'external')
+    assert.equal(soundFor({ tag: 'a', href: 'https://github.com/Clive-04', newTab: true }), 'external')
+  })
+
+  it('plays confirm for the email link and same-tab external links', () => {
     assert.equal(soundFor({ tag: 'a', href: 'mailto:someone@example.com' }), 'confirm')
-    assert.equal(soundFor({ tag: 'a', href: 'https://www.credly.com/x', newTab: true }), 'confirm')
     assert.equal(soundFor({ tag: 'a', href: 'https://github.com/Clive-04' }), 'confirm')
+  })
+
+  it('accepts the page cue through data-sound (case-study Previous/Next)', () => {
+    assert.equal(soundFor({ tag: 'button', dataSound: 'page' }), 'page')
   })
 
   it('plays open or back for the phone menu button', () => {
