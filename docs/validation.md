@@ -393,3 +393,5 @@ Owner brief: section-specific actions instead of constant running or teleporting
 Found and fixed during the run: he rested between anchors when scrolling stopped mid-walk; he now finishes the walk to the nearest anchor in view once scrolling pauses for 0.6 s. He stood partly in front of the card above the "Based in" tile; placements now treat other cards as obstacles.
 
 Not yet checked: Firefox, Safari/iOS, a real screen reader, the owner's own motion review.
+
+Run 17 follow-up, same day (owner: "the companion is not on top of cards on the skills page"): the Skills anchor moved from the tabs-and-panel wrapper to the panel card, and a focusable card no longer blocks standing on its own border; instead he steps out of view while a keyboard focus ring would touch him. Desktop Day and Night: feet exactly on the panel's top border, pouch action played; with the panel focused by keyboard he is hidden, and back once focus moves away. Tablet and phone: the tabs sit directly on the panel, so he stands below it. Plans re-captured (desktop: 10 top, 8 ledge, 8 below, 3 skipped). 126 of 126 tests pass.
