@@ -308,4 +308,16 @@ Reported by Clive; recorded as stated, not re-run by Claude Code.
 
 Sound: the owner listened and found the cues too quiet (audible only at 60–80% system volume). Fixed in `5936825` (master level 0.05 → 0.15, triangle notes lifted 1.6×); a re-listen at about 30% is still to confirm. Layout: the About bio card had a large empty area under its text on wide screens; fixed in `d7a04ef` by moving Focus to a full-width row.
 
+## Run 13 — 2026-11-25 (Pixel becomes the main design, automated)
+
+Pixel is now the default for first-time visitors (`28e9fff`), and Classic is a "Switch to Classic" button instead of a "Pixel mode" switch. A saved Classic choice is still honoured. Preview image redrawn in `b0ff86e`.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 47/47 (defaults now Pixel; a saved Classic choice is kept; the pre-paint script matches `DEFAULT_DESIGN`) |
+| `npm run build` | Passed |
+| Browser suite, now with a first-visit run (nothing saved) at 1280, 390, and 320 px | **212 passed, 0 failed**; first visit lands on Pixel with the sound prompt |
+| Design button, keyboard only | Enter switches Pixel → Classic → Pixel, focus stays on the button, its label updates, the choice is saved and survives a reload, 44 px tall |
+
 Remaining: Firefox is untested on real hardware. Automated Firefox checks are possible with Playwright's Firefox build if the owner approves downloading it.
