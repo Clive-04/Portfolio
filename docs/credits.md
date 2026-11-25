@@ -32,6 +32,7 @@ Every file in this repository that was not written or drawn for this site is lis
 | Line icons in `src/components/Icon/Icon.tsx` | Drawn for this site | Part of this repository | 2026-11-22 |
 | 16 × 16 pixel icons in `src/components/PixelIcon/bitmaps.ts` | Drawn for this site | Part of this repository | 2026-11-25 |
 | `public/favicon.svg` (pixel "CB" tile) | Drawn for this site as a 16 × 16 grid | Part of this repository | 2026-11-25 |
+| Pixel companion sprite (`src/components/Companion/sprite.ts`: 2 idle, 4 walk, 4 teleport frames) | Drawn for this site by hand on a 16 × 16 grid, using Clive's own photo (`public/profile.jpg`) only as a likeness and clothing reference. Colours sampled from that photo and fitted to the site palette. Not traced from the photo and not adapted from any game sprite. Review sheet: `docs/design/companion/` | Part of this repository; Clive's likeness, all rights reserved | 2026-11-25 |
 | GitHub and LinkedIn marks in `src/components/Icon/Icon.tsx` | The companies' published brand marks, used only to link to Clive's profiles | Trademarks of their owners | 2026-11-22 |
 
 ## Sound
