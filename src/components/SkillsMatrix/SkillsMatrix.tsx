@@ -1,6 +1,7 @@
 import { useId, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { projects } from '../../content/projects'
 import type { SkillGroup } from '../../content/types'
+import { playSound } from '../../lib/sound'
 import styles from './SkillsMatrix.module.css'
 
 /** Column order follows the Projects section. Short codes label the columns on small screens. */
@@ -36,9 +37,15 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
   const tabId = (index: number) => `${baseId}-tab-${index}`
   const panelId = `${baseId}-panel`
 
+  /** Switch pocket; plays the navigate cue (silent unless sound is on) when the tab changes. */
+  function choose(index: number) {
+    if (index !== active) playSound('navigate')
+    setActive(index)
+  }
+
   function select(index: number) {
     const next = (index + groups.length) % groups.length
-    setActive(next)
+    choose(next)
     tabRefs.current[next]?.focus()
   }
 
@@ -76,7 +83,7 @@ export function SkillsMatrix({ groups }: SkillsMatrixProps) {
             aria-controls={panelId}
             tabIndex={index === active ? 0 : -1}
             className={styles.tab}
-            onClick={() => setActive(index)}
+            onClick={() => choose(index)}
             onKeyDown={onKeyDown}
           >
             <span className={styles.tabIndex} aria-hidden="true">

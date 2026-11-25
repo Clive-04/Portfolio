@@ -456,6 +456,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
                     type="button"
                     className={dialogStyles.pagerButton}
                     data-direction="previous"
+                    data-sound="navigate"
                     onClick={() => switchTo(previous, 'previous')}
                   >
                     <Icon name="prev" />
@@ -472,6 +473,7 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
                     type="button"
                     className={dialogStyles.pagerButton}
                     data-direction="next"
+                    data-sound="navigate"
                     onClick={() => switchTo(next, 'next')}
                   >
                     <span>

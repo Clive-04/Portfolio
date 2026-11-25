@@ -44,6 +44,7 @@ export function TechMarquee({ items }: TechMarqueeProps) {
         type="button"
         className={styles.toggle}
         aria-pressed={paused}
+        data-sound="confirm"
         onClick={() => setPaused((value) => !value)}
       >
         <Icon name={paused ? 'play' : 'pause'} />
