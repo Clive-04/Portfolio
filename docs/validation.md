@@ -255,4 +255,25 @@ Reported by the owner: Skills, Certifications, and Contact buttons made no sound
 
 Covered: sidebar and footer section links, Day/Night (no double cue), skill tabs by click and arrow keys (silent when the same tab is clicked), project Live and Code, opening, Next, and closing a case study, Credly and Verify, the résumé download, Contact Email/LinkedIn/GitHub, the technology-strip pause, the phone menu open/close, and two controls with sound off (silent). Two bugs found by this check and fixed: the phone menu cues were reversed, and Next played the dialog close and open cues on top of navigate.
 
+## Run 10 — 2026-11-25 (more distinct sounds, automated)
+
+Owner request: the sounds felt repetitive; links that open another tab and the Skills buttons should each sound different. Added three original cues in `5267ed5` (notes can now slide between pitches) and routed controls to them in `6149836`:
+
+| Cue | Controls |
+|---|---|
+| external (upward sweep + sparkle) | LinkedIn, GitHub, Verify, Credly, project Live and Code |
+| tab (soft dipping note) | Skill category tabs, by click or arrow keys |
+| page (double tick) | Case-study Previous / Next |
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 37/37 (new tests: the new cues differ from every other cue; new-tab links map to external) |
+| `npm run build` | Passed |
+| Browser suite (as in Run 6) | **155 passed, 0 failed** |
+| Click-through check, now identifying each cue by its pitches rather than counting notes | **22 passed, 0 failed** |
+| Sound lab in headless Edge | 0 errors |
+
+How the cues sound has still not been judged by ear; the owner tunes them in the sound lab.
+
 Remaining before release (R6): sound audition and tuning (local test page), then the full manual set for Day and Night (NVDA, real phone including the dialog's scrollbar strip, 400% zoom, Windows animation setting, PageSpeed, Firefox; Safari/iOS if available).
