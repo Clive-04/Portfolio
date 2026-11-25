@@ -10,6 +10,7 @@ import { Section } from './components/Section/Section'
 import { SiteFooter } from './components/SiteFooter/SiteFooter'
 import { SiteHeader } from './components/SiteHeader/SiteHeader'
 import { SkillsMatrix } from './components/SkillsMatrix/SkillsMatrix'
+import { SoundPrompt } from './components/SoundPrompt/SoundPrompt'
 import { certifications, credlyProfile } from './content/certifications'
 import { profile } from './content/profile'
 import { projects } from './content/projects'
@@ -49,6 +50,7 @@ export default function App() {
       <SiteHeader name={profile.name} />
 
       <main id="main" tabIndex={-1} className={styles.main}>
+        <SoundPrompt />
         <section id="top" aria-labelledby="hero-heading" className={styles.hero}>
           <div className={styles.heroInner}>
             <div className={styles.heroText}>
