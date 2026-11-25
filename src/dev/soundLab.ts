@@ -10,10 +10,11 @@ import '../styles/global.css'
 import { VOLUME, cues, playNotes, type Note, type SoundName } from '../lib/sound'
 
 const descriptions: Record<SoundName, string> = {
-  navigate: 'Jumping to a section from the menu or a link',
-  confirm: 'Choosing Day/Night, turning sound on, switching designs',
-  back: 'Closing a dialog or turning sound off',
-  open: 'Opening a project case study',
+  navigate: 'Jumping to a section, switching skill tabs, Previous/Next between case studies',
+  confirm:
+    'Day/Night, turning sound on, switching designs, email and external links (LinkedIn, GitHub, Verify, Credly, Live, Code), pausing the technology strip',
+  back: 'Closing a dialog or the phone menu, turning sound off',
+  open: 'Opening a project case study or the phone menu',
   download: 'Starting the résumé download',
 }
 
