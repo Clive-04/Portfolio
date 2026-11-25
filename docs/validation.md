@@ -171,4 +171,21 @@ Three looks (Classic, Pixel Day, Pixel Night) × three widths (1280, 390, 320 px
 
 Also checked by hand in the in-app browser: the Pixel mode switch keeps keyboard focus when the layout changes; Day/Night and sound choices persist across reloads; "Not now" removes the prompt, moves focus to `main`, and it stays dismissed after reload; turning Sound on creates the audio context inside that click, and each action plays its own cue (dialog open 3 notes, close 2, section link 1). Sound output itself was not listened to.
 
-Known and expected at this stage: the hero, sections, and footer still use Classic shapes and a few hard-coded teal decorative colors (orbit rings, glows, status pill) until the R4 section restyle.
+Known and expected at this stage (superseded in part by Run 5): the hero, sections, and footer still use Classic shapes and a few hard-coded teal decorative colors (orbit rings, glows, status pill) until the R4 section restyle.
+
+## Run 5 — 2026-11-25 (R4 batch 1: shared pieces and hero, automated)
+
+Scope: pixel section headings with motif labels, pixel buttons, squared chips, and the pixel hero (status pill, title banner, halftone portrait, stats strip). Commits `f149f55` to `0a95be1`.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 28/28 (the new globe icon adds one grid test) |
+| `npm run build` | Passed |
+| Browser suite from Run 4 (same 12 runs: Classic, Day, Night × 1280/390/320 px, plus reduced motion) | **137 passed, 0 failed**: 0 axe violations, 0 CSP violations, 0 console errors, no horizontal scrolling |
+
+New color pairs, measured before use (WCAG 2.x): vermilion label on the Day band 5.01:1, white on vermilion 5.63:1, navy on Night coral 6.71:1, coral on the Night band 6.28:1. Motif labels and section numbers are hidden from assistive technology, so headings read "Skills", "About", and so on.
+
+Screenshots (headless Edge, reduced motion) were reviewed for Day and Night at 1280 and 390 px. Classic was checked to be unchanged: no motif labels, original headings, orbit rings, and the unfiltered photo. The halftone portrait is CSS-only over the unchanged `public/profile.jpg`.
+
+Not covered yet: the remaining sections (Projects and the case-study dialog, Skills, About, Certifications, Résumé, Contact, footer) still carry Classic shapes and some hard-coded teal decoration; the moving technology list between the hero and About is unchanged.
