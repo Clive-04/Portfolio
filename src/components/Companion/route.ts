@@ -63,7 +63,7 @@ export function clearRun(
   ledge: Ledge,
   obstacles: readonly Rect[],
   box = SPRITE_BOX,
-  maxLength = 240,
+  maxLength = 160,
   step = 8,
 ): [number, number] | null {
   const standAt = (x: number) => isClear(sweep(x, ledge.y, x, ledge.y, box), obstacles)
@@ -76,10 +76,10 @@ export function clearRun(
 }
 
 /**
- * Joins the ledges (top to bottom) into one path. At each ledge the companion
- * enters at the end nearer to where it came from and strolls to the other end.
- * Between ledges it walks straight down and across when that path is clear,
- * and otherwise takes a short teleport, so it never crosses page content.
+ * Joins the ledges (top to bottom) into one path. On each ledge the companion
+ * stands at the clear spot nearest to where it came from. Between ledges it
+ * walks straight down and across when that path is clear, and otherwise
+ * takes a short teleport, so it never crosses page content.
  */
 export function buildRoute(
   ledges: readonly Ledge[],
@@ -99,8 +99,8 @@ export function buildRoute(
 
     const shared = { dark: Boolean(ledge.dark), ledge: ledge.id }
     const [left, right] = run
-    const enter = !prev || Math.abs(prev.x - right) <= Math.abs(prev.x - left) ? right : left
-    const leave = enter === right ? left : right
+    // Stand at the clear spot nearest where he already is, so the path runs straight down rather than zig-zagging.
+    const enter = prev ? Math.min(right, Math.max(left, prev.x)) : right
 
     if (!prev) {
       points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, ...shared })
@@ -115,7 +115,6 @@ export function buildRoute(
       const key = Math.max(prev.key, ledge.y - 0.15 * viewportHeight)
       points.push({ x: enter, y: ledge.y, key, blink: true, ...shared })
     }
-    if (leave !== enter) points.push({ x: leave, y: ledge.y, key: points.at(-1)!.key, blink: false, ...shared })
   }
   return points
 }

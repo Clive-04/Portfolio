@@ -18,9 +18,9 @@ export function Section({ id, title, index, intro, tone = 'plain', children }: S
   const headingId = `${id}-heading`
   const motif = sectionMotif(id)
   return (
-    <section id={id} aria-labelledby={headingId} className={styles.section} data-tone={tone} data-companion-ledge={id}>
+    <section id={id} aria-labelledby={headingId} className={styles.section} data-tone={tone}>
       <div className={styles.inner}>
-        <header className={styles.header} data-reveal>
+        <header className={styles.header} data-reveal data-companion-ledge={id}>
           {index && (
             <span className={styles.bigIndex} aria-hidden="true">
               {index}

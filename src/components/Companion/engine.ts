@@ -30,7 +30,10 @@ const INTERACTIVE = 'a, button, input, select, textarea, summary, label, [tabind
 let dockedThisLoad = false
 /** Each ledge's line is said once per page load. */
 const said = new Set<string>()
+/** A line shows for 3.5 s; after 2 s a newer section's line may take over; a teleport pause never stretches it past 6 s. */
 const BUBBLE_MS = 3500
+const MIN_READ_MS = 2000
+const MAX_SPEECH_MS = 6000
 
 const frames = (clip: Clip): Frame[] => sheet.clips[clip].ms.map((ms, i) => [clip, i, ms])
 
@@ -185,7 +188,9 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   function speak() {
     const ledge = currentLedge()
     const line = ledge && companionLines[ledge]
-    if (!ledge || !line || said.has(ledge) || speaking || !onScreen()) return
+    // A new section's line takes over once the current one has had a fair chance to be read.
+    const busySpeaking = speaking && performance.now() - speechStartedAt < MIN_READ_MS
+    if (!ledge || !line || said.has(ledge) || busySpeaking || !inClearView()) return
     bubble.textContent = line
     bubble.style.visibility = 'hidden'
     bubble.hidden = false
@@ -198,12 +203,21 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     }
     said.add(ledge)
     speaking = ledge
-    bubbleTimer = window.setTimeout(hideBubble, BUBBLE_MS)
+    speechStartedAt = performance.now()
+    speakFor(BUBBLE_MS)
   }
 
-  /** Keep the bubble with him for its full time, as long as it still has a clear spot. */
+  /** Keep the bubble with him for its full time; it steps aside only while no clear spot exists. */
   function followSpeech() {
-    if (speaking && !placeSpeech()) hideBubble()
+    if (speaking) bubble.hidden = !placeSpeech()
+  }
+
+  let speechEndsAt = 0
+  let speechStartedAt = 0
+  function speakFor(ms: number) {
+    window.clearTimeout(bubbleTimer)
+    speechEndsAt = performance.now() + ms
+    bubbleTimer = window.setTimeout(hideBubble, ms)
   }
 
   /** Breathing, a blink every third breath, and one tie-straightening beat after four still seconds. */
@@ -230,15 +244,29 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     }
   }
 
+  /** Teleports and docking. A line in progress pauses while he teleports and carries on beside him after. */
   async function sequence(task: () => Promise<void>) {
     busy = true
     stopIdle()
-    hideBubble()
+    const remaining = speaking ? speechEndsAt - performance.now() : 0
+    window.clearTimeout(bubbleTimer)
+    bubble.hidden = true
     await task()
+    const sinceStart = performance.now() - speechStartedAt
+    if (speaking && !isDocked && sinceStart < MAX_SPEECH_MS) {
+      speakFor(Math.min(Math.max(remaining, 1500), MAX_SPEECH_MS - sinceStart))
+      followSpeech()
+    } else hideBubble()
     busy = false
     walked = 0
     lastTime = 0
     wake()
+  }
+
+  /** Fully on screen and below the top tenth, so a line never starts as he is about to scroll away. */
+  function inClearView() {
+    const { y } = positionAt(points, p)
+    return y - box.h >= window.scrollY + 0.1 * window.innerHeight && y <= window.scrollY + window.innerHeight
   }
 
   /** Departures are only played when the visitor can see them. */
@@ -279,6 +307,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       void dock()
       return
     }
+    speak() // the moment he lands on a ledge, before taking another step
 
     const to = targetAt(points, line())
     if (Math.abs(to - p) < 1e-6) {
@@ -289,16 +318,18 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     }
     stopIdle()
 
-    // A long walk (a fast scroll or a jump link): teleport there instead. When a
-    // teleport already lies on the way, take that one so he arrives on the ledge.
-    const gap = Math.abs(positionAt(points, to).y - positionAt(points, p).y)
+    // Far behind (a fast scroll or a menu jump): one teleport straight to the
+    // ledge at the reader's position, so he arrives there (and can speak)
+    // instead of crawling through every ledge in between.
     const walk = walkingDistance(points, p, to)
-    if (walk !== Infinity && walk > 1.5 * window.innerHeight) {
-      void teleportTo(to)
+    const gap = Math.abs(positionAt(points, to).y - positionAt(points, p).y)
+    if (gap > 1.5 * window.innerHeight || (walk !== Infinity && walk > 1.5 * window.innerHeight)) {
+      void teleportTo(to > p ? Math.floor(to) : Math.ceil(to))
       return
     }
 
-    const speed = Math.min(320, 60 + gap * 1.5) // CSS px per second
+    // Brisker the further behind he is, so he keeps up with the reader; frames follow distance, so the feet still match.
+    const speed = Math.min(420, 90 + Math.min(walk, 600) * 2) // CSS px per second
     const step = advance(points, p, to, (speed * dt) / 1000)
     p = step.p
     if (step.walked > 0) {

@@ -23,7 +23,7 @@ const VH = 800
 
 describe('clearRun', () => {
   it('stands at the right end of an empty ledge and strolls left up to the cap', () => {
-    assert.deepEqual(clearRun({ y: 500, x0: 0, x1: 1000 }, []), [1000 - SPRITE_BOX.w - 240, 1000 - SPRITE_BOX.w])
+    assert.deepEqual(clearRun({ y: 500, x0: 0, x1: 1000 }, []), [1000 - SPRITE_BOX.w - 160, 1000 - SPRITE_BOX.w])
   })
 
   it('steps left past an obstacle that sits where the sprite would stand', () => {
