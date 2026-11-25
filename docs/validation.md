@@ -189,3 +189,20 @@ New color pairs, measured before use (WCAG 2.x): vermilion label on the Day band
 Screenshots (headless Edge, reduced motion) were reviewed for Day and Night at 1280 and 390 px. Classic was checked to be unchanged: no motif labels, original headings, orbit rings, and the unfiltered photo. The halftone portrait is CSS-only over the unchanged `public/profile.jpg`.
 
 Not covered yet: the remaining sections (Projects and the case-study dialog, Skills, About, Certifications, Résumé, Contact, footer) still carry Classic shapes and some hard-coded teal decoration; the moving technology list between the hero and About is unchanged.
+
+## Run 6 — 2026-11-25 (R4 batch 2: Projects, automated)
+
+Scope: pixel project cards and the case-study dialog (CSS only; markup, evidence, links, and dialog behavior unchanged). Commits `c80e54b` and `52f6a85`.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 28/28 |
+| `npm run build` | Passed |
+| Browser suite (Run 4's 12 runs, plus new dialog checks in the 9 runs without reduced motion) | **155 passed, 0 failed** |
+
+New dialog checks, run in Classic, Day, and Night at 1280, 390, and 320 px: opening a case study from the keyboard moves focus inside the dialog; axe finds 0 violations in the open dialog; Escape closes it and focus returns to its "View case study" button.
+
+Screenshots reviewed: the project grid (Day, 1280 px) and the open dialog (Day 1280 px, Night 390 px). Screenshots stay whole at 25:12. The Classic green window dot and teal glows are replaced in Pixel by vermilion, yellow, and cobalt; the projects' own screenshots keep their real colors as evidence.
+
+Noted, not a regression: on the phone bottom sheet, headless Edge draws the dialog's reserved scrollbar space as a solid strip at the right edge. Classic shows the same strip, and phone browsers overlay their scrollbars, so it should not appear on a real phone; confirm during the R6 real-phone check.
