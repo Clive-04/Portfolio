@@ -27,3 +27,11 @@
   margin-inline: auto;
   padding: var(--space-8) var(--gutter);
 }
+
+/*
+ * Pixel design: a dashed pixel rule above. The text stays in the body font:
+ * at this size Pixelify's "C" reads like an "O", and the copyright line names Clive.
+ */
+:global(html[data-design="pixel"]) .footer {
+  border-top: var(--pixel-line) dashed color-mix(in srgb, var(--color-on-ink) 30%, transparent);
+}
