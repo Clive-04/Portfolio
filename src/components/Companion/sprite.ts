@@ -421,6 +421,20 @@ const otherLeg = (rows: Frame) => rows.map((line) => line.replace(/[jJ]/g, (c) =
 const sideContact = (pose: keyof typeof arm, legs: Frame) => [EMPTY, ...sideUpper(pose), ...legs]
 const sidePass = (pose: keyof typeof arm) => [...sideUpper(pose), sideHip, ...standLegs]
 
+/** Contact: pressing the Email button, seen from the side (facing right; mirrored for left). */
+const pushArm = [
+  '.....ojjjjjjooooooooo...',
+  '.....ojjjjjjLjjjjjjsso..',
+  '.....ojjjjjjoooooooSSo..',
+  '.....ojjjjjjjjJo...oo...',
+  '.....ojjjjjjjjJo........',
+  '.....ojjjjjjjjJo........',
+  '.....oJJJJJJJJJo........',
+  '.....ojjjjjjjJJo........',
+]
+const pressReach = sidePass('forward')
+const pressPush = [...sideHead, ...pushArm, sideHip, ...standLegs]
+
 const walkRight = [
   sideContact('back', strideLegs),
   sidePass('down'),
@@ -531,6 +545,9 @@ export const animations = {
   thumbsUp: clip([thumbsUp], 900, false),
   /* Idle variety when he has been still a while. */
   look: clip([lookLeft, front, lookRight], [600, 200, 600], false),
+  /* Contact: reach, press (the button shows its own pressed state), reach back. */
+  pressRight: clip([pressReach, pressPush, pressReach], [180, 240, 160], false),
+  pressLeft: clip([pressReach, pressPush, pressReach].map(mirror), [180, 240, 160], false),
 } satisfies Record<string, Clip>
 
 export type ClipName = keyof typeof animations

@@ -1,7 +1,7 @@
 {
   "image": "companion-sprites.png",
   "width": 120,
-  "height": 736,
+  "height": 800,
   "frameWidth": 24,
   "frameHeight": 32,
   "clips": {
@@ -219,6 +219,24 @@
         600,
         200,
         600
+      ],
+      "loop": false
+    },
+    "pressRight": {
+      "row": 23,
+      "ms": [
+        180,
+        240,
+        160
+      ],
+      "loop": false
+    },
+    "pressLeft": {
+      "row": 24,
+      "ms": [
+        180,
+        240,
+        160
       ],
       "loop": false
     }
