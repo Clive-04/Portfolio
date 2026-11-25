@@ -117,12 +117,12 @@ const tieHand = paint(front, [
 ])
 const tieTug = sparks(happy(tieHand), [[20, 3, 'y'], [19, 4, 'y'], [21, 4, 'y'], [20, 5, 'y']])
 
-/** Sidebar pose: a thumbs-up beside the shoulder. */
-const thumbsUp = paint(front, [
-  [21, 9, 'o'],
-  [20, 10, 'oso'],
-  [19, 11, 'osSo'],
-  [19, 12, 'oSSo'],
+/* ---------- Actions: a few strong poses, reused with small props ---------- */
+
+type Edit = [number, number, string]
+
+/** His right arm (viewer's right) raised from the shoulder: the shared pose for thumbs-up, wave, and inspect. */
+const raisedArm: Edit[] = [
   [19, 13, 'ojJo'],
   [19, 14, 'ojJo'],
   [17, 15, 'oJJjJo'],
@@ -133,7 +133,172 @@ const thumbsUp = paint(front, [
   [18, 20, '...'],
   [18, 21, '...'],
   [18, 22, '..'],
+]
+const fist: Edit[] = [
+  [19, 11, 'osSo'],
+  [19, 12, 'oSSo'],
+]
+/** Both hands raised to the chest (polish, document, notes): the hanging hands become cuffs. */
+const handsToChest: Edit[] = [
+  [4, 20, 'jj'],
+  [4, 21, 'JJ'],
+  [18, 20, 'JJ'],
+  [18, 21, 'JJ'],
+]
+const eyes = (dx: number): Edit[] => [
+  [8, 7, ['oss', 'sos', 'sso'][dx + 1]],
+  [13, 7, ['oss', 'sos', 'sso'][dx + 1]],
+  [8, 8, ['oss', 'sos', 'sso'][dx + 1]],
+  [13, 8, ['oss', 'sos', 'sso'][dx + 1]],
+]
+
+/** Sidebar pose, and the reply to a download or an external link: a thumbs-up beside the shoulder. */
+const thumbsUp = paint(front, [[21, 9, 'o'], [20, 10, 'oso'], ...fist, ...raisedArm])
+
+/** Hero and contact: a wave with an open hand, tilting out and back. */
+const waveA = paint(front, [[19, 9, 'oooo'], [19, 10, 'osso'], [19, 11, 'osso'], [19, 12, 'oSSo'], ...raisedArm])
+const waveB = paint(front, [[20, 9, 'oooo'], [20, 10, 'osso'], [19, 11, 'oosso'], [19, 12, 'oSSo'], ...raisedArm])
+
+/** Projects: a magnifying glass held up (cyan lens), then a look at the card. */
+const lens = (glint: Edit[] = []): Edit[] => [
+  [20, 7, '.oo.'],
+  [20, 8, 'occo'],
+  [20, 9, 'occo'],
+  [20, 10, '.oo.'],
+  ...glint,
+  ...fist,
+  ...raisedArm,
+]
+const inspectRaise = paint(front, lens())
+const inspectLook = paint(front, [...lens([[21, 8, 'y']]), ...eyes(1)])
+const inspectLook2 = paint(front, [...lens([[22, 9, 'y']]), ...eyes(1)])
+
+/** Skills: a hip pouch; he lifts out a small yellow gem (a tool, simply drawn) and it sparkles. */
+const pouch: Edit[] = [
+  [3, 22, 'oooo'],
+  [3, 23, 'oRRo'],
+  [3, 24, 'oRRo'],
+  [3, 25, 'oooo'],
+]
+/** Raise his left arm by drawing the raised right arm on the mirror image. */
+const leftRaised = (extra: Edit[]) => mirror(paint(mirror(front), [...extra, ...fist, ...raisedArm]))
+const gem: Edit[] = [
+  [21, 6, 'o'],
+  [20, 7, 'oyo'],
+  [19, 8, 'oyyyo'],
+  [20, 9, 'oyo'],
+  [21, 10, 'o'],
+]
+const pouchReach = paint(front, pouch)
+const pouchShow = paint(leftRaised(gem), pouch)
+const pouchShine = sparks(pouchShow, [[5, 5, 'y'], [0, 4, 'y'], [5, 11, 'y']])
+
+/** About: sitting cross-legged on the card edge (the body drops 8 pixels; feet stay on the bottom row). */
+const sitLegs = [
+  '...ossojjjjjjjjJJosSo...',
+  '...oSSoJJJJJJJJJJoSSo...',
+  '..oojjjjjjjjjjjjjjJJoo..',
+  '.ojjjjjJjjjjjjjjJjjjJJo.',
+  '..ooLJJojjjjjjjjoJJLoo..',
+  '....oooooooooooooooo....',
+]
+const sit = [...lower(front, 8, 26).slice(0, 26), ...sitLegs]
+const sitBlink = paint(sit, [[9, 15, 's'], [14, 15, 's'], [9, 16, 'o'], [14, 16, 'o']])
+
+/** Certifications: holding an emblem at the chest, polishing it, then a short approving nod. */
+const emblem: Edit[] = [
+  [10, 15, 'oooo'],
+  [10, 16, 'oyyo'],
+  [10, 17, 'oyyo'],
+  [10, 18, 'oooo'],
+]
+const polishA = paint(front, [...handsToChest, ...emblem, [8, 16, 'os'], [8, 17, 'oS'], [14, 16, 'so'], [14, 17, 'So']])
+const polishB = sparks(
+  paint(front, [...handsToChest, ...emblem, [8, 16, 'os'], [8, 17, 'oS'], [14, 17, 'so'], [14, 18, 'So'], [12, 16, 'w']]),
+  [[16, 13, 'y']],
+)
+const nod = happy(lower(polishA, 1, 13), 8)
+
+/** Résumé: a rolled scroll, the unrolled page, then pointing to the side (toward the résumé action). */
+const page: Edit[] = [
+  [9, 13, 'oooooo'],
+  [9, 14, 'owwwwo'],
+  [9, 15, 'oJJJwo'],
+  [9, 16, 'owwwwo'],
+  [9, 17, 'oJJwwo'],
+  [9, 18, 'owwwwo'],
+  [9, 19, 'oJJJwo'],
+  [9, 20, 'oooooo'],
+]
+const scroll = paint(front, [...handsToChest, [8, 15, 'oooooooo'], [8, 16, 'swwwwwws'], [8, 17, 'oooooooo']])
+const pageHeld = paint(front, [...handsToChest, ...page, [7, 16, 'os'], [7, 17, 'oS'], [15, 16, 'so'], [15, 17, 'So']])
+const pagePoint = paint(front, [
+  ...handsToChest,
+  ...page,
+  [7, 16, 'os'],
+  [7, 17, 'oS'],
+  [20, 14, 'ooo'],
+  [17, 15, 'oJJJJso'],
+  [17, 16, 'oJJJJSo'],
+  [17, 17, 'ooooooo'],
+  [18, 18, '...'],
+  [18, 19, '...'],
+  [18, 20, '...'],
+  [18, 21, '...'],
+  [18, 22, '..'],
 ])
+
+/** Case-study dialog: a clipboard and a pen that moves along the line. */
+const clipboard = (pen: number): Edit[] => [
+  ...handsToChest,
+  ...page,
+  [11, 12, 'LL'],
+  [7, 18, 'os'],
+  [7, 19, 'oS'],
+  [13 + pen, 16, 'o'],
+  [14 + pen, 17, 'sS'],
+]
+const notesA = paint(front, clipboard(0))
+const notesB = paint(front, clipboard(1))
+
+/** Day: a hand over the brow against the new light, then a squint. */
+const brow: Edit[] = [
+  [12, 5, 'oooooooooo'],
+  [12, 6, 'osssssssSo'],
+  [19, 7, 'ojJo'],
+  [19, 8, 'ojJo'],
+  [19, 9, 'ojJo'],
+  [19, 10, 'ojJo'],
+  [19, 11, 'ojJo'],
+  [19, 12, 'ojJo'],
+  ...raisedArm,
+]
+const shield = paint(front, brow)
+const shieldSquint = paint(front, [...brow, [8, 7, 'sss'], [13, 7, 'sss'], [8, 8, 'ooo'], [13, 8, 'ooo']])
+
+/** Night: a small lantern switched on at his side, its glow flickering. */
+const lantern: Edit[] = [
+  [3, 22, 'oo'],
+  [2, 23, 'ooooo'],
+  [2, 24, 'oyyyo'],
+  [2, 25, 'oyyyo'],
+  [2, 26, 'ooooo'],
+]
+const lanternA = paint(front, lantern)
+const lanternB = sparks(lanternA, [[0, 24, 'y'], [1, 22, 'y'], [0, 27, 'y'], [7, 23, 'y']])
+
+/** Sound turned on: two small notes (cobalt, so they read on Day cream). */
+const note = (x: number, y: number): Edit[] => [
+  [x + 1, y, 'bb'],
+  [x + 1, y + 1, 'b'],
+  [x, y + 2, 'bb'],
+]
+const musicA = paint(front, note(20, 1))
+const musicB = paint(front, [...note(20, 0), ...note(0, 4)])
+
+/** Idle: looking around. */
+const lookLeft = paint(front, eyes(-1))
+const lookRight = paint(front, eyes(1))
 
 /** Facing the viewer, the stepping foot lifts two pixels; between steps the body dips onto both feet. */
 const liftLeft = (frame: Frame) =>
@@ -350,6 +515,22 @@ export const animations = {
   settle: clip([tieHand, tieTug, tieHand], [180, 420, 140], false),
   /** Final pose in the sidebar brand slot, shown at 1×. */
   sidebar: clip([thumbsUp], 0, false),
+
+  /* Section actions: played once he stands still on an anchor and scrolling has paused. */
+  wave: clip([waveA, waveB, waveA, waveB], 220, false),
+  inspect: clip([inspectRaise, inspectLook, inspectLook2, inspectRaise], [200, 500, 500, 200], false),
+  pouch: clip([pouchReach, pouchShow, pouchShine, pouchShow], [250, 300, 600, 200], false),
+  sit: clip([sit, sitBlink, sit], [900, 120, 900], false),
+  polish: clip([polishA, polishB, polishA, polishB, nod], [200, 200, 200, 200, 500], false),
+  document: clip([scroll, pageHeld, pagePoint], [250, 400, 900], false),
+  notes: clip([notesA, notesB, notesA, notesB], 300, false),
+  /* Reactions to the page: theme switch, sound on, a download or external link. */
+  shield: clip([shield, shieldSquint, shield], [500, 600, 300], false),
+  lantern: clip([lanternA, lanternB, lanternA, lanternB], 400, false),
+  music: clip([musicA, musicB, musicA, musicB], 300, false),
+  thumbsUp: clip([thumbsUp], 900, false),
+  /* Idle variety when he has been still a while. */
+  look: clip([lookLeft, front, lookRight], [600, 200, 600], false),
 } satisfies Record<string, Clip>
 
 export type ClipName = keyof typeof animations
