@@ -1,5 +1,7 @@
 {
   "image": "companion-sprites.png",
+  "width": 120,
+  "height": 352,
   "frameWidth": 24,
   "frameHeight": 32,
   "clips": {

@@ -9,7 +9,8 @@
   (npm run dev → /docs/design/companion/companion-review-sheet.html): the
   "on the real site" panels load the portfolio itself in frames and place the
   sprite on a real project card and in the real sidebar. Everything else is
-  drawn from companion-sprites.png / .json, the exported production sheet.
+  drawn from src/components/Companion/companion-sprites.png / .json, the
+  exported production sheet.
 -->
 <style>
   @font-face { font-family: Pixelify; src: url(/node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2) format('woff2'); font-weight: 400 700; }
@@ -157,9 +158,10 @@
 </main>
 
 <script type="module">
-const meta = await fetch('companion-sprites.json').then((r) => r.json())
+const base = '/src/components/Companion/'
+const meta = await fetch(base + 'companion-sprites.json').then((r) => r.json())
 const sheet = new Image()
-sheet.src = meta.image
+sheet.src = base + meta.image
 await sheet.decode()
 const W = meta.frameWidth, H = meta.frameHeight
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(location.search).has('still')

@@ -1,13 +1,13 @@
 // Exports the companion sprite (src/components/Companion/sprite.ts) as a
 // transparent 4-bit indexed PNG sheet plus a JSON map of clips and timings.
 // One clip per row, one 24 × 32 cell per frame, no padding.
-// Usage: node scripts/export-companion.mjs <output-dir>
+// Usage: node scripts/export-companion.mjs   (writes next to the component)
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { deflateSync } from 'node:zlib'
 import { SPRITE_H, SPRITE_W, animations, palette } from '../src/components/Companion/sprite.ts'
 
-const outDir = process.argv[2] ?? 'docs/design/companion'
+const outDir = process.argv[2] ?? 'src/components/Companion'
 const roles = Object.keys(palette)
 if (roles.length > 15) throw new Error('A 4-bit PNG holds 15 colours plus transparency')
 
@@ -77,6 +77,8 @@ writeFileSync(
   `${JSON.stringify(
     {
       image: 'companion-sprites.png',
+      width,
+      height,
       frameWidth: SPRITE_W,
       frameHeight: SPRITE_H,
       clips: Object.fromEntries(clips.map(([name, clip], row) => [name, { row, ms: clip.ms, loop: clip.loop }])),
