@@ -1,0 +1,35 @@
+/*
+ * Pixelify Sans for the pixel design, locked to its regular (400) weight.
+ *
+ * At weights above ~500 the font's "C" closes up and reads as "O"
+ * ("Clive" looked like "Olive", "CERTIFICATIONS" like "OERTIFIOATIONS").
+ * Declaring the self-hosted variable files with `font-weight: 400` makes the
+ * browser clamp the weight axis to 400 even where a component asks for bold,
+ * and pixel-tokens.css turns off synthetic bolding, so every Pixelify label
+ * keeps the open "C". Plus Jakarta Sans is unaffected.
+ *
+ * Files: @fontsource-variable/pixelify-sans 5.3.0 (OFL 1.1), see docs/credits.md.
+ * Only the Latin subsets are needed (English UI, including é in "Résumé").
+ */
+
+@font-face {
+  font-family: "Pixelify Sans UI";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("../../node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-ext-wght-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Pixelify Sans UI";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("../../node_modules/@fontsource-variable/pixelify-sans/files/pixelify-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

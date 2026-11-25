@@ -1,8 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource-variable/plus-jakarta-sans'
-// Pixel design only. Browsers download a font file only when text uses it, so Classic never loads it.
-import '@fontsource-variable/pixelify-sans'
 import './styles/global.css'
 import App from './App'
 import { PreferencesProvider } from './lib/PreferencesProvider'

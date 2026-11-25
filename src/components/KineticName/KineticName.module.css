@@ -57,3 +57,17 @@
     color: CanvasText;
   }
 }
+
+/*
+ * Pixel design: no variable-weight letters. Pixelify is locked to 400 (see
+ * src/styles/pixel-font.css) and the per-letter weight settings would bypass
+ * that lock and close the "C" into an "O". The small lift on hover stays.
+ */
+:global(html[data-design="pixel"]) .letter,
+:global(html[data-design="pixel"]) .letter:hover,
+:global(html[data-design="pixel"]) .letter:has(+ .letter:hover),
+:global(html[data-design="pixel"]) .letter:hover + .letter,
+:global(html[data-design="pixel"]) .letter:has(+ .letter + .letter:hover),
+:global(html[data-design="pixel"]) .letter:hover + .letter + .letter {
+  font-variation-settings: normal;
+}

@@ -17,7 +17,11 @@
 /* ---------- Shared by Day and Night ---------- */
 
 :root[data-design="pixel"] {
-  --font-display: "Pixelify Sans Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
+  /* Locked to weight 400 in pixel-font.css so "C" never closes into "O". */
+  --font-display: "Pixelify Sans UI", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  /* Never fake-bold Pixelify (Plus Jakarta Sans has real weights, so it is unaffected). */
+  font-synthesis-weight: none;
 
   /* Squared chips and controls; stepped corners come from --pixel-step. */
   --radius-sm: 0;
