@@ -10,6 +10,7 @@ import {
   type DesignMode,
   type Preferences,
 } from './preferences'
+import { setSoundEnabled } from './sound'
 import { PreferencesContext, type PreferencesContextValue } from './usePreferences'
 
 const darkQuery = '(prefers-color-scheme: dark)'
@@ -27,6 +28,11 @@ const themeColors = { classic: '#0b1615', day: '#fff6d8', night: '#101a33' } as 
  */
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<Preferences>(() => loadPreferences(getStorage(), prefersDark()))
+
+  // Sound only plays in the pixel design, and only after the visitor turned it on.
+  useEffect(() => {
+    setSoundEnabled(prefs.sound && prefs.design === 'pixel')
+  }, [prefs.sound, prefs.design])
 
   useEffect(() => {
     applyToDocument(document.documentElement, prefs)

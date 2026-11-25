@@ -39,6 +39,12 @@
   flex: none;
 }
 
+.switchLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* "On"/"Off" tag inside a switch; the state itself comes from aria-checked. */
 .state {
   min-width: 2.25em;
@@ -107,6 +113,15 @@
 
 :global(html[data-design="pixel"]) .switch {
   justify-content: space-between;
+}
+
+/* Sound off shows a vermilion speaker; on shows cobalt. */
+:global(html[data-design="pixel"]) .switch[aria-checked="false"] .icon {
+  color: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .switch[aria-checked="true"] .icon {
+  color: var(--pixel-cobalt);
 }
 
 :global(html[data-design="pixel"]) .state {

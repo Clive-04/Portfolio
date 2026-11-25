@@ -37,4 +37,4 @@ Every file in this repository that was not written or drawn for this site is lis
 
 | Asset | Source | Licence | Added |
 |---|---|---|---|
-| _None yet._ | | | |
+| Interface cues (navigate, confirm, back, open, download) in `src/lib/sound.ts` | Written for this site and synthesised in the browser with the Web Audio API; no audio files, nothing sampled | Part of this repository | 2026-11-25 |

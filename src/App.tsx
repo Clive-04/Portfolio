@@ -14,6 +14,7 @@ import { certifications, credlyProfile } from './content/certifications'
 import { profile } from './content/profile'
 import { projects } from './content/projects'
 import { skillGroups } from './content/skills'
+import { useInterfaceSounds } from './lib/useInterfaceSounds'
 import { useReveal } from './lib/useReveal'
 import { useSpotlight } from './lib/useSpotlight'
 import styles from './App.module.css'
@@ -41,6 +42,7 @@ const marqueeItems = [...new Set(skillGroups.flatMap((group) => group.skills.map
 export default function App() {
   useReveal()
   useSpotlight()
+  useInterfaceSounds()
 
   return (
     <>
