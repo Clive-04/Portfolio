@@ -583,3 +583,205 @@
     }
   }
 }
+
+/* ==========================================================================
+   Pixel design: a framed window with a hard shadow. Same structure, focus
+   handling, and two-column scrolling as Classic; only the surface changes.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .dialog {
+  border: var(--pixel-frame) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: 8px 8px 0 var(--pixel-shadow);
+}
+
+/* A deep-navy dimmer with a faint dot screen; ::backdrop gets literal colors for older engines. */
+:global(html[data-design="pixel"]) .dialog::backdrop {
+  background: radial-gradient(rgb(114 167 255 / 0.12) 1px, transparent 1.5px) 0 0 / 8px 8px, rgb(5 10 24 / 0.74);
+  backdrop-filter: none;
+}
+
+:global(html[data-design="pixel"]) .topbar {
+  border-bottom: var(--pixel-line) solid var(--color-border-strong);
+  background: var(--color-surface);
+  backdrop-filter: none;
+}
+
+:global(html[data-design="pixel"]) .counter {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+}
+
+:global(html[data-design="pixel"]) .counter strong {
+  color: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .kbd {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  font-family: var(--font-display);
+}
+
+/* Close: square, 44px, presses in instead of rotating. */
+:global(html[data-design="pixel"]) .close {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .close:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  transform: none;
+}
+
+:global(html[data-design="pixel"]) .close:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* ---------- Left column ---------- */
+
+:global(html[data-design="pixel"]) .aside {
+  background: var(--color-band);
+}
+
+:global(html[data-design="pixel"]) .browser {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+}
+
+:global(html[data-design="pixel"]) .chrome {
+  border-bottom: var(--pixel-line) solid var(--color-border-strong);
+}
+
+/* Window buttons: square, vermilion / yellow / cobalt (no green). */
+:global(html[data-design="pixel"]) .dots i {
+  border-radius: 0;
+  background: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .dots i:nth-child(2) {
+  background: var(--pixel-yellow);
+}
+
+:global(html[data-design="pixel"]) .dots i:nth-child(3) {
+  background: var(--pixel-cobalt);
+}
+
+:global(html[data-design="pixel"]) .url {
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+:global(html[data-design="pixel"]) .cover > div {
+  background: radial-gradient(color-mix(in srgb, var(--pixel-cobalt) 22%, transparent) 1px, transparent 1.5px) 0 0 / 8px
+      8px,
+    var(--color-band);
+}
+
+:global(html[data-design="pixel"]) .cover > div span {
+  color: var(--pixel-cobalt);
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .team,
+:global(html[data-design="pixel"]) .sectionLabel,
+:global(html[data-design="pixel"]) .meta dt {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+}
+
+:global(html[data-design="pixel"]) .team {
+  color: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .title,
+:global(html[data-design="pixel"]) .timeline h5 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
+
+:global(html[data-design="pixel"]) .meta {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+}
+
+/* ---------- Story timeline: square steps on a dashed pixel line ---------- */
+
+:global(html[data-design="pixel"]) .timeline::before {
+  width: 4px;
+  left: calc(1rem - 1px);
+  border-radius: 0;
+  background: repeating-linear-gradient(to bottom, var(--color-accent) 0 8px, transparent 8px 12px);
+}
+
+:global(html[data-design="pixel"]) .step {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--pixel-yellow);
+  color: var(--pixel-on-yellow);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  box-shadow: 2px 2px 0 var(--color-border-strong);
+}
+
+/* ---------- Feature, testing, and limitation lists ---------- */
+
+:global(html[data-design="pixel"]) .list li {
+  border: var(--pixel-line) solid var(--color-border);
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .list li:hover {
+    border-color: var(--color-border-strong);
+    transform: none;
+  }
+}
+
+:global(html[data-design="pixel"]) .listIcon {
+  border-radius: 0;
+}
+
+/* ---------- Previous / Next ---------- */
+
+:global(html[data-design="pixel"]) .pager {
+  border-top: var(--pixel-line) dashed var(--color-border);
+}
+
+:global(html[data-design="pixel"]) .pagerButton {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  font-family: var(--font-display);
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .pagerButton small {
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .pagerButton:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-selected);
+  box-shadow: var(--shadow-md);
+}
+
+:global(html[data-design="pixel"]) .pagerButton:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Phones: the bottom sheet keeps square corners. */
+@media (max-width: 47.99rem) {
+  :global(html[data-design="pixel"]) .dialog {
+    border-width: var(--pixel-frame) 0 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
