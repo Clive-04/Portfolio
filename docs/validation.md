@@ -357,3 +357,18 @@ Owner approved sprite sheet v7.2; this run covers the integration on `feature/pi
 | Console / CSP | 0 errors in every scenario |
 
 Not yet checked: Firefox and Safari/iOS (not installed), a real screen reader, 320 px / 400% zoom (the companion is off below 56rem, so these fall under the narrow fallback). No teleport sound was added; the optional sound cue is still open.
+
+## Run 16 — 2026-11-25 (companion stays docked; speech bubbles; automated)
+
+Owner requests: once the companion reaches the name it stays there until the page is reloaded, and he introduces sections in speech bubbles. Same headless Edge setup as Run 15, 1280 × 800, Day and Night.
+
+| Check | Result |
+|---|---|
+| `npm run lint` / `npm test` / `npm run build` | Passed / 94 of 94 (3 new bubble-placement tests; docking test now expects it to stay) / Passed |
+| Stays docked | Docked at the bottom; still docked after scrolling back to the top, and after a narrow → wide restart of the companion. A reload starts him on the route again |
+| Lines said (scroll top to bottom) | All 7 reachable: start, Projects, project card, Skills, Résumé, Certifications, Contact; each once per visit (back at the top, no repeat). About has no clear spot at this width; the footer line was dropped (he docks before reaching it) |
+| Bubble never covers content | Checked at every change of the bubble (shown, moved): 0 overlaps with text lines, links, buttons, images, or focusable elements. It sits above his head, or to his left when text is above, or is skipped |
+| Day / Night | Day: navy text on the surface colour with a navy keyline. Night: cream text on raised navy with the light keyline |
+| Console / CSP | 0 errors |
+
+Bubbles are `aria-hidden` like the sprite: they are flavour, and each section's own heading and intro already carry its content. Lines live in `src/content/companion.ts` and can be edited there.
