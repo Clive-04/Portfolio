@@ -1,248 +1,355 @@
 /**
- * Original 24 × 32 pixel sprite of Clive, drawn for this site. Likeness from
- * two of his own photos: a casual photo he provided (hair swept up and to the
- * right, thin glasses, smile, white mock-neck sweater) and his formal portrait
- * (skin and hair tones). Jeans and sneakers are invented; the casual photo is
- * cropped at the waist.
+ * Original 24 × 32 pixel companion of Clive, drawn for this site from his
+ * formal portrait (`public/profile.jpg`): thick dark hair with a parted
+ * fringe, ears showing, wide smile, dark suit, white shirt and tie. The tie is
+ * the site's vermilion so it reads at actual size; the portrait's tie is a
+ * grey stripe. Nothing is traced from the photo or adapted from a game sprite.
  *
- * Style: detailed pixel-character craft after a reference sheet Clive shared
- * (layered hair highlights, three-tone shading, glasses with a glint, folds,
- * shaded sneakers) — Clive's own outfit and features, nothing copied from the
- * reference, traced from the photos, or adapted from any game's sprites.
- *
- * Rows are run-length strings ("5. 1o 4k" = five transparent, one outline,
- * four sneaker-white) so each row is easy to edit; `.` is transparent. The art
- * is identical in Day and Night; Night only adds a light outline around the
- * silhouette. No imports, so Node's test runner can check the frames directly.
+ * Every frame is 24 columns × 32 rows; each character is one pixel and `.` is
+ * transparent. Light comes from the top left. `animations` gives each clip its
+ * frames, per-frame timing (ms), and whether it loops. No imports, so Node's
+ * test runner and the PNG export script can read it directly.
  */
 
 export const SPRITE_W = 24
 export const SPRITE_H = 32
 
 export const palette = {
-  o: '#1d1b26', // outline: near-black, slightly warm
-  h: '#2a2433', // hair (formal photo #171a26, warmed)
-  H: '#4e4762', // hair highlight
-  s: '#d29d80', // skin (formal photo #bf9074)
+  o: '#1a1824', // outline, eyes
+  h: '#262233', // hair
+  H: '#4a4462', // hair highlight
+  s: '#d29d80', // skin
   S: '#a86f59', // skin shade
-  e: '#1d1b26', // eyes
-  l: '#ffffff', // glint on the lenses
-  g: '#2f2c3a', // glasses frame (casual photo #586061, darkened for a crisp line)
-  m: '#fff6d8', // teeth: site cream
-  w: '#eef0f4', // sweater (casual photo, lifted from overcast light)
-  W: '#bcc2cf', // sweater shade (casual photo #c7c9cf)
-  V: '#8e96a8', // sweater deep fold
-  n: '#3b4660', // jeans
-  N: '#28304a', // jeans shade, and the far leg in the side walk
-  J: '#56648a', // jeans highlight
-  k: '#f4f2ec', // sneakers
-  r: '#b73d33', // sneaker soles: site vermilion
-  c: '#25b7d3', // teleport beam: site cyan
-  y: '#f3c847', // teleport spark: site yellow
+  t: '#fff6d8', // teeth: site cream
+  j: '#323850', // suit
+  J: '#22263a', // suit shade
+  L: '#56608a', // suit light: lapels, shoe shine
+  w: '#f4f1ea', // shirt
+  r: '#b73d33', // tie: site vermilion
+  R: '#7a2630', // tie stripe
+  b: '#245aa5', // teleport edge: site cobalt
+  c: '#25b7d3', // teleport light: site cyan
+  y: '#f3c847', // spark: site yellow
 } as const
 
 export type Role = keyof typeof palette
+type Frame = string[]
 
-/** "5. 1o 4k" → ".....okkkk": each token is a count and a colour role. */
-function row(runs: string): string {
-  return runs
-    .trim()
-    .split(/\s+/)
-    .map((token) => token.slice(-1).repeat(Number(token.slice(0, -1))))
-    .join('')
-}
+const EMPTY = '.'.repeat(SPRITE_W)
 
-const rows = (list: string[]) => list.map(row)
-
-/** Facing down. Rows 0–12 head (messy quiff, glasses rows 6–9), 13 collar, 14–21 sweater, 22 waist, 23–29 legs, 30–31 sneakers. */
-const head = rows([
-  '10. 2o 2. 1o 9.',
-  '8. 2o 2h 2o 1h 1o 8.',
-  '6. 1o 3h 2H 5h 1o 6.',
-  '5. 1o 2h 2H 6h 1H 2h 1o 4.',
-  '4. 1o 15h 1o 3.',
-  '4. 1o 2h 2s 2h 4s 3h 2h 1o 3.',
-  '5. 1o 1s 5g 1s 5g 1s 1o 4.',
-  '5. 1o 1s 1g 1s 1e 1l 1g 1g 1g 1s 1e 1l 1g 1s 1o 4.',
-  '5. 1o 1s 1g 1s 1e 1s 1g 1s 1g 1s 1e 1s 1g 1s 1o 4.',
-  '5. 1o 1S 1g 3S 1g 1S 1g 3S 1g 1S 1o 4.',
-  '5. 1o 1S 5s 1S 5s 1S 1o 4.',
-  '6. 1o 1S 2s 1S 2m 1S 2s 1S 1o 6.',
-  '7. 1o 1S 6s 1S 1o 7.',
-])
-
-const torso = rows([
-  '8. 1o 1W 4w 1W 1o 8.',
-  '5. 1o 12w 1W 1o 4.',
-  '4. 1o 2w 1o 8w 1W 1o 2W 1o 3.',
-  '4. 1o 2w 1o 7w 2W 1o 2W 1o 3.',
-  '4. 1o 1w 1W 1o 7w 2W 1o 1W 1V 1o 3.',
-  '4. 1o 1w 1W 1o 6w 3W 1o 1W 1V 1o 3.',
-  '4. 1o 2W 1o 6w 3W 1o 2V 1o 3.',
-  '4. 1o 2s 1o 1V 5w 3W 1o 2s 1o 3.',
-  '4. 1o 2S 1o 1V 7W 1V 1o 2S 1o 3.',
-  '6. 1o 1n 2J 6n 1N 1o 6.',
-])
-
-const leg = row('6. 1o 1J 2n 1N 2o 1n 2n 1N 1o 6.')
-const cuffs = row('6. 1o 4N 2o 4N 1o 6.')
-const legs = [leg, leg, leg, leg, leg, leg, cuffs]
-
-const idle = [
-  ...head,
-  ...torso,
-  ...legs,
-  row('5. 1o 4k 1o 2. 1o 4k 1o 5.'),
-  row('5. 1o 4r 1o 2. 1o 4r 1o 5.'),
-]
-
-/** Idle blink: eyes closed behind the glasses for one frame. */
-const blink = idle.map((line, y) =>
-  y === 7 ? row('5. 1o 1s 1g 1s 1S 1l 1g 1g 1g 1s 1S 1l 1g 1s 1o 4.') : y === 8 ? row('5. 1o 1s 1g 3s 1g 1s 1g 3s 1g 1s 1o 4.') : line,
-)
-
-/** Facing down: left step, stand, right step, stand. The stepping foot lifts two pixels; both legs stay visible. */
-const above = [...head, ...torso, leg, leg, leg, leg, leg]
-const walkDown = [
-  [
-    ...above,
-    row('6. 1o 1J 2n 1N 2o 1o 4k 1o 5.'),
-    row('6. 1o 4N 2o 1o 4r 1o 5.'),
-    row('5. 1o 4k 1o 13.'),
-    row('5. 1o 4r 1o 13.'),
-  ],
-  idle,
-  [
-    ...above,
-    row('5. 1o 4k 1o 2o 1n 2n 1N 1o 6.'),
-    row('5. 1o 4r 1o 2o 4N 1o 6.'),
-    row('13. 1o 4k 1o 5.'),
-    row('13. 1o 4r 1o 5.'),
-  ],
-  idle,
-]
-
-/** Side view (facing right): glasses arm from the ear to the lens, nose past the lens. */
-const sideHead = rows([
-  '9. 2o 1. 1o 11.',
-  '7. 2o 2h 1o 1h 2o 9.',
-  '6. 1o 3h 2H 4h 1o 7.',
-  '5. 1o 2h 2H 6h 1H 1h 1o 5.',
-  '4. 1o 15h 1o 3.',
-  '4. 1o 8h 4s 3h 1o 3.',
-  '4. 1o 5h 1S 7g 2s 1o 3.',
-  '4. 1o 5h 1S 4s 1g 1e 1l 1g 2s 1o 2.',
-  '4. 1o 5h 1S 4s 1g 1e 1s 1g 2s 1o 2.',
-  '4. 1o 4h 1S 5s 4S 1s 1o 3.',
-  '5. 1o 2h 1S 9s 1S 1o 4.',
-  '5. 1o 1h 1S 7s 2m 1S 1o 5.',
-  '6. 1o 1S 8s 1o 7.',
-])
-
-const sideCollar = rows(['8. 1o 1W 3w 1W 1o 9.', '7. 1o 7w 1W 1o 7.'])
-/** The near arm is a shaded sleeve (no inner outlines) that swings back, hangs, or swings forward. */
-const sleeve = row('7. 1o 2w 3W 2w 1W 1o 7.')
-const hem = row('7. 1o 1V 6W 1V 1o 7.')
-const arms = {
-  back: rows([
-    '7. 1o 2w 3W 2w 1W 1o 7.',
-    '7. 1o 1w 3W 3w 1W 1o 7.',
-    '7. 1o 3W 4w 1W 1o 7.',
-    '6. 1o 3W 5w 1W 1o 7.',
-    '5. 1o 3W 6w 1W 1o 7.',
-    '4. 1o 2s 1o 7w 1W 1o 7.',
-    '7. 1o 1V 6W 1V 1o 7.',
-  ]),
-  down: [sleeve, sleeve, sleeve, sleeve, sleeve, row('7. 1o 2w 1o 2s 1o 1w 1W 1o 7.'), hem],
-  forward: rows([
-    '7. 1o 2w 3W 2w 1W 1o 7.',
-    '7. 1o 3w 3W 1w 1W 1o 7.',
-    '7. 1o 4w 3W 1W 1o 7.',
-    '7. 1o 5w 3W 1o 7.',
-    '7. 1o 6w 3W 1o 6.',
-    '7. 1o 7w 1o 2s 1o 5.',
-    '7. 1o 1V 6W 1V 1o 7.',
-  ]),
-}
-
-const waist = row('7. 1o 8n 1o 7.')
-
-const strideLegs = rows([
-  '6. 1o 3N 2o 3n 1o 8.',
-  '6. 1o 3N 1o 1. 1o 3n 1o 7.',
-  '5. 1o 3N 1o 3. 1o 3n 1o 6.',
-  '5. 1o 3N 1o 4. 1o 3n 1o 5.',
-  '4. 1o 3N 1o 6. 1o 3n 1o 4.',
-  '4. 1o 3N 1o 6. 1o 3n 1o 4.',
-  '3. 1o 3N 1o 8. 1o 3n 1o 3.',
-  '2. 1o 4k 1o 8. 1o 5k 1o 1.',
-  '2. 1o 4r 1o 8. 1o 5r 1o 1.',
-])
-
-const passLegs = rows([
-  '8. 1o 2n 2N 1o 10.',
-  '8. 1o 2n 2N 1o 10.',
-  '8. 1o 2n 2N 1o 10.',
-  '8. 1o 2n 2N 1o 10.',
-  '8. 1o 2n 2N 1o 10.',
-  '8. 1o 2n 2N 1o 10.',
-  '8. 1o 2n 2N 1o 10.',
-  '7. 1o 6k 1o 9.',
-  '7. 1o 6r 1o 9.',
-])
-
-/** Swap which leg is the far (darker) one, so the second stride uses the other leg. */
-const swapLegs = (list: string[]) => list.map((line) => line.replace(/[nN]/g, (c) => (c === 'n' ? 'N' : 'n')))
-
-/** Facing right: stride, pass, stride with the other leg, pass. Mirrored for walking left. */
-const walkSide = [
-  [...sideHead, ...sideCollar, ...arms.back, waist, ...strideLegs],
-  [...sideHead, ...sideCollar, ...arms.down, waist, ...passLegs],
-  [...sideHead, ...sideCollar, ...arms.forward, waist, ...swapLegs(strideLegs)],
-  [...sideHead, ...sideCollar, ...arms.down, waist, ...swapLegs(passLegs)],
-]
-
-const empty = '.'.repeat(SPRITE_W)
-/** Place single-character marks (sparks) on an empty frame: [x, y, role]. */
-const marks = (points: [number, number, Role][]) =>
-  Array.from({ length: SPRITE_H }, (_, y) =>
-    [...empty].map((dot, x) => points.find(([px, py]) => px === x && py === y)?.[2] ?? dot).join(''),
+/** Overwrite text at column x of row y, e.g. [9, 7, 'o']. */
+const paint = (frame: Frame, edits: [number, number, string][]): Frame =>
+  frame.map((line, y) =>
+    edits.filter(([, ey]) => ey === y).reduce((l, [x, , s]) => l.slice(0, x) + s + l.slice(x + s.length), line),
   )
 
-/**
- * Teleport departure, four frames; arrival plays them in reverse.
- * 1: sparks gather. 2: every other row turns to cyan light.
- * 3: a narrow column of light. 4: a few fading sparks.
- */
-const teleport = [
-  idle.map((line, y) => (y === 31 ? `y${line.slice(1, -1)}y` : y === 20 ? `.y${line.slice(2, -2)}y.` : line)),
-  idle.map((line, y) => (y % 2 ? line.replace(/[^.]/g, 'c') : line)),
+/** Move rows 0…rows-1 down by n (the body settles onto the legs); rows below stay put. */
+const lower = (frame: Frame, n = 1, rows = 24): Frame => [
+  ...Array(n).fill(EMPTY),
+  ...frame.slice(0, rows - n),
+  ...frame.slice(rows),
+]
+
+const mirror = (frame: Frame): Frame => frame.map((line) => [...line].reverse().join(''))
+
+/** Solid light shape of a frame: outline becomes cobalt, everything else cyan. */
+const silhouette = (frame: Frame): Frame => frame.map((line) => line.replace(/[^.]/g, (c) => (c === 'o' ? 'b' : 'c')))
+
+/** Single-pixel sparks: [x, y, role]. */
+const sparks = (frame: Frame, points: [number, number, Role][]) => paint(frame, points)
+
+/* ---------- Facing the viewer ---------- */
+
+const front: Frame = [
+  '........oooooooo........',
+  '......ooHHHhhhhhoo......',
+  '.....oHHHhhhhhhhhho.....',
+  '....oHHhhhhhhHhhhhho....',
+  '....ohHhhhhhhhHhhhho....',
+  '....ohhhhhshhhhhhhho....',
+  '....ohhshssshhhhhhho....',
+  '....oShssossssoshhSo....',
+  '....oSsssossssossSSo....',
+  '.....ossssSSSSsssSo.....',
+  '.....osssottttossSo.....',
+  '......ossssSSsssSo......',
+  '.......oooSSSSooo.......',
+  '....oooojwwrrwwJoooo....',
+  '...ojjjjLwwrrwwLJJJJo...',
+  '...ojjJjjLwRrwLjJoJJo...',
+  '...ojjJjjjLrRLjJJoJJo...',
+  '...ojjJjjjLRrLjJJoJJo...',
+  '...ojjJjjjjLJjjJJoJJo...',
+  '...ojjJjjjjjLjjJJoJJo...',
+  '...ossojjjjjjjjJJosSo...',
+  '...oSSoJJJJJJJJJJoSSo...',
+  '....ooojjjjjjjjJJooo....',
+  '......ojjjjjjjjJJo......',
+  '......ojjjJoojjJJo......',
+  '......ojjJo..ojJJo......',
+  '......ojjJo..ojJJo......',
+  '......ojjJo..ojJJo......',
+  '......ojjJo..ojJJo......',
+  '......ojjJo..ojJJo......',
+  '.....oLJJJo..oLJJJo.....',
+  '.....oooooo..oooooo.....',
+]
+
+const blink = paint(front, [[9, 7, 's'], [14, 7, 's'], [9, 8, 'o'], [14, 8, 'o']])
+/** Smiling eyes: each eye becomes a small arch. */
+const happy = (frame: Frame, top = 7) =>
+  paint(frame, [[8, top, 'sos'], [13, top, 'sos'], [8, top + 1, 'oso'], [13, top + 1, 'oso']])
+
+/** Breathing out: the upper body settles one pixel; legs and feet stay planted. */
+const exhale = lower(front)
+
+/** Personality beat: straighten the tie, then a pleased squint. */
+const tieHand = paint(front, [
+  [3, 14, 'ojjjjLosss'],
+  [3, 15, 'ojjJoLosSo'],
+  [3, 16, 'ojjoLjoLrR'],
+  [3, 17, 'oLjojjjLRr'],
+  [3, 18, 'ojJojjjjLJ'],
+  [3, 19, '.oooj'],
+  [3, 20, '...o'],
+  [3, 21, '...o'],
+  [3, 22, '...o'],
+])
+const tieTug = sparks(happy(tieHand), [[20, 3, 'y'], [19, 4, 'y'], [21, 4, 'y'], [20, 5, 'y']])
+
+/** Sidebar pose: a thumbs-up beside the shoulder. */
+const thumbsUp = paint(front, [
+  [21, 9, 'o'],
+  [20, 10, 'oso'],
+  [19, 11, 'osSo'],
+  [19, 12, 'oSSo'],
+  [19, 13, 'ojJo'],
+  [19, 14, 'ojJo'],
+  [17, 15, 'oJJjJo'],
+  [17, 16, 'oJJJo'],
+  [17, 17, 'oooo'],
+  [18, 18, '...'],
+  [18, 19, '...'],
+  [18, 20, '...'],
+  [18, 21, '...'],
+  [18, 22, '..'],
+])
+
+/** Facing the viewer, the stepping foot lifts two pixels; between steps the body dips onto both feet. */
+const liftLeft = (frame: Frame) =>
+  paint(frame, [
+    [5, 28, 'oLJJJo'],
+    [5, 29, 'oooooo'],
+    [5, 30, '......'],
+    [5, 31, '......'],
+  ])
+const liftRight = (frame: Frame) =>
+  paint(frame, [
+    [13, 28, 'oLJJJo'],
+    [13, 29, 'oooooo'],
+    [13, 30, '......'],
+    [13, 31, '......'],
+  ])
+
+/* ---------- Facing away ---------- */
+
+const back = [
+  ...front.slice(0, 5),
+  '....ohhhhhhhhhhhhhho....',
+  '....ohhhhhHhhhhhhhho....',
+  '....oShhhhhhhhhhhhSo....',
+  '....oShhhhhhhhhhhhSo....',
+  '.....ohhhhhhhhhhhho.....',
+  '.....ohHhhhhhhhhhho.....',
+  '......ohhhhhhhhhho......',
+  '.......oooSSSSooo.......',
+  '....oooojjwwwwjJoooo....',
+  '...ojjjjjjjjjjjjJJJJo...',
+  '...ojjJjjjjjjjjJJoJJo...',
+  '...ojjJjjjjjjjjJJoJJo...',
+  '...ojjJjjjjJjjjJJoJJo...',
+  '...ojjJjjjjJjjjJJoJJo...',
+  '...ojjJjjjjJjjjJJoJJo...',
+  '...ossojjjjJjjjJJosSo...',
+  ...front.slice(21),
+]
+
+/* ---------- Side view, facing right (mirrored for left) ---------- */
+
+const sideHead = [
+  '........oooooo..........',
+  '......ooHHHhhhoo........',
+  '.....oHHHhhhhhhhoo......',
+  '....oHHhhhhhHhhhhho.....',
+  '....ohHhhhhhhhHhhhho....',
+  '....ohhhhhhhhhhhhhhho...',
+  '....ohhhhhhhhshhhhso....',
+  '....ohHhhhSShsssosso....',
+  '....ohhhhhSsssssossso...',
+  '....ohhhhhhSssssssSo....',
+  '.....ohhhhSsssssoto.....',
+  '......ohhSsssssSo.......',
+  '........oSSSSoooo.......',
+  '......oojjjjLwro........',
+  '.....ojjjjjjLwro........',
+]
+
+/** Near arm: hanging, swung back, or swung forward (rows 15–22). */
+const arm = {
+  down: [
+    '.....ojjoLjjowRo........',
+    '.....ojjoLjjoLro........',
+    '.....ojjoLjjojJo........',
+    '.....ojjoLjjojJo........',
+    '.....ojjoLjjojJo........',
+    '.....ojjosSsojJo........',
+    '.....oJJoSSoJJJo........',
+    '.....ojjjoojjJJo........',
+  ],
+  back: [
+    '.....ojjoLjjowRo........',
+    '.....ojoLjjojLro........',
+    '....oLjjojjjjJJo........',
+    '...oLjjojjjjjJJo........',
+    '...ossojjjjjjJJo........',
+    '...oSSojjjjjjJJo........',
+    '....oooJJJJJJJJo........',
+    '.....ojjjjjjjJJo........',
+  ],
+  forward: [
+    '.....ojjoLjjowRo........',
+    '.....ojjjoLjjoro........',
+    '.....ojjjjoLjjoo........',
+    '.....ojjjjjoLjjo........',
+    '.....ojjjjjjJossSo......',
+    '.....ojjjjjjJoSSo.......',
+    '.....oJJJJJJJJoo........',
+    '.....ojjjjjjjJJo........',
+  ],
+}
+
+const sideUpper = (pose: keyof typeof arm): Frame => [...sideHead, ...arm[pose]]
+const sideHip = '......ojjjjjJJo.........'
+
+const standLegs = [
+  ...Array(6).fill('.......ojjJJo...........'),
+  '.......oLJJJJo..........',
+  '.......ooooooo..........',
+]
+
+/** Contact pose: near leg forward, far (darker) leg back, heel of the back foot up. */
+const strideLegs = [
+  '......oJJjjjjo..........',
+  '.....oJJo.ojjjo.........',
+  '....oJJo...ojjjo........',
+  '....oJJo....ojjjo.......',
+  '...oJJo......ojjjo......',
+  '...oJJo......ojjjo......',
+  '..oLJJo.......oLjjjo....',
+  '..ooooo.......oooooo....',
+]
+
+/** The other step: the far leg is now the forward one. */
+const otherLeg = (rows: Frame) => rows.map((line) => line.replace(/[jJ]/g, (c) => (c === 'j' ? 'J' : 'j')))
+
+/** Body one pixel lower on contact, so each step carries weight. */
+const sideContact = (pose: keyof typeof arm, legs: Frame) => [EMPTY, ...sideUpper(pose), ...legs]
+const sidePass = (pose: keyof typeof arm) => [...sideUpper(pose), sideHip, ...standLegs]
+
+const walkRight = [
+  sideContact('back', strideLegs),
+  sidePass('down'),
+  sideContact('forward', otherLeg(strideLegs)),
+  sidePass('down'),
+]
+
+/** Hop between ledges: crouch, push off, tuck in the air, land. The runtime moves the sprite along the arc. */
+const crouchLegs = [
+  '.......ojjjjJo..........',
+  '.......ojjjjjJo.........',
+  '........ojjjJJo.........',
+  '........ojjJJo..........',
+  '.......ojjjJJo..........',
+  '.......oLJJJJJo.........',
+  '.......oooooooo.........',
+]
+const crouch = [EMPTY, EMPTY, ...sideUpper('back'), ...crouchLegs]
+const pushOff = [
+  ...sideUpper('forward'),
+  sideHip,
+  ...standLegs.slice(0, 6),
+  '........oLJJo...........',
+  '.........ooo............',
+]
+const tuck = [
+  ...sideUpper('back'),
+  '......ojjjjjjjo.........',
+  '......ojjjjjjjJo........',
+  '......ojjjjjjjJo........',
+  '..........ojjJJo........',
+  '.........oLJJJJo........',
+  '.........ooooooo........',
+  EMPTY,
+  EMPTY,
+  EMPTY,
+]
+const land = [EMPTY, EMPTY, ...sideUpper('down'), ...crouchLegs]
+
+/* ---------- Teleport ---------- */
+
+/** Pixels dissolve on an ordered checkerboard rather than random noise. */
+const dissolve = (frame: Frame, fromRow: number) =>
+  frame.map((line, y) => (y < fromRow ? line : [...line].map((c, x) => ((x + y) % 2 ? '.' : c)).join('')))
+
+const column = (top = 0) =>
   Array.from({ length: SPRITE_H }, (_, y) =>
-    y === 0 ? row('11. 1y 12.') : y === SPRITE_H - 1 ? row('7. 1y 1. 6c 1. 1y 7.') : y % 2 ? row('10. 4c 10.') : row('11. 2c 11.'),
-  ),
-  marks([
-    [11, 2, 'y'], [6, 6, 'c'], [17, 7, 'c'], [12, 10, 'y'], [3, 13, 'y'], [19, 15, 'c'],
-    [9, 18, 'c'], [15, 21, 'y'], [5, 24, 'y'], [13, 26, 'c'], [8, 29, 'c'], [16, 30, 'y'],
+    y < top ? EMPTY : y % 2 ? '..........bccb..........' : '...........cc...........',
+  )
+
+const materialise = (fromRow: number) => [...front.slice(0, fromRow), ...silhouette(front).slice(fromRow)]
+
+const teleportOut = [
+  sparks(front, [[4, 30, 'y'], [19, 29, 'y'], [2, 24, 'c'], [21, 22, 'c']]),
+  [...front.slice(0, 18), ...dissolve(silhouette(front), 0).slice(18)],
+  dissolve(silhouette(front), 0),
+  sparks(column(), [[11, 0, 'r'], [12, 0, 'y']]),
+  sparks(Array(SPRITE_H).fill(EMPTY), [
+    [11, 1, 'y'], [9, 4, 'c'], [14, 6, 'b'], [12, 9, 'c'], [10, 12, 'y'], [13, 15, 'c'], [11, 19, 'b'],
   ]),
 ]
 
-export const frames = { idle, blink, walkDown, walkSide, teleport }
+const teleportIn = [
+  sparks(column(22).map((l, y) => (y < 22 ? EMPTY : l)), [[11, 21, 'y'], [12, 21, 'r']]),
+  sparks(column(), [[8, 31, 'y'], [15, 31, 'y']]),
+  silhouette(front),
+  materialise(16),
+  sparks(front, [[20, 2, 'y'], [21, 1, 'y'], [22, 2, 'y'], [21, 3, 'y']]),
+]
 
-/** One SVG path per colour role: each horizontal run of a role becomes a rectangle. */
-export function toRuns(lines: readonly string[]): Partial<Record<Role, string>> {
-  const paths: Partial<Record<Role, string>> = {}
-  lines.forEach((line, y) => {
-    let x = 0
-    while (x < line.length) {
-      const role = line[x] as Role
-      if (role === ('.' as Role)) {
-        x += 1
-        continue
-      }
-      const start = x
-      while (line[x] === role) x += 1
-      paths[role] = `${paths[role] ?? ''}M${start} ${y}h${x - start}v1h-${x - start}z`
-    }
-  })
-  return paths
-}
+/* ---------- Clips ---------- */
+
+type Clip = { frames: Frame[]; ms: number[]; loop: boolean }
+const clip = (frames: Frame[], ms: number | number[], loop: boolean): Clip => ({
+  frames,
+  ms: Array.isArray(ms) ? ms : frames.map(() => ms),
+  loop,
+})
+
+export const animations = {
+  /** Standing still: slow breathing; a blink is swapped in every few seconds. */
+  idle: clip([front, exhale], [900, 700], true),
+  blink: clip([blink], 120, false),
+  walkDown: clip([lower(front), liftLeft(front), lower(front), liftRight(front)], 140, true),
+  walkUp: clip([lower(back), liftLeft(back), lower(back), liftRight(back)], 140, true),
+  walkRight: clip(walkRight, 140, true),
+  walkLeft: clip(walkRight.map(mirror), 140, true),
+  hop: clip([crouch, pushOff, tuck, land], [90, 70, 180, 110], false),
+  teleportOut: clip(teleportOut, [120, 80, 80, 70, 90], false),
+  teleportIn: clip(teleportIn, [70, 70, 80, 80, 200], false),
+  /** When scrolling stops for a while: straighten the tie, a pleased squint, back to idle. */
+  settle: clip([tieHand, tieTug, tieHand], [180, 420, 140], false),
+  /** Final pose in the sidebar brand slot, shown at 1×. */
+  sidebar: clip([thumbsUp], 0, false),
+} satisfies Record<string, Clip>
+
+export type ClipName = keyof typeof animations

@@ -1,0 +1,110 @@
+{
+  "image": "companion-sprites.png",
+  "frameWidth": 24,
+  "frameHeight": 32,
+  "clips": {
+    "idle": {
+      "row": 0,
+      "ms": [
+        900,
+        700
+      ],
+      "loop": true
+    },
+    "blink": {
+      "row": 1,
+      "ms": [
+        120
+      ],
+      "loop": false
+    },
+    "walkDown": {
+      "row": 2,
+      "ms": [
+        140,
+        140,
+        140,
+        140
+      ],
+      "loop": true
+    },
+    "walkUp": {
+      "row": 3,
+      "ms": [
+        140,
+        140,
+        140,
+        140
+      ],
+      "loop": true
+    },
+    "walkRight": {
+      "row": 4,
+      "ms": [
+        140,
+        140,
+        140,
+        140
+      ],
+      "loop": true
+    },
+    "walkLeft": {
+      "row": 5,
+      "ms": [
+        140,
+        140,
+        140,
+        140
+      ],
+      "loop": true
+    },
+    "hop": {
+      "row": 6,
+      "ms": [
+        90,
+        70,
+        180,
+        110
+      ],
+      "loop": false
+    },
+    "teleportOut": {
+      "row": 7,
+      "ms": [
+        120,
+        80,
+        80,
+        70,
+        90
+      ],
+      "loop": false
+    },
+    "teleportIn": {
+      "row": 8,
+      "ms": [
+        70,
+        70,
+        80,
+        80,
+        200
+      ],
+      "loop": false
+    },
+    "settle": {
+      "row": 9,
+      "ms": [
+        180,
+        420,
+        140
+      ],
+      "loop": false
+    },
+    "sidebar": {
+      "row": 10,
+      "ms": [
+        0
+      ],
+      "loop": false
+    }
+  }
+}
