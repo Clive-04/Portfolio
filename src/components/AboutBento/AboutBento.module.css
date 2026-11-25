@@ -298,3 +298,49 @@
   font-family: var(--font-display);
   letter-spacing: var(--tracking-label);
 }
+
+/* About icons: pixel design only (decorative; Classic keeps its original tiles). */
+.cornerIcon,
+.labelIcon,
+.chipIcon {
+  display: none;
+}
+
+:global(html[data-design="pixel"]) .bio {
+  justify-content: flex-start;
+}
+
+:global(html[data-design="pixel"]) .cornerIcon {
+  display: block;
+  flex: none;
+  color: var(--pixel-cobalt);
+}
+
+:global(html[data-design="pixel"]) .look .dot {
+  display: none;
+}
+
+:global(html[data-design="pixel"]) .labelIcon {
+  display: block;
+  flex: none;
+}
+
+:global(html[data-design="pixel"]) .clock .labelIcon {
+  color: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .focus .labelIcon {
+  color: var(--pixel-violet);
+}
+
+:global(html[data-design="pixel"]) .focusList li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+:global(html[data-design="pixel"]) .chipIcon {
+  display: block;
+  flex: none;
+  color: var(--pixel-cobalt);
+}
