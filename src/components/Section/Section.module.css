@@ -123,3 +123,70 @@
 .section[data-tone="ink"] a:not([class]) {
   color: var(--color-on-ink-accent);
 }
+
+/* ==========================================================================
+   Pixel design: "01 · INVENTORY" over a plain heading, then a stepped rule.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .bigIndex {
+  display: none;
+}
+
+:global(html[data-design="pixel"]) .index {
+  gap: var(--space-3);
+  color: var(--pixel-cobalt);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+}
+
+/* The motif label: vermilion, uppercase, after a small pixel square. 5.01:1 or better on every Day surface. */
+.motif {
+  display: none;
+}
+
+:global(html[data-design="pixel"]) .motif {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--pixel-vermilion);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+}
+
+:global(html[data-design="pixel"]) .motif::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--pixel-yellow);
+  box-shadow: 0 0 0 1px var(--color-border-strong);
+}
+
+/* A dotted pixel rule fills the rest of the line. */
+:global(html[data-design="pixel"]) .index::after {
+  flex: 1;
+  width: auto;
+  max-width: 24rem;
+  height: 4px;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--pixel-yellow) 0 4px, transparent 4px 8px);
+}
+
+:global(html[data-design="pixel"]) .title {
+  font-size: var(--text-2xl);
+  text-transform: uppercase;
+}
+
+:global(html[data-design="pixel"]) .section[data-tone="band"] {
+  border-block: var(--pixel-line) solid var(--color-border);
+}
+
+:global(html[data-design="pixel"]) .section[data-tone="plain"] + .section[data-tone="plain"] .inner {
+  border-top: var(--pixel-line) dashed var(--color-border);
+}
+
+:global(html[data-design="pixel"]) .section[data-tone="ink"] .index,
+:global(html[data-design="pixel"]) .section[data-tone="ink"] .motif {
+  color: var(--color-on-ink-accent);
+}

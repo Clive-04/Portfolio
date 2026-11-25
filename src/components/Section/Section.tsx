@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react'
+import { sectionMotif, type SectionId } from '../../content/sections'
 import styles from './Section.module.css'
 
 interface SectionProps {
-  id: string
+  id: SectionId
   title: string
   /** Two-digit label shown above the title, e.g. "01". */
   index?: string
   intro?: string
-  /** `band` = mist-tinted background; `ink` = dark pine panel. */
+  /** `band` = tinted background; `ink` = dark panel. */
   tone?: 'plain' | 'band' | 'ink'
   children: ReactNode
 }
@@ -15,6 +16,7 @@ interface SectionProps {
 /** A page section with a linked heading, used by every part of the page. */
 export function Section({ id, title, index, intro, tone = 'plain', children }: SectionProps) {
   const headingId = `${id}-heading`
+  const motif = sectionMotif(id)
   return (
     <section id={id} aria-labelledby={headingId} className={styles.section} data-tone={tone}>
       <div className={styles.inner}>
@@ -24,9 +26,11 @@ export function Section({ id, title, index, intro, tone = 'plain', children }: S
               {index}
             </span>
           )}
+          {/* Pixel design: "01 · Inventory". Decorative; the heading below is what assistive tech reads. */}
           {index && (
             <p className={styles.index} aria-hidden="true">
               <span>{index}</span>
+              {motif && <span className={styles.motif}>{motif}</span>}
             </p>
           )}
           <h2 id={headingId} className={styles.title}>
