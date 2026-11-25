@@ -20,16 +20,16 @@ function useMedia(query: string) {
 const AFTER_THEME_WIPE_MS = 650
 
 /**
- * A small pixel Clive who walks down the page as the visitor scrolls,
- * performs a small action in each section, and teleports into the brand
- * mark at the bottom. Decorative only: hidden from assistive technology,
- * never focusable or clickable, and absent in Classic and with reduced
- * motion, where the "CB" mark simply stays.
+ * A small pixel Clive who visits one card per section as the visitor
+ * scrolls, says a line, performs a small action, says goodbye at Contact,
+ * and settles into the brand mark. Decorative only: hidden from assistive
+ * technology, never focusable or clickable, and absent in Classic. With
+ * reduced motion he is a still figure (no walking, waving, or teleporting).
  */
 export function Companion() {
   const { design, colorTheme, sound } = usePreferences()
   const reducedMotion = useMedia('(prefers-reduced-motion: reduce)')
-  const enabled = companionEnabled({ pixel: design === 'pixel', reducedMotion })
+  const enabled = companionEnabled({ pixel: design === 'pixel' })
   const ref = useRef<HTMLDivElement>(null)
   const bubbleRef = useRef<HTMLDivElement>(null)
   const handle = useRef<CompanionHandle | null>(null)
@@ -37,7 +37,12 @@ export function Companion() {
   useEffect(() => {
     if (!enabled || !ref.current || !bubbleRef.current) return
     try {
-      handle.current = startCompanion(ref.current, bubbleRef.current, document.querySelector<HTMLElement>('[data-companion-slot]'))
+      handle.current = startCompanion(
+        ref.current,
+        bubbleRef.current,
+        document.querySelector<HTMLElement>('[data-companion-slot]'),
+        reducedMotion,
+      )
     } catch {
       // Any failure leaves the page and the "CB" mark exactly as they were.
       delete document.documentElement.dataset.companion
@@ -47,7 +52,7 @@ export function Companion() {
       handle.current?.stop()
       handle.current = null
     }
-  }, [enabled])
+  }, [enabled, reducedMotion])
 
   // Reactions to the visitor's own changes (not the initial values).
   const first = useRef({ colorTheme, sound })

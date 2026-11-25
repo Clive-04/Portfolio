@@ -28,5 +28,6 @@ export const companionActions: Record<string, string[]> = {
   skills: ['pouch'],
   resume: ['document'],
   certifications: ['polish'],
-  contact: ['wave'],
+  // Contact: face the Email button, press it (its pressed look only), step back, wave, then teleport to the brand slot.
+  contact: ['goodbye'],
 }

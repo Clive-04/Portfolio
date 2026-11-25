@@ -9,7 +9,6 @@ import {
   docked,
   isClear,
   layoutFor,
-  modesFor,
   resolveAnchor,
   type Anchor,
   pixelScale,
@@ -18,7 +17,10 @@ import {
   walkClip,
   walkFrame,
   walkingDistance,
+  brandScale,
+  nextMove,
   pickStops,
+  stopStart,
   tour,
   type Placement,
   type Rect,
@@ -225,10 +227,9 @@ describe('pixelScale', () => {
 })
 
 describe('when the companion runs', () => {
-  it('runs only in Pixel with motion allowed, at every width', () => {
-    assert.equal(companionEnabled({ pixel: true, reducedMotion: false }), true)
-    assert.equal(companionEnabled({ pixel: false, reducedMotion: false }), false, 'Classic')
-    assert.equal(companionEnabled({ pixel: true, reducedMotion: true }), false, 'reduced motion')
+  it('runs in Pixel only; Classic is unchanged', () => {
+    assert.equal(companionEnabled({ pixel: true }), true)
+    assert.equal(companionEnabled({ pixel: false }), false)
   })
 })
 
@@ -236,23 +237,16 @@ describe('layouts', () => {
   it('splits desktop (sidebar), tablet, and phone', () => {
     assert.equal(layoutFor(1280), 'desktop')
     assert.equal(layoutFor(800), 'tablet')
-    assert.equal(layoutFor(375), 'phone')
-  })
-
-  it('never places him beside a card on narrow screens', () => {
-    assert.ok(modesFor('desktop').includes('beside'))
-    assert.ok(!modesFor('tablet').includes('beside'))
-    assert.ok(!modesFor('phone').includes('beside'))
+    assert.equal(layoutFor(320), 'phone')
   })
 })
 
 describe('resolveAnchor', () => {
   const card: Anchor = { id: 'projects', rect: { x: 300, y: 1000, w: 400, h: 300 }, modes: ['top', 'below', 'beside'] }
   const bounds = { x0: 240, x1: 1260 }
-  const all = modesFor('desktop')
 
   it('stands on the top border when there is room, feet exactly on the edge', () => {
-    const { placement } = resolveAnchor(card, [], bounds, all)
+    const { placement } = resolveAnchor(card, [], bounds)
     assert.equal(placement?.mode, 'top')
     assert.equal(placement?.y, 1000)
     assert.ok(placement!.x >= 300 && placement!.x + SPRITE_BOX.w <= 700)
@@ -260,7 +254,7 @@ describe('resolveAnchor', () => {
 
   it('goes below the card when its top is crowded (a badge or a heading above it)', () => {
     const heading: Rect = { x: 280, y: 930, w: 440, h: 60 }
-    const { placement, attempts } = resolveAnchor(card, [heading], bounds, all)
+    const { placement, attempts } = resolveAnchor(card, [heading], bounds)
     assert.equal(placement?.mode, 'below')
     assert.equal(placement?.y, 1000 + 300 + 8 + SPRITE_BOX.h)
     assert.deepEqual(attempts.map((a) => [a.mode, a.ok]), [['top', false], ['below', true]])
@@ -268,27 +262,97 @@ describe('resolveAnchor', () => {
 
   it('needs walking room on top, not just a gap his own width', () => {
     const narrow: Anchor = { ...card, rect: { x: 300, y: 1000, w: SPRITE_BOX.w + 4, h: 300 }, modes: ['top'] }
-    assert.equal(resolveAnchor(narrow, [], bounds, all).placement, null)
+    assert.equal(resolveAnchor(narrow, [], bounds).placement, null)
   })
 
-  it('stands beside it, feet level with its bottom, when above and below are taken', () => {
+  it('stands beside it, feet level with its bottom, only when above and below are taken', () => {
     const blocked: Rect[] = [{ x: 280, y: 900, w: 440, h: 95 }, { x: 280, y: 1302, w: 440, h: 120 }]
-    const { placement } = resolveAnchor(card, blocked, bounds, all)
+    const { placement, attempts } = resolveAnchor(card, blocked, bounds)
     assert.equal(placement?.mode, 'beside')
     assert.equal(placement?.y, 1300)
     assert.ok(placement!.x >= 700 || placement!.x + SPRITE_BOX.w <= 300)
+    assert.deepEqual(attempts.map((a) => a.mode), ['top', 'below', 'beside'], 'top and below are tried first')
   })
 
-  it('skips beside on a phone, and skips the anchor when nothing is safe', () => {
+  it('looks a few paces along the ground line for a clear spot beside it, but no further', () => {
+    const button: Anchor = { id: 'contact', rect: { x: 300, y: 1000, w: 150, h: 48 }, modes: ['beside'] }
+    const label: Rect = { x: 455, y: 1010, w: 100, h: 40 } // text right after the button
+    const near = resolveAnchor(button, [label, { x: 0, y: 1000, w: 300, h: 48 }], bounds).placement!
+    assert.equal(near.y, 1048, 'feet level with its bottom edge')
+    assert.ok(near.x >= 555, 'just past the text')
+    const farText: Rect = { x: 455, y: 1010, w: 600, h: 40 }
+    assert.equal(resolveAnchor(button, [farText, { x: 0, y: 1000, w: 300, h: 48 }], bounds).placement, null, 'too far to read as beside')
+  })
+
+  it('skips the anchor when nothing is safe (narrow column, everything crowded)', () => {
+    const tight = { x0: 290, x1: 710 }
     const blocked: Rect[] = [{ x: 280, y: 900, w: 440, h: 95 }, { x: 280, y: 1302, w: 440, h: 120 }]
-    const { placement, attempts } = resolveAnchor(card, blocked, bounds, modesFor('phone'))
+    const { placement, attempts } = resolveAnchor(card, blocked, tight)
     assert.equal(placement, null)
     assert.ok(attempts.every((a) => !a.ok))
   })
 
   it('never leaves the content column', () => {
     const edge: Anchor = { ...card, rect: { x: 1100, y: 1000, w: 160, h: 200 }, modes: ['beside'] }
-    const { placement } = resolveAnchor(edge, [], { x0: 240, x1: 1270 }, all)
+    const { placement } = resolveAnchor(edge, [], { x0: 240, x1: 1270 })
     assert.ok(!placement || (placement.x >= 240 && placement.x + SPRITE_BOX.w <= 1270))
+  })
+})
+
+describe('nextMove (always from the latest scroll position)', () => {
+  // Five sections, each a stop with a short walk: indices 0-1, 2-3, 4-5, 6-7, 8-9.
+  const sections = ['start', 'about', 'projects', 'skills', 'contact']
+  const route = tour(sections.map((id, i) => stop(id, 1000 + i * 1000)), VH)
+  const stopOf = (id: string) => route.findIndex((p) => p.ledge === id)
+
+  it('teleports straight to the reader\'s section when one update skips several', () => {
+    const move = nextMove(route, 0, 4900 - 0.15 * VH)
+    assert.deepEqual(move, { kind: 'teleport', to: stopOf('skills') })
+  })
+
+  it('is just as direct scrolling up, and after a rapid reversal', () => {
+    assert.deepEqual(nextMove(route, stopOf('contact') + 1, 2000), { kind: 'teleport', to: stopOf('about') })
+    const down = nextMove(route, 0, 5000)
+    const back = nextMove(route, 0, 900)
+    assert.equal(down.kind, 'teleport')
+    assert.deepEqual(back, { kind: 'walk', to: 1 }, 'back at the start: finish the short walk, no teleport')
+  })
+
+  it('clamps to the first and last stops at the very top and bottom', () => {
+    assert.deepEqual(nextMove(route, 0, 0), { kind: 'walk', to: 1 }, 'top of the page: the first stop')
+    assert.deepEqual(nextMove(route, 0, 1e9), { kind: 'teleport', to: stopOf('contact') })
+    assert.deepEqual(nextMove(route, route.length - 1, 1e9), { kind: 'still' })
+  })
+
+  it('walks only within the current stop, and stands still once done', () => {
+    const at = stopOf('projects')
+    const line = route[at].key
+    assert.deepEqual(nextMove(route, at, line), { kind: 'walk', to: at + 1 })
+    assert.deepEqual(nextMove(route, at + 0.5, line), { kind: 'walk', to: at + 1 })
+    assert.deepEqual(nextMove(route, at + 1, line), { kind: 'still' })
+  })
+
+  it('finds the start of a stop from any of its points', () => {
+    assert.equal(stopStart(route, stopOf('skills') + 1), stopOf('skills'))
+    assert.equal(stopStart(route, 0), 0)
+  })
+})
+
+describe('brandScale (sidebar sprite beside the name)', () => {
+  it('uses the largest whole device-pixel scale no taller than the name', () => {
+    assert.equal(brandScale(46, 1), 1, 'desktop sidebar: 32 px tall beside a 46 px name')
+    assert.equal(brandScale(46, 2), 1, '2x display: 2 device px per sprite px (3 would be 48 px, taller than the name)')
+    assert.equal(brandScale(26.4, 3), 2 / 3, 'phone at 3x: 21.3 px beside a 26 px name')
+    for (const [limit, dpr] of [[46, 1], [46, 1.25], [46, 2], [30, 2], [26.4, 3], [36, 4]]) {
+      const s = brandScale(limit, dpr)!
+      assert.ok(32 * s <= limit + 1e-9, 'never taller than the name')
+      const device = s * dpr
+      assert.ok(Math.abs(device - Math.round(device)) < 1e-9, 'whole device pixels per sprite pixel')
+    }
+  })
+
+  it('keeps the "CB" mark when even one device pixel per sprite pixel is too tall', () => {
+    assert.equal(brandScale(26.4, 1), null)
+    assert.equal(brandScale(30, 1), null)
   })
 })

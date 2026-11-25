@@ -1,4 +1,4 @@
-import { layoutFor, modesFor, resolveAnchor, type Anchor, type Attempt, type Box, type Mode, type Placement, type Rect } from './route'
+import { layoutFor, resolveAnchor, type Anchor, type Attempt, type Box, type Mode, type Placement, type Rect } from './route'
 
 /**
  * Page measuring for the companion (DOM only; the decisions live in
@@ -83,13 +83,12 @@ export function planPlacements(box: Box): PlacementPlan {
   const layout = layoutFor(window.innerWidth, parseFloat(getComputedStyle(document.documentElement).fontSize) || 16)
   const obstacles = measureObstacles()
   const bounds = contentBounds()
-  const allowed = modesFor(layout)
   const measured = measureAnchors()
   // He may stand on a card or in whitespace, never in front of another card.
   const cards = measured.filter((a) => !a.modes.every((m) => m === 'ledge'))
   const anchors = measured.map((anchor) => {
     const others = cards.filter((c) => c !== anchor).map((c) => c.rect)
-    return { anchor, ...resolveAnchor(anchor, [...obstacles, ...others], bounds, allowed, box) }
+    return { anchor, ...resolveAnchor(anchor, [...obstacles, ...others], bounds, box) }
   })
   return { layout, obstacles, bounds, anchors }
 }

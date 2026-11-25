@@ -15,6 +15,8 @@ interface ButtonLinkProps {
   /** Opens in a new tab. `noopener noreferrer` stops the new page from controlling this one. */
   external?: boolean
   download?: boolean
+  /** Extra data attributes (e.g. the pixel companion's anchor). */
+  data?: Record<`data-${string}`, string>
 }
 
 export function ButtonLink({
@@ -26,6 +28,7 @@ export function ButtonLink({
   leadingIcon,
   external = false,
   download = false,
+  data,
 }: ButtonLinkProps) {
   const trailing = icon ?? (external ? 'external' : undefined)
   return (
@@ -35,6 +38,7 @@ export function ButtonLink({
       data-icon={trailing}
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
       {...(download && { download: true })}
+      {...data}
     >
       {leadingIcon && <Icon name={leadingIcon} className={styles.leading} />}
       <span className={styles.label}>{children}</span>

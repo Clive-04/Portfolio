@@ -3,19 +3,18 @@ import sheetUrl from './companion-sprites.png'
 import sheet from './companion-sprites.json'
 import { planPlacements } from './measure'
 import {
-  BRIEF_WALK,
   advance,
+  brandScale,
   docked,
+  nextMove,
   pickStops,
-  tour,
   pixelScale,
   placeBubble,
   positionAt,
   snap,
-  targetAt,
+  tour,
   walkClip,
   walkFrame,
-  walkingDistance,
   type Box,
   type Rect,
   type RoutePoint,
@@ -24,20 +23,20 @@ import {
 type Clip = keyof typeof sheet.clips
 type Frame = [clip: Clip, index: number, ms: number]
 
-/** The companion aims for the route point level with this share of the viewport height. */
+/** He aims for the route point level with this share of the viewport height. */
 const LINE = 0.75
-/** Section actions wait until he is standing on an anchor and scrolling has paused this long. */
+/** Section actions wait until he is standing on a stop and scrolling has paused this long. */
 const SETTLE_MS = 600
+/** A line shows this long. */
+const BUBBLE_MS = 3500
+/** The short walk on each card is an unhurried stroll (CSS px per second). */
+const STROLL_SPEED = 70
 
-/** Once he reaches the brand slot he stays there until the page is reloaded, even if the companion restarts (resize, design switch). */
+/** Once he reaches the brand slot he stays there until the page is reloaded, even if the companion restarts. */
 let dockedThisLoad = false
 /** Each section's line and action play once per page load. */
 const said = new Set<string>()
 const acted = new Set<string>()
-/** A line shows for 3.5 s; after 2 s a newer section's line may take over; a teleport pause never stretches it past 6 s. */
-const BUBBLE_MS = 3500
-const MIN_READ_MS = 2000
-const MAX_SPEECH_MS = 6000
 
 const isClip = (name: string): name is Clip => name in sheet.clips
 const frames = (clip: Clip): Frame[] => sheet.clips[clip].ms.map((ms, i) => [clip, i, ms])
@@ -59,21 +58,41 @@ function show(el: HTMLElement, [clip, index]: Frame | [Clip, number], scale: num
   el.toggleAttribute('data-seated', clip === 'sit')
 }
 
+/** Finite CSS animations still running on page content (reveals, the hero entrance); their transforms skew measurements. */
+const contentAnimations = () =>
+  document.getAnimations().filter((a) => {
+    const target = (a.effect as KeyframeEffect | null)?.target
+    return (
+      a.playState === 'running' &&
+      target instanceof Element &&
+      target.closest('main, footer') !== null &&
+      Number.isFinite(a.effect?.getComputedTiming().endTime ?? Infinity)
+    )
+  })
+
 export type Reaction = 'shield' | 'lantern' | 'music' | 'thumbsUp'
 
 export interface CompanionHandle {
   stop: () => void
-  /** Play a short reaction (theme switch, sound on, a successful download or link) if he is free and in view. */
+  /** Play a short reaction (theme switch, sound on, a download or link) if he is free and in view. */
   react: (reaction: Reaction) => void
 }
 
 /**
- * Runs the companion: plans his anchors, follows the scroll, says a line and
- * performs a section action on the cards, reacts to the page, and docks in
- * the brand slot at the bottom. `stop()` removes every listener and timer and
- * restores the "CB" mark.
+ * Runs the companion: plans one stop per section, follows the scroll, walks
+ * briefly and talks on each card, performs the section action once the
+ * reader pauses, says goodbye at Contact, and docks in the brand slot.
+ *
+ * Ownership: every sequence (idle beats, actions, teleports, reactions,
+ * docking) claims a new generation and checks it before each frame, so a
+ * newer claim (a teleport for a fast scroll, a dialog, the mobile menu)
+ * silently ends any older one. Where he goes is always derived from the
+ * latest scroll position (`nextMove`), never from a queue of moves.
+ *
+ * `still` (reduced motion): no travelling or animation; a still figure at
+ * the last section, then the brand slot at the bottom of the page.
  */
-export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: HTMLElement | null): CompanionHandle {
+export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: HTMLElement | null, still: boolean): CompanionHandle {
   const root = document.documentElement
   let stopped = false
   let points: RoutePoint[] = []
@@ -82,18 +101,29 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   let p = 0
   let walked = 0
   let isDocked = dockedThisLoad
-  let bubbleTimer = 0
-  let busy = false
+  let busy = false // a teleport, reaction, or docking owns him
+  let idling = false
   let raf = 0
   let lastTime = 0
-  let idleRun = 0
-  let idling = false
   let scale = 2
+  let slotScale: number | null = null
   let box: Box = { w: 48, h: 64 }
   let dpr = 1
   let lastScroll = performance.now()
   let paused = false // a dialog or the mobile menu is open
+  let sheetReady = false
   const timers = new Set<number>()
+
+  /* ---------- Ownership ---------- */
+
+  let generation = 0
+  /** Start a new owner; every older sequence stops at its next frame. */
+  const claim = () => {
+    generation += 1
+    idling = false
+    const mine = generation
+    return () => mine === generation && !stopped
+  }
 
   const wait = (ms: number) =>
     new Promise<void>((resolve) => {
@@ -104,12 +134,13 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       timers.add(id)
     })
 
-  async function play(el: HTMLElement, list: Frame[], s: number, still: () => boolean = () => !stopped) {
+  async function play(el: HTMLElement, list: Frame[], s: number, owns: () => boolean) {
     for (const frame of list) {
-      if (!still()) return
+      if (!owns()) return false
       show(el, frame, s)
       await wait(frame[2])
     }
+    return owns()
   }
 
   const line = () => window.scrollY + LINE * window.innerHeight
@@ -120,6 +151,10 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     sprite.toggleAttribute('data-dark', dark)
     followSpeech()
     yieldToFocus()
+  }
+
+  function wake() {
+    if (!raf && !stopped) raf = requestAnimationFrame(tick)
   }
 
   /**
@@ -145,65 +180,30 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     bubble.style.visibility = touches ? 'hidden' : ''
   }
 
-  function wake() {
-    if (!raf && !stopped) raf = requestAnimationFrame(tick)
+  /** Fully in view (below the top bar on narrow screens), so nothing starts where it cannot be seen. */
+  function inClearView() {
+    const { y } = positionAt(points, p)
+    const header = document.querySelector('header')?.getBoundingClientRect()
+    const top = header && header.width >= window.innerWidth * 0.9 ? header.bottom : 0
+    return !sprite.hidden && y - box.h >= window.scrollY + top + 4 && y <= window.scrollY + window.innerHeight
   }
 
-  function stopIdle() {
-    idleRun += 1
-    idling = false
+  /** Departures are only played when the visitor can see them. */
+  function onScreen() {
+    const { y } = positionAt(points, p)
+    return !sprite.hidden && y > window.scrollY && y - box.h < window.scrollY + window.innerHeight
   }
 
-  /* ---------- Speech ---------- */
+  /* ---------- Speech: a line belongs to the stop where he said it ---------- */
 
   let speaking: string | undefined
   let bubbleSize: Box = { w: 0, h: 0 }
-  let speechEndsAt = 0
-  let speechStartedAt = 0
+  let bubbleTimer = 0
 
   function hideBubble() {
     window.clearTimeout(bubbleTimer)
     bubble.hidden = true
     speaking = undefined
-    wake() // he may have been waiting to finish a line before docking
-  }
-
-  /**
-   * At the bottom of the page he docks only after finishing at the last
-   * section: the short walk, the stop, and his line (or a few seconds there
-   * if the line has nowhere clear to go).
-   */
-  let atLastSince = 0
-  function finishedLastStop() {
-    const last = points.length - 1
-    if (p !== last) {
-      atLastSince = 0
-      return false
-    }
-    atLastSince ||= performance.now()
-    const section = points[last].ledge
-    const lineDone = !section || !companionLines[section] || (said.has(section) && speaking !== section)
-    if (lineDone || performance.now() - atLastSince > 4500) return true
-    window.setTimeout(wake, 500)
-    return false
-  }
-
-  function speakFor(ms: number) {
-    window.clearTimeout(bubbleTimer)
-    speechEndsAt = performance.now() + ms
-    bubbleTimer = window.setTimeout(hideBubble, ms)
-  }
-
-  /** The route point he is standing on, or undefined while walking between anchors. */
-  function standingOn() {
-    return Number.isInteger(p) ? points[p] : undefined
-  }
-
-  /** The section he is in (standing, or on a segment within one section). */
-  function currentSection() {
-    const a = points[Math.floor(p)]
-    const b = points[Math.ceil(p)]
-    return a?.ledge && a.ledge === b?.ledge ? a.ledge : undefined
   }
 
   /** Put the bubble beside him where it covers nothing; false when there is no such spot. */
@@ -217,12 +217,15 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     return true
   }
 
-  /** On arriving in a section with a line he has not said yet this visit, say it. */
+  function followSpeech() {
+    if (speaking) bubble.hidden = !placeSpeech()
+  }
+
+  /** Standing still on a stop: say its section's line, once per visit. */
   function speak() {
-    const section = currentSection()
+    const section = points[p]?.ledge
     const text = section && companionLines[section]
-    const busySpeaking = speaking && performance.now() - speechStartedAt < MIN_READ_MS
-    if (!section || !text || said.has(section) || busySpeaking || !inClearView()) return
+    if (!section || !text || said.has(section) || speaking || !inClearView()) return
     bubble.textContent = text
     bubble.style.visibility = 'hidden'
     bubble.hidden = false
@@ -235,36 +238,36 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     }
     said.add(section)
     speaking = section
-    speechStartedAt = performance.now()
-    speakFor(BUBBLE_MS)
+    bubbleTimer = window.setTimeout(() => {
+      hideBubble()
+      wake() // he may be waiting to finish before docking
+    }, BUBBLE_MS)
   }
 
-  /** Keep the bubble with him for its full time; it steps aside only while no clear spot exists. */
-  function followSpeech() {
-    if (speaking) bubble.hidden = !placeSpeech()
-  }
+  /* ---------- Standing still: section action, then idle beats ---------- */
 
-  /* ---------- Standing still: section actions and idle variety ---------- */
-
-  /**
-   * Standing still. First his section's action, once he is on a card that
-   * allows it and scrolling has paused; then breathing and blinking, with
-   * a small contextual beat every few seconds (tie, a look around, his map).
-   */
   async function idle() {
     if (idling) return
+    const owns = claim()
     idling = true
-    const run = ++idleRun
-    const still = () => run === idleRun && !stopped
+    if (still) {
+      show(sprite, ['idle', 0], scale)
+      return
+    }
     const variety: Clip[] = ['settle', 'look', 'document']
     let elapsed = 0
     let nextBeat = 4000
-    for (let breath = 1; still(); breath += 1) {
-      const here = standingOn()
-      const action = here?.acts && here.ledge && !acted.has(here.ledge) ? companionActions[here.ledge] : undefined
-      if (action && performance.now() - lastScroll >= SETTLE_MS && inClearView()) {
-        acted.add(here!.ledge!)
-        for (const clip of action) if (isClip(clip)) await play(sprite, frames(clip), scale, still)
+    for (let breath = 1; owns(); breath += 1) {
+      const here = points[p]
+      const section = here?.acts ? here.ledge : undefined
+      if (section && !acted.has(section) && performance.now() - lastScroll >= SETTLE_MS && inClearView()) {
+        const steps = companionActions[section] ?? []
+        if (steps[0] === 'goodbye') {
+          if (await goodbye(owns)) return
+        } else {
+          for (const clip of steps) if (isClip(clip) && !(await play(sprite, frames(clip), scale, owns))) return
+          acted.add(section)
+        }
         elapsed = 0
         continue
       }
@@ -274,7 +277,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
         nextBeat = elapsed + 5000
       }
       for (const frame of beat) {
-        if (!still()) return
+        if (!owns()) return
         show(sprite, frame, scale)
         await wait(frame[2])
         elapsed += frame[2]
@@ -282,134 +285,140 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     }
   }
 
+  /**
+   * Contact: he faces the Email button, presses it (the button shows only its
+   * own pressed look; nothing is clicked, focused, or opened), steps back,
+   * waves goodbye, and teleports to the brand slot. Skips the press when the
+   * button is not beside him on his ground line. Cancelled cleanly if the
+   * reader scrolls away. Returns true once he has docked.
+   */
+  async function goodbye(owns: () => boolean) {
+    const button = document.querySelector<HTMLElement>('main a[href^="mailto:"]')
+    const here = positionAt(points, p)
+    const r = button?.getBoundingClientRect()
+    const level = r && Math.abs(r.bottom + window.scrollY - here.y) <= 2
+    const gap = r ? Math.min(Math.abs(r.left + window.scrollX - (here.x + box.w)), Math.abs(here.x - (r.right + window.scrollX))) : Infinity
+    const beside = button && level && gap <= 2 * box.w
+    try {
+      if (beside) {
+        const toLeft = r!.left + window.scrollX < here.x
+        const press = frames(toLeft ? 'pressLeft' : 'pressRight')
+        for (const [i, frame] of press.entries()) {
+          if (!owns()) return false
+          show(sprite, frame, scale)
+          button!.toggleAttribute('data-companion-press', i === 1)
+          await wait(frame[2])
+        }
+        button!.removeAttribute('data-companion-press')
+        // Step back two paces, facing away from the button.
+        for (const pace of [1, 2]) {
+          if (!owns()) return false
+          show(sprite, [toLeft ? 'walkRight' : 'walkLeft', pace], scale)
+          sprite.style.transform = `translate(${snap(here.x + (toLeft ? 8 : -8) * pace, dpr)}px, ${snap(here.y - box.h, dpr)}px)`
+          await wait(140)
+        }
+      }
+      if (!(await play(sprite, frames('wave'), scale, owns))) return false
+    } finally {
+      button?.removeAttribute('data-companion-press')
+      if (!owns()) place() // cancelled: back to his route position
+    }
+    acted.add('contact')
+    if (!slotScale || !sheetReady) return false
+    await dock()
+    return true
+  }
+
   /* ---------- Teleports, docking, reactions ---------- */
 
-  /** A line in progress pauses while he teleports and carries on beside him after. */
-  async function sequence(task: () => Promise<void>) {
+  /** One owner at a time: idle beats end, and the route resumes when this finishes or is overtaken. */
+  async function sequence(task: (owns: () => boolean) => Promise<unknown>) {
     busy = true
-    stopIdle()
-    const remaining = speaking ? speechEndsAt - performance.now() : 0
-    window.clearTimeout(bubbleTimer)
-    bubble.hidden = true
-    await task()
-    const sinceStart = performance.now() - speechStartedAt
-    if (speaking && !isDocked && sinceStart < MAX_SPEECH_MS) {
-      speakFor(Math.min(Math.max(remaining, 1500), MAX_SPEECH_MS - sinceStart))
-      followSpeech()
-    } else hideBubble()
-    busy = false
-    walked = 0
-    lastTime = 0
-    wake()
+    const owns = claim()
+    try {
+      await task(owns)
+    } finally {
+      busy = false
+      walked = 0
+      lastTime = 0
+      wake()
+    }
   }
 
-  /** Whether he is fully in view, so a line or an action is never started where it cannot be seen. */
-  function inClearView() {
-    const { y } = positionAt(points, p)
-    // Fully on screen, and below the top bar on narrow screens (on desktop the header is the side bar).
-    const header = document.querySelector('header')?.getBoundingClientRect()
-    const top = header && header.width >= window.innerWidth * 0.9 ? header.bottom : 0
-    return !sprite.hidden && y - box.h >= window.scrollY + top + 4 && y <= window.scrollY + window.innerHeight
-  }
-
-  /** Departures are only played when the visitor can see them. */
-  function onScreen() {
-    const { y } = positionAt(points, p)
-    return !sprite.hidden && y > window.scrollY && y - box.h < window.scrollY + window.innerHeight
-  }
-
-  const teleportTo = (next: number) =>
-    sequence(async () => {
-      if (onScreen()) await play(sprite, frames('teleportOut'), scale)
-      p = next
+  /** Teleport to the reader's stop. The destination is read after the departure, so a fast scroll never queues stale stops. */
+  const teleport = () =>
+    sequence(async (owns) => {
+      hideBubble()
+      // Placement before animation: a scroll that skips more than one section gets no departure.
+      const ahead = nextMove(points, p, line())
+      const skipped = ahead.kind === 'teleport' && points.slice(Math.min(p, ahead.to) + 1, Math.max(p, ahead.to) + 1).filter((q) => q.blink).length > 1
+      if (onScreen() && !skipped && !(await play(sprite, frames('teleportOut'), scale, owns))) return
+      const move = nextMove(points, p, line())
+      if (move.kind === 'teleport') p = move.to
       place()
-      await play(sprite, frames('teleportIn'), scale)
+      await play(sprite, frames('teleportIn'), scale, owns)
     })
 
-  const dock = () =>
-    sequence(async () => {
-      isDocked = true
-      dockedThisLoad = true
-      if (onScreen()) await play(sprite, frames('teleportOut'), scale)
+  async function dock() {
+    if (!slotScale || !sheetReady || !slot) return
+    isDocked = true
+    dockedThisLoad = true
+    hideBubble()
+    // Docking commits once it starts: its frames are not cancelled by newer claims.
+    await sequence(async () => {
+      if (!still && onScreen()) await play(sprite, frames('teleportOut'), scale, () => !stopped)
       sprite.hidden = true
       root.dataset.companion = 'sidebar'
-      if (slot) {
-        await play(slot, frames('teleportIn'), pixelScale(1, dpr))
-        show(slot, ['sidebar', 0], pixelScale(1, dpr))
-      }
+      if (!still) await play(slot, frames('teleportIn'), slotScale!, () => !stopped)
+      show(slot, ['sidebar', 0], slotScale!)
     })
+  }
 
   function react(reaction: Reaction) {
-    if (stopped || busy || isDocked || paused || !onScreen()) return
-    void sequence(() => play(sprite, frames(reaction), scale))
+    if (stopped || still || busy || isDocked || paused || !onScreen()) return
+    void sequence((owns) => play(sprite, frames(reaction), scale, owns))
   }
 
-  /** The anchor (a whole route point) to settle on near a fractional target: the nearer one, unless only the other is in view. */
-  /** The first point of the stop that point i belongs to: arrivals begin there and take the short walk. */
-  function stopStart(i: number) {
-    while (i > 0 && !points[i].blink && points[i - 1].ledge === points[i].ledge) i -= 1
-    return i
-  }
-
-  function restingPoint(to: number) {
-    const inView = (i: number) => {
-      const { y } = positionAt(points, i)
-      return y - box.h >= window.scrollY && y <= window.scrollY + window.innerHeight
-    }
-    const near = Math.round(to)
-    const far = near === Math.floor(to) ? Math.ceil(to) : Math.floor(to)
-    return inView(near) || !inView(far) ? near : far
-  }
-
-  /* ---------- Following the scroll ---------- */
+  /* ---------- Following the scroll (one frame-coordinated update) ---------- */
 
   function tick(now: number) {
     raf = 0
-    if (busy || stopped || paused || !points.length) return
+    if (busy || stopped || paused || isDocked || !points.length) return
     const dt = lastTime ? Math.min(now - lastTime, 64) : 16
     lastTime = now
 
-    if (isDocked) return
-    if (docked(false, window.scrollY, root.scrollHeight - window.innerHeight) && finishedLastStop()) {
-      void dock()
-      return
-    }
-    let to = targetAt(points, line())
-    // Scrolling has paused: never rest between anchors; finish the walk to the nearest one in view.
-    if (performance.now() - lastScroll >= SETTLE_MS && !Number.isInteger(to)) to = restingPoint(to)
-    if (Math.abs(to - p) < 1e-6) {
-      // He has stopped: now he talks (the section action waits for scrolling to pause).
-      lastTime = 0
-      speak()
-      void idle()
-      return
-    }
-    stopIdle()
+    const atBottom = docked(false, window.scrollY, root.scrollHeight - window.innerHeight)
+    const move = nextMove(points, p, line())
 
-    // Far behind (a fast scroll or a menu jump): one teleport straight to the
-    // anchor at the reader's position, instead of crawling through every one.
-    const walk = walkingDistance(points, p, to)
-    const gap = Math.abs(positionAt(points, to).y - positionAt(points, p).y)
-    if (gap > 1.5 * window.innerHeight || (walk !== Infinity && walk > 1.5 * window.innerHeight)) {
-      void teleportTo(stopStart(to > p ? Math.floor(to) : Math.ceil(to)))
-      return
+    if (move.kind === 'teleport') {
+      if (still) {
+        p = move.to
+        place()
+      } else return void teleport()
     }
-
-    // The short walk on a card is an unhurried stroll; anything longer is brisker so he keeps up.
-    // Frames follow distance, so the feet match either way.
-    const speed = walk <= BRIEF_WALK ? 70 : Math.min(420, 90 + Math.min(walk, 600) * 2) // CSS px per second
-    const step = advance(points, p, to, (speed * dt) / 1000)
-    p = step.p
-    if (step.walked > 0) {
+    if (move.kind === 'walk' && !still) {
+      if (idling) claim() // stop the idle beat; he is moving again
+      const step = advance(points, p, move.to, (STROLL_SPEED * dt) / 1000)
+      p = step.p
       walked += step.walked
       show(sprite, [walkClip(step.dx, step.dy), walkFrame(walked, 4 * scale)], scale)
       place()
-    }
-    if (step.blinkTo !== null) {
-      void teleportTo(step.blinkTo)
+      raf = requestAnimationFrame(tick)
       return
     }
-    raf = requestAnimationFrame(tick)
+    if (move.kind === 'walk') p = move.to
+
+    // Standing still: talk, then the section action and idle beats.
+    lastTime = 0
+    walked = 0
+    place()
+    speak()
+    // At the bottom: with reduced motion, or when his last stop has no goodbye to play, he goes to the
+    // brand slot once his line is done. Otherwise the goodbye (a section action) ends with docking.
+    const last = points[points.length - 1]
+    const goodbyeHere = !still && last.acts && companionActions[last.ledge ?? '']?.[0] === 'goodbye'
+    if (atBottom && p === points.length - 1 && !speaking && !(goodbyeHere && inClearView())) return void dock()
+    void idle()
   }
 
   /* ---------- Measuring, and pausing for dialogs and the mobile menu ---------- */
@@ -421,25 +430,38 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     scale = pixelScale(2, dpr)
     box = { w: sheet.frameWidth * scale, h: sheet.frameHeight * scale }
     dress(sprite, scale)
-    if (slot) {
-      dress(slot, pixelScale(1, dpr))
-      if (isDocked) show(slot, ['sidebar', 0], pixelScale(1, dpr))
+
+    // Brand slot: no taller than the name beside it (or the mark, when the name is hidden).
+    const name = document.querySelector('header a[href="#top"] > span:last-of-type')?.getBoundingClientRect()
+    const mark = slot?.parentElement?.getBoundingClientRect()
+    const limit = name && name.width > 2 ? name.height : (mark?.height ?? 0)
+    slotScale = brandScale(limit, dpr)
+    if (slot && slotScale) {
+      dress(slot, slotScale)
+      if (isDocked) show(slot, ['sidebar', 0], slotScale)
     }
     if (isDocked) {
-      root.dataset.companion = 'sidebar'
+      if (slotScale && sheetReady) root.dataset.companion = 'sidebar'
+      else delete root.dataset.companion
       sprite.hidden = true
       return
     }
+
+    // Measuring while a reveal is mid-way would include its offset; measure again when it finishes.
+    const settling = contentAnimations()
+    if (settling.length) void Promise.allSettled(settling.map((a) => a.finished)).then(remeasure)
+
     const plan = planPlacements(box)
     obstacles = plan.obstacles
     bounds = plan.bounds
-    // One stop per section (its first card), walked along, with a teleport to the next section's.
-    points = tour(pickStops(plan.anchors), window.innerHeight)
-    // Too few safe places for a coherent route (very small screens): stay out of the way.
-    sprite.hidden = points.length < 2 || paused
-    if (points.length < 2) return hideBubble()
-    // On load he starts at the beginning of his stop, so he takes his short walk before talking.
-    p = measured ? Math.min(p, points.length - 1) : stopStart(Math.floor(targetAt(points, line())))
+    const stops = pickStops(plan.anchors)
+    // Reduced motion: one still figure at the last section.
+    points = still ? tour(stops.slice(-1), window.innerHeight).slice(0, 1) : tour(stops, window.innerHeight)
+    sprite.hidden = !points.length || paused
+    if (!points.length) return hideBubble()
+    const move = nextMove(points, measured ? p : -1, line())
+    if (!measured) p = move.kind === 'teleport' ? move.to : 0
+    p = Math.min(p, points.length - 1)
     if (!measured) show(sprite, ['idle', 0], scale)
     measured = true
     place()
@@ -453,24 +475,20 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     const nowPaused = Boolean(dialog || menu)
     if (nowPaused === paused) return
     paused = nowPaused
-    stopIdle()
+    const owns = claim()
     hideBubble()
     if (menu) sprite.hidden = true
-    else if (!isDocked) sprite.hidden = points.length < 2
-    if (dialog && !sprite.hidden) {
-      const run = ++idleRun
+    else if (!isDocked) sprite.hidden = !points.length
+    if (dialog && !sprite.hidden && !still) {
       void (async () => {
-        while (run === idleRun && paused && !stopped) await play(sprite, frames('notes'), scale, () => run === idleRun && !stopped)
+        while (owns() && paused) await play(sprite, frames('notes'), scale, owns)
       })()
     }
-    if (!paused) {
-      lastTime = 0
-      wake()
-    }
+    if (!paused) remeasure()
   }
 
   let measureTimer = 0
-  const remeasure = () => {
+  function remeasure() {
     window.clearTimeout(measureTimer)
     measureTimer = window.setTimeout(measure, 150)
   }
@@ -478,15 +496,32 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   const onScroll = () => {
     lastScroll = performance.now()
     wake()
-    // Look again once scrolling pauses, so he settles on an anchor and can act.
+    // Look again once scrolling pauses, so the section action can start.
     window.clearTimeout(settleTimer)
     settleTimer = window.setTimeout(wake, SETTLE_MS + 20)
   }
-  /** Downloads and links that open elsewhere get a small thumbs-up. */
+  /** Downloads, links that open elsewhere, and the Email button (when the visitor uses it) get a small thumbs-up. Never delays the link. */
   const onClick = (event: MouseEvent) => {
     const link = (event.target as Element | null)?.closest?.('a')
-    if (link && (link.hasAttribute('download') || link.target === '_blank')) window.setTimeout(() => react('thumbsUp'), 150)
+    if (link && (link.hasAttribute('download') || link.target === '_blank' || link.protocol === 'mailto:')) {
+      window.setTimeout(() => react('thumbsUp'), 150)
+    }
   }
+
+  const probe = new Image()
+  probe.src = sheetUrl
+  void probe.decode().then(
+    () => {
+      sheetReady = true
+      wake()
+    },
+    () => {
+      // The sheet could not load: no companion, and the "CB" mark stays.
+      sprite.hidden = true
+      delete root.dataset.companion
+    },
+  )
+
   const resizeObserver = new ResizeObserver(remeasure)
   resizeObserver.observe(document.body)
   const overlayObserver = new MutationObserver(checkOverlays)
@@ -504,7 +539,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     react,
     stop() {
       stopped = true
-      stopIdle()
+      claim()
       hideBubble()
       cancelAnimationFrame(raf)
       window.clearTimeout(measureTimer)
@@ -517,6 +552,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       document.removeEventListener('click', onClick, true)
       document.removeEventListener('focusin', yieldToFocus)
       document.removeEventListener('focusout', yieldToFocus)
+      document.querySelector('[data-companion-press]')?.removeAttribute('data-companion-press')
       delete root.dataset.companion
     },
   }

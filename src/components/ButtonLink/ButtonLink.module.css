@@ -98,7 +98,9 @@
 }
 
 /* Immediate press feedback; no transition on the way down. */
-.button:active {
+/* The pixel companion's press shows this same pressed look (nothing is clicked). */
+.button:active,
+.button[data-companion-press] {
   translate: 0 0;
   transform: scale(var(--motion-press-scale));
   transition-duration: 0s;
@@ -200,7 +202,8 @@
   }
 }
 
-:global(html[data-design="pixel"]) .button:active {
+:global(html[data-design="pixel"]) .button:active,
+:global(html[data-design="pixel"]) .button[data-companion-press] {
   translate: 2px 2px;
   transform: none;
   box-shadow: none;

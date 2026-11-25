@@ -40,6 +40,9 @@ const email = profile.email ? `${profile.email.user}@${profile.email.domain}` : 
 
 const { github, linkedin, resume } = profile.links
 
+// Pixel companion: where he may stand in Contact, best first (beside the Email button; else beside the last button).
+const contactAnchor = (place: string) => ({ 'data-companion-anchor': 'contact', 'data-companion-place': place, 'data-companion-act': '' })
+
 // The ticker shows each technology once, in the order the skills list them.
 const marqueeItems = [...new Set(skillGroups.flatMap((group) => group.skills.map((skill) => skill.name)))]
 
@@ -226,9 +229,9 @@ export default function App() {
           title="Let’s work together"
           intro="Email is the fastest way to reach me. You can also find me on LinkedIn and GitHub."
         >
-          <div className={styles.actions} data-companion-anchor="contact" data-companion-place="beside below" data-companion-act>
+          <div className={styles.actions}>
             {email && (
-              <ButtonLink href={`mailto:${email}`} variant="light" icon="mail">
+              <ButtonLink href={`mailto:${email}`} variant="light" icon="mail" data={contactAnchor("beside below top")}>
                 Email me
               </ButtonLink>
             )}
@@ -238,7 +241,7 @@ export default function App() {
               </ButtonLink>
             )}
             {github.href && (
-              <ButtonLink href={github.href} variant="ghost" leadingIcon="github" external>
+              <ButtonLink href={github.href} variant="ghost" leadingIcon="github" external data={contactAnchor("beside")}>
                 {github.label}
               </ButtonLink>
             )}

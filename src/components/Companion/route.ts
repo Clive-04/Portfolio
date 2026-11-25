@@ -67,17 +67,15 @@ export type Layout = 'desktop' | 'tablet' | 'phone'
 export const layoutFor = (width: number, remPx = 16): Layout =>
   width >= 56 * remPx ? 'desktop' : width >= 40 * remPx ? 'tablet' : 'phone'
 
-/** On narrow screens he stands above or below cards, never beside them. */
-export const modesFor = (layout: Layout): Mode[] =>
-  layout === 'desktop' ? ['top', 'ledge', 'below', 'beside'] : ['top', 'ledge', 'below']
-
 /** Walking room a card top needs beyond his own width before he will stand there. */
 export const TOP_ROOM = 24
 const SIDE_GAP = 12
 const BELOW_GAP = 8
+/** How far (in sprite widths) "beside" may look along the ground line before the spot no longer reads as beside the card. */
+const BESIDE_REACH = 4
 
 /**
- * Where the companion can stand for an anchor: the first allowed mode whose
+ * Where the companion can stand for an anchor: the first of its modes whose
  * sprite box is clear of every obstacle and inside the content bounds.
  * Returns every attempt too, so the placement review can show the fallbacks.
  */
@@ -85,7 +83,6 @@ export function resolveAnchor(
   anchor: Anchor,
   obstacles: readonly Rect[],
   bounds: { x0: number; x1: number },
-  allowed: readonly Mode[],
   box = SPRITE_BOX,
 ): { placement: Placement | null; attempts: Attempt[] } {
   const attempts: Attempt[] = []
@@ -97,7 +94,7 @@ export function resolveAnchor(
     return { placement, attempts }
   }
 
-  for (const mode of anchor.modes.filter((m) => allowed.includes(m))) {
+  for (const mode of anchor.modes) {
     if (mode === 'top' || mode === 'ledge' || mode === 'below') {
       const y = mode === 'below' ? rect.y + rect.h + BELOW_GAP + box.h : rect.y
       const x0 = Math.max(rect.x, bounds.x0)
@@ -107,10 +104,18 @@ export function resolveAnchor(
       if (run && (mode !== 'top' || room >= TOP_ROOM)) return done(mode, run[1], y, run)
       attempts.push({ mode, box: x1 - x0 >= box.w ? sweep(x1 - box.w, y, x1 - box.w, y, box) : null, ok: false })
     } else {
+      // Beside: the nearest clear spot on the card's ground line, right then left, within a few paces.
       const y = rect.y + rect.h
-      for (const x of [rect.x + rect.w + SIDE_GAP, rect.x - SIDE_GAP - box.w]) {
+      const reach = BESIDE_REACH * box.w
+      const fits = (x: number) => {
         const b = sweep(x, y, x, y, box)
-        if (inBounds(b) && isClear(b, obstacles)) return done(mode, x, y)
+        return inBounds(b) && isClear(b, obstacles)
+      }
+      for (let d = 0; d <= reach; d += 8) {
+        const right = rect.x + rect.w + SIDE_GAP + d
+        if (fits(right)) return done(mode, right, y)
+        const left = rect.x - SIDE_GAP - box.w - d
+        if (fits(left)) return done(mode, left, y)
       }
       attempts.push({ mode, box: null, ok: false })
     }
@@ -375,5 +380,38 @@ export const pixelScale = (target: number, devicePixelRatio: number) =>
 /** Round a CSS length to the device-pixel grid. */
 export const snap = (value: number, devicePixelRatio: number) => Math.round(value * devicePixelRatio) / devicePixelRatio
 
-/** The companion runs only in the Pixel design with motion allowed (every width; the route adapts to the layout). */
-export const companionEnabled = (o: { pixel: boolean; reducedMotion: boolean }) => o.pixel && !o.reducedMotion
+/** The first point of the stop that point i belongs to: arrivals begin there and take the short walk. */
+export function stopStart(points: readonly RoutePoint[], i: number): number {
+  while (i > 0 && !points[i].blink && points[i - 1].ledge === points[i].ledge) i -= 1
+  return i
+}
+
+export type Move = { kind: 'still' } | { kind: 'walk'; to: number } | { kind: 'teleport'; to: number }
+
+/**
+ * What he should do now, from the latest scroll position only: stay, finish
+ * his short walk on the current stop, or teleport straight to the stop the
+ * reader has reached (however many sections a fast scroll skipped, in either
+ * direction). Nothing depends on earlier animations having finished.
+ */
+export function nextMove(points: readonly RoutePoint[], p: number, line: number): Move {
+  if (!points.length) return { kind: 'still' }
+  const to = targetAt(points, line)
+  const there = stopStart(points, to)
+  if (stopStart(points, Math.floor(p)) !== there) return { kind: 'teleport', to: there }
+  return Math.abs(to - p) < 1e-6 ? { kind: 'still' } : { kind: 'walk', to }
+}
+
+/**
+ * CSS px per sprite pixel in the brand slot: the largest whole number of
+ * device pixels per sprite pixel that keeps him no taller than `limit` (the
+ * height of the name beside him). Null when even one device pixel per sprite
+ * pixel is too tall; then the "CB" mark stays.
+ */
+export function brandScale(limit: number, devicePixelRatio: number, spriteHeight = 32): number | null {
+  const devicePixels = Math.floor((limit * devicePixelRatio) / spriteHeight)
+  return devicePixels >= 1 ? devicePixels / devicePixelRatio : null
+}
+
+/** The companion runs in the Pixel design only. With reduced motion he is a still figure (see engine.ts). */
+export const companionEnabled = (o: { pixel: boolean }) => o.pixel
