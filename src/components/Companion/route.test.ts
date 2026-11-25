@@ -3,7 +3,6 @@ import { describe, it } from 'node:test'
 import {
   SPRITE_BOX,
   advance,
-  buildRoute,
   clearRun,
   companionEnabled,
   docked,
@@ -19,7 +18,9 @@ import {
   walkClip,
   walkFrame,
   walkingDistance,
-  type Ledge,
+  pickStops,
+  tour,
+  type Placement,
   type Rect,
 } from './route.ts'
 
@@ -42,98 +43,99 @@ describe('clearRun', () => {
   })
 })
 
-describe('buildRoute', () => {
-  const ledges: Ledge[] = [
-    { y: 400, x0: 0, x1: 1000 },
-    { y: 1200, x0: 0, x1: 1000 },
-  ]
+/** A placement for tests: a stop at feet line y that can be walked from x0 to x1. */
+const stop = (id: string, y: number, x0 = 300, x1 = 600, over: Partial<Placement> = {}): Placement => ({
+  id, mode: 'top', x: x1, y, run: [x0, x1], dark: false, acts: true, ...over,
+})
+const anchorFor = (id: string, modes: Anchor['modes'] = ['top']): Anchor => ({ id, rect: { x: 0, y: 0, w: 10, h: 10 }, modes })
 
-  it('walks down when the path between ledges is clear', () => {
-    const route = buildRoute(ledges, [], VH)
-    assert.ok(route.every((p) => !p.blink))
-    assert.ok(route.every((p, i) => i === 0 || p.y >= route[i - 1].y), 'never walks back up the page')
+describe('pickStops', () => {
+  it('picks one stop per section: its first card', () => {
+    const stops = pickStops([
+      { anchor: anchorFor('start', ['ledge']), placement: stop('start', 700) },
+      { anchor: anchorFor('about', ['ledge']), placement: stop('about', 900) },
+      { anchor: anchorFor('about'), placement: stop('about', 1100) },
+      { anchor: anchorFor('about'), placement: stop('about', 1300) },
+      { anchor: anchorFor('projects'), placement: stop('projects', 2000) },
+    ])
+    assert.deepEqual(stops.map((s) => [s.id, s.y]), [['start', 700], ['about', 1100], ['projects', 2000]])
   })
 
-  it('teleports instead of crossing content between ledges', () => {
-    const route = buildRoute(ledges, [{ x: 0, y: 700, w: 1000, h: 100 }], VH)
-    assert.equal(route.filter((p) => p.blink).length, 1)
-    const blink = route.find((p) => p.blink)!
-    assert.equal(blink.y, 1200)
-    assert.ok(blink.key < 1200 && blink.key >= route[route.indexOf(blink) - 1].key)
+  it('uses the next card when the first is unsafe, and the heading only when no card is', () => {
+    const stops = pickStops([
+      { anchor: anchorFor('skills', ['ledge']), placement: stop('skills', 3000) },
+      { anchor: anchorFor('skills'), placement: null },
+      { anchor: anchorFor('skills'), placement: stop('skills', 3400) },
+      { anchor: anchorFor('contact', ['ledge']), placement: stop('contact', 6000) },
+      { anchor: anchorFor('contact'), placement: null },
+    ])
+    assert.deepEqual(stops.map((s) => [s.id, s.y]), [['skills', 3400], ['contact', 6000]])
   })
 
-  it('skips ledges with no clear spot and ledges too close to the last one', () => {
-    const route = buildRoute(
-      [...ledges, { y: 420, x0: 0, x1: 1000 }, { y: 800, x0: 0, x1: 200 }],
-      [{ x: 0, y: 730, w: 200, h: 70 }],
-      VH,
-    )
-    assert.deepEqual([...new Set(route.map((p) => p.y))], [400, 1200])
+  it('makes no stop at the footer (he docks before it)', () => {
+    const stops = pickStops([{ anchor: anchorFor('footer', ['ledge']), placement: stop('footer', 7000) }])
+    assert.equal(stops.length, 0)
+  })
+})
+
+describe('tour', () => {
+  const route = tour([stop('about', 1000), stop('projects', 2000), stop('skills', 3000)], VH)
+
+  it('walks the length of each card top and teleports between sections', () => {
+    assert.deepEqual(route.map((p) => [p.ledge, p.x, p.blink]), [
+      ['about', 600, false], ['about', 300, false],
+      ['projects', 300, true], ['projects', 600, false],
+      ['skills', 600, true], ['skills', 300, false],
+    ])
+    assert.ok(route.every((p) => p.y === { about: 1000, projects: 2000, skills: 3000 }[p.ledge!]), 'feet stay on each card top')
   })
 
-  it('carries the dark-panel flag for the light rim', () => {
-    const route = buildRoute([{ y: 400, x0: 0, x1: 1000, dark: true }], [], VH)
-    assert.ok(route.every((p) => p.dark))
+  it('arrives on the next card once it is well into view, after finishing the walk', () => {
+    const arrival = route[2]
+    assert.equal(arrival.key, 2000 - 0.15 * VH)
+    assert.ok(route[1].key <= arrival.key - 40)
+    route.forEach((p, i) => assert.ok(i === 0 || p.key >= route[i - 1].key))
+  })
+
+  it('stands still on a stop with no room to walk', () => {
+    const r = tour([stop('contact', 6000, 900, 900)], VH)
+    assert.equal(r.length, 1)
   })
 })
 
 describe('following the scroll', () => {
-  const route = buildRoute(
-    [
-      { y: 400, x0: 0, x1: 1000 },
-      { y: 1200, x0: 0, x1: 1000 },
-    ],
-    [],
-    VH,
-  )
+  const route = tour([stop('about', 1000), stop('projects', 2000)], VH)
   const last = route.length - 1
 
-  it('stays on the first ledge above the route and on the last below it', () => {
+  it('starts on the first card and ends on the last', () => {
     assert.equal(targetAt(route, 0), 0)
     assert.equal(targetAt(route, 99999), last)
   })
 
-  it('tracks the viewport line while walking down, and the target only grows as the page scrolls down', () => {
+  it('walks along the card as the page scrolls, never backwards while scrolling down', () => {
     let previous = -1
-    for (let line = 0; line <= 1600; line += 25) {
+    for (let line = 0; line <= 3000; line += 25) {
       const t = targetAt(route, line)
       assert.ok(t >= previous)
       previous = t
     }
-    const mid = targetAt(route, 800)
-    assert.equal(Math.round(positionAt(route, mid).y), 800)
-  })
-
-  it('walks back up the same path when the visitor scrolls up', () => {
-    const down = advance(route, 0, last, 10_000)
-    assert.equal(down.p, last)
-    assert.ok(down.dy > 0 || down.dx !== 0)
-    const up = advance(route, last, 0, 10_000)
-    assert.equal(up.p, 0)
-    assert.equal(walkClip(up.dx, up.dy) === 'walkDown', false)
+    const mid = targetAt(route, 1150)
+    assert.ok(mid > 0 && mid < 1, 'part-way along the first card')
+    assert.equal(positionAt(route, mid).y, 1000)
   })
 
   it('walks no further than its budget and reports the distance', () => {
-    const step = advance(route, 0, last, 30)
+    const step = advance(route, 0, 1, 30)
     assert.ok(Math.abs(step.walked - 30) < 1e-6)
-    assert.ok(step.p > 0 && step.p < last)
+    assert.equal(walkClip(step.dx, step.dy), 'walkLeft')
   })
 
-  it('stops at a teleport and says where it leads, in both directions', () => {
-    const gapped = buildRoute(
-      [
-        { y: 400, x0: 0, x1: 1000 },
-        { y: 1200, x0: 0, x1: 1000 },
-      ],
-      [{ x: 0, y: 700, w: 1000, h: 100 }],
-      VH,
-    )
-    const b = gapped.findIndex((p) => p.blink)
-    const down = advance(gapped, 0, gapped.length - 1, 10_000)
-    assert.equal(down.blinkTo, b)
-    assert.equal(walkingDistance(gapped, 0, gapped.length - 1), Infinity)
-    const up = advance(gapped, gapped.length - 1, 0, 10_000)
-    assert.equal(up.blinkTo, b - 1)
+  it('stops at the teleport between sections, in both directions', () => {
+    const down = advance(route, 0, last, 10_000)
+    assert.equal(down.blinkTo, 2)
+    assert.equal(walkingDistance(route, 0, last), Infinity)
+    const up = advance(route, last, 0, 10_000)
+    assert.equal(up.blinkTo, 1)
   })
 })
 

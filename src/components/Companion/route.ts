@@ -18,18 +18,11 @@ export interface Rect {
   h: number
 }
 
-/** A surface the companion may stand on: its top edge from x0 to x1. */
+/** A surface the companion may stand on: its feet line y, from x0 to x1. */
 export interface Ledge {
   y: number
   x0: number
   x1: number
-  /** The sprite would stand over a dark panel, so it needs its light rim even in Day. */
-  dark?: boolean
-  /** The section the place belongs to, used to pick what the companion says and does there. */
-  id?: string
-  mode?: Mode
-  /** His section action may play here. */
-  acts?: boolean
 }
 
 /**
@@ -62,6 +55,8 @@ export interface Placement {
   x: number
   /** Feet line. */
   y: number
+  /** The clear stretch he can walk along on that surface (left and right sprite positions). */
+  run: [number, number]
   dark: boolean
   acts: boolean
 }
@@ -96,9 +91,10 @@ export function resolveAnchor(
   const attempts: Attempt[] = []
   const { rect } = anchor
   const inBounds = (b: Rect) => b.x >= bounds.x0 && b.x + b.w <= bounds.x1
-  const done = (mode: Mode, x: number, y: number) => {
-    attempts.push({ mode, box: sweep(x, y, x, y, box), ok: true })
-    return { placement: { id: anchor.id, mode, x, y, dark: Boolean(anchor.dark), acts: Boolean(anchor.acts) }, attempts }
+  const done = (mode: Mode, x: number, y: number, run: [number, number] = [x, x]) => {
+    attempts.push({ mode, box: sweep(run[0], y, run[1], y, box), ok: true })
+    const placement = { id: anchor.id, mode, x, y, run, dark: Boolean(anchor.dark), acts: Boolean(anchor.acts) }
+    return { placement, attempts }
   }
 
   for (const mode of anchor.modes.filter((m) => allowed.includes(m))) {
@@ -106,9 +102,9 @@ export function resolveAnchor(
       const y = mode === 'below' ? rect.y + rect.h + BELOW_GAP + box.h : rect.y
       const x0 = Math.max(rect.x, bounds.x0)
       const x1 = Math.min(rect.x + rect.w, bounds.x1)
-      const run = clearRun({ y, x0, x1 }, obstacles, box)
+      const run = clearRun({ y, x0, x1 }, obstacles, box, x1 - x0)
       const room = run ? run[1] - run[0] : -1
-      if (run && (mode !== 'top' || room >= TOP_ROOM)) return done(mode, run[1], y)
+      if (run && (mode !== 'top' || room >= TOP_ROOM)) return done(mode, run[1], y, run)
       attempts.push({ mode, box: x1 - x0 >= box.w ? sweep(x1 - box.w, y, x1 - box.w, y, box) : null, ok: false })
     } else {
       const y = rect.y + rect.h
@@ -170,47 +166,47 @@ export function clearRun(
   return [left, right]
 }
 
+/** Sections that are not stops on his tour (he docks in the brand slot before the footer). */
+const NOT_A_STOP = new Set(['footer'])
+
 /**
- * Joins the ledges (top to bottom) into one path. On each ledge the companion
- * stands at the clear spot nearest to where it came from. Between ledges it
- * walks straight down and across when that path is clear, and otherwise
- * takes a short teleport, so it never crosses page content.
+ * One stop per section, in page order: the section's first card he can stand
+ * on (or below or beside); if none of its cards is safe, its heading ledge.
+ * `resolved` is every anchor in document order with its placement (or null).
  */
-export function buildRoute(
-  ledges: readonly Ledge[],
-  obstacles: readonly Rect[],
-  viewportHeight: number,
-  box = SPRITE_BOX,
-): RoutePoint[] {
-  const points: RoutePoint[] = []
-  const sorted = [...ledges].sort((a, b) => a.y - b.y)
-
-  for (const ledge of sorted) {
-    if (ledge.y < box.h) continue // no room above the top of the page
-    const run = clearRun(ledge, obstacles, box)
-    if (!run) continue
-    const prev = points.at(-1)
-    if (prev && ledge.y - prev.y < box.h) continue // too close to the last ledge to read as a step
-
-    const shared = { dark: Boolean(ledge.dark), ledge: ledge.id, mode: ledge.mode, acts: ledge.acts }
-    const [left, right] = run
-    // Stand at the clear spot nearest where he already is, so the path runs straight down rather than zig-zagging.
-    const enter = prev ? Math.min(right, Math.max(left, prev.x)) : right
-
-    if (!prev) {
-      points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, ...shared })
-    } else if (
-      isClear(sweep(prev.x, prev.y, prev.x, ledge.y, box), obstacles) &&
-      isClear(sweep(prev.x, ledge.y, enter, ledge.y, box), obstacles)
-    ) {
-      if (prev.x !== enter) points.push({ x: prev.x, y: ledge.y, key: ledge.y, blink: false, ...shared })
-      points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, ...shared })
-    } else {
-      // Stay on the last ledge as it scrolls away; arrive once the next one is well into view.
-      const key = Math.max(prev.key, ledge.y - 0.15 * viewportHeight)
-      points.push({ x: enter, y: ledge.y, key, blink: true, ...shared })
-    }
+export function pickStops(resolved: readonly { anchor: Anchor; placement: Placement | null }[]): Placement[] {
+  const stops: Placement[] = []
+  const sections = [...new Set(resolved.map((r) => r.anchor.id))].filter((id) => !NOT_A_STOP.has(id))
+  for (const id of sections) {
+    const inSection = resolved.filter((r) => r.anchor.id === id && r.placement)
+    const card = inSection.find((r) => !r.anchor.modes.every((m) => m === 'ledge'))
+    const pick = (card ?? inSection[0])?.placement
+    if (pick) stops.push(pick)
   }
+  return stops.sort((a, b) => a.y - b.y)
+}
+
+/**
+ * His tour: on each stop he walks the clear length of the card top as the
+ * reader scrolls through that section (alternating direction from section
+ * to section), then teleports onto the next section's stop once it is well
+ * into view. The first stop is where he appears on load.
+ */
+export function tour(stops: readonly Placement[], viewportHeight: number): RoutePoint[] {
+  const points: RoutePoint[] = []
+  const arrive = stops.map((s, i) => (i === 0 ? s.y : s.y - 0.15 * viewportHeight))
+  stops.forEach((stop, i) => {
+    const shared = { y: stop.y, dark: stop.dark, ledge: stop.id, mode: stop.mode, acts: stop.acts }
+    const [left, right] = stop.run
+    const [from, to] = i % 2 ? [left, right] : [right, left]
+    const key = Math.max(points.at(-1)?.key ?? -Infinity, arrive[i])
+    points.push({ x: from, key, blink: i > 0, ...shared })
+    if (to !== from) {
+      // Walk the card as the reader scrolls, finishing a little before the next section's arrival.
+      const room = i + 1 < stops.length ? arrive[i + 1] - key - 40 : Infinity
+      points.push({ x: to, key: key + Math.max(0, Math.min(Math.abs(to - from), room)), blink: false, ...shared })
+    }
+  })
   return points
 }
 

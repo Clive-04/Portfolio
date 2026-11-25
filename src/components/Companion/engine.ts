@@ -4,8 +4,9 @@ import sheet from './companion-sprites.json'
 import { planPlacements } from './measure'
 import {
   advance,
-  buildRoute,
   docked,
+  pickStops,
+  tour,
   pixelScale,
   placeBubble,
   positionAt,
@@ -401,13 +402,8 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     const plan = planPlacements(box)
     obstacles = plan.obstacles
     bounds = plan.bounds
-    const placements = plan.anchors.flatMap((a) => (a.placement ? [a.placement] : []))
-    points = buildRoute(
-      placements.map((pl) => ({ y: pl.y, x0: pl.x, x1: pl.x + box.w, id: pl.id, dark: pl.dark, mode: pl.mode, acts: pl.acts })),
-      obstacles,
-      window.innerHeight,
-      box,
-    )
+    // One stop per section (its first card), walked along, with a teleport to the next section's.
+    points = tour(pickStops(plan.anchors), window.innerHeight)
     // Too few safe places for a coherent route (very small screens): stay out of the way.
     sprite.hidden = points.length < 2 || paused
     if (points.length < 2) return hideBubble()
