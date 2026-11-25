@@ -372,3 +372,24 @@ Owner requests: once the companion reaches the name it stays there until the pag
 | Console / CSP | 0 errors |
 
 Bubbles are `aria-hidden` like the sprite: they are flavour, and each section's own heading and intro already carry its content. Lines live in `src/content/companion.ts` and can be edited there.
+
+## Run 17 — 2026-11-25 (companion actions, anchor placement, responsive route; automated)
+
+Owner brief: section-specific actions instead of constant running or teleporting; placement attached to the page composition through measured anchors (top / ledge / below / beside / brand slot); responsive routes; annotated placement review before merging. Also covers the earlier card-ledge change (afcd01e). Headless Edge over the DevTools protocol, dev server. Not merged, pushed, or deployed.
+
+| Check | Result |
+|---|---|
+| `npm run lint` / `npm test` / `npm run build` | Passed / 126 of 126 (new: anchor resolution, fallbacks, layouts) / Passed; JS 99.02 kB gzip (was 94.96) |
+| Sprite (pixel-art-sprites review) | 23 clips, 79 frames, 24 × 32, 14 colours, 3.8 KB indexed PNG; actions reuse three poses with small props; each read at 1× (lens rounded and pouch moved to the hip after the 1× review) |
+| Anchor plans (Day and Night identical) | Desktop 1280: 29 anchors → 9 top, 8 ledge, 9 below, 0 beside, 3 skipped; 26 route points, 7 teleports. Tablet 820: 7 / 8 / 7 / – / 7 skipped; 24 points. Phone 390: 4 / 8 / 6 / – / 11 skipped; 14 points. Annotated full-page captures in `docs/design/companion/placement/` |
+| Never in front of content | Sprite box (real rendered size) clear of text (6 px), links and controls (12 px), images (2 px), other cards, and the content column edges; no horizontal overflow |
+| Section actions (desktop) | Hero: tie then wave; About: sit; Projects: inspect; Résumé: document (after the settle fix below); Certifications (Night): polish and nod |
+| Reactions | Night switch → lantern; Day switch → shield; sound on → music; résumé download → thumbs-up |
+| Overlays | Case study open → he stops and takes notes; mobile menu open → hidden, back when closed |
+| Dock | Desktop sidebar and phone top bar: thumbs-up replaces "CB" |
+| Reduced motion | No companion; "CB" unchanged |
+| Console | 0 site errors (Edge's own assistant script logs one unrelated error in headless) |
+
+Found and fixed during the run: he rested between anchors when scrolling stopped mid-walk; he now finishes the walk to the nearest anchor in view once scrolling pauses for 0.6 s. He stood partly in front of the card above the "Based in" tile; placements now treat other cards as obstacles.
+
+Not yet checked: Firefox, Safari/iOS, a real screen reader, the owner's own motion review.
