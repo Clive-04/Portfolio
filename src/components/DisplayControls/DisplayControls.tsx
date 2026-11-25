@@ -1,4 +1,6 @@
+import type { MouseEvent } from 'react'
 import { playSound, setSoundEnabled } from '../../lib/sound'
+import { switchThemeWithWipe } from '../../lib/themeTransition'
 import { usePreferences } from '../../lib/usePreferences'
 import { PixelIcon } from '../PixelIcon/PixelIcon'
 import styles from './DisplayControls.module.css'
@@ -18,9 +20,19 @@ export function DisplayControls() {
   const { design, colorTheme, sound, setDesign, setColorTheme, setSound } = usePreferences()
   const isPixel = design === 'pixel'
 
-  function chooseTheme(theme: typeof colorTheme) {
-    setColorTheme(theme)
+  function chooseTheme(theme: typeof colorTheme, event: MouseEvent<HTMLButtonElement>) {
     playSound('confirm')
+    // Already showing: just save it as the visitor's choice, no wipe.
+    if (theme === colorTheme) {
+      setColorTheme(theme)
+      return
+    }
+    // The wipe grows from the centre of the pressed button (also for keyboard presses).
+    const rect = event.currentTarget.getBoundingClientRect()
+    switchThemeWithWipe({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }, () => {
+      document.documentElement.dataset.colorTheme = theme
+      setColorTheme(theme)
+    })
   }
 
   function toggleSound() {
@@ -50,7 +62,7 @@ export function DisplayControls() {
               type="button"
               className={styles.button}
               aria-pressed={colorTheme === 'day'}
-              onClick={() => chooseTheme('day')}
+              onClick={(event) => chooseTheme('day', event)}
             >
               <PixelIcon name="sun" className={styles.icon} />
               Day
@@ -59,7 +71,7 @@ export function DisplayControls() {
               type="button"
               className={styles.button}
               aria-pressed={colorTheme === 'night'}
-              onClick={() => chooseTheme('night')}
+              onClick={(event) => chooseTheme('night', event)}
             >
               <PixelIcon name="moon" className={styles.icon} />
               Night

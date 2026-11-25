@@ -241,3 +241,37 @@ a:not([class]):hover {
     padding-inline-start: var(--sidebar-width);
   }
 }
+
+/*
+ * Day / Night switch (src/lib/themeTransition.ts): a stepped diamond wipe from
+ * the clicked button instead of a color fade. The new theme is revealed in ten
+ * chunky steps over the old snapshot; during the switch every color
+ * transition is off, so nothing fades underneath.
+ */
+html[data-theme-switching] *,
+html[data-theme-switching] *::before,
+html[data-theme-switching] *::after {
+  transition: none !important;
+}
+
+html[data-theme-switching="wipe"]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-theme-switching="wipe"]::view-transition-new(root) {
+  animation: theme-diamond-wipe 600ms steps(10, end) both;
+}
+
+@keyframes theme-diamond-wipe {
+  from {
+    clip-path: polygon(var(--wipe-x) var(--wipe-y), var(--wipe-x) var(--wipe-y), var(--wipe-x) var(--wipe-y), var(--wipe-x) var(--wipe-y));
+  }
+  to {
+    clip-path: polygon(
+      var(--wipe-x) calc(var(--wipe-y) - var(--wipe-r)),
+      calc(var(--wipe-x) + var(--wipe-r)) var(--wipe-y),
+      var(--wipe-x) calc(var(--wipe-y) + var(--wipe-r)),
+      calc(var(--wipe-x) - var(--wipe-r)) var(--wipe-y)
+    );
+  }
+}
