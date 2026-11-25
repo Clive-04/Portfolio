@@ -11,11 +11,13 @@
  * always follows a click or key press.
  */
 
-export type SoundName = 'navigate' | 'confirm' | 'back' | 'open' | 'download'
+export type SoundName = 'navigate' | 'confirm' | 'back' | 'open' | 'download' | 'external' | 'tab' | 'page'
 
 export interface Note {
   /** Frequency in hertz. */
   freq: number
+  /** Optional end frequency: the note slides from `freq` to `to` over its length. */
+  to?: number
   /** Start time in seconds after the cue begins. */
   at: number
   /** Length in seconds. */
@@ -49,6 +51,18 @@ export const cues: Record<SoundName, readonly Note[]> = {
     { freq: 659.25, at: 0.06, dur: 0.05, wave: 'square' },
     { freq: 783.99, at: 0.12, dur: 0.05, wave: 'square' },
     { freq: 1046.5, at: 0.18, dur: 0.12, wave: 'triangle' },
+  ],
+  // Upward sweep with a small sparkle: a link opens in another browser tab.
+  external: [
+    { freq: 392, to: 1046.5, at: 0, dur: 0.09, wave: 'square' },
+    { freq: 1567.98, at: 0.1, dur: 0.06, wave: 'triangle' },
+  ],
+  // One soft, round note that dips: switching a skill pocket.
+  tab: [{ freq: 740, to: 494, at: 0, dur: 0.07, wave: 'triangle' }],
+  // Quick double tick on one pitch: turning to the previous or next case study.
+  page: [
+    { freq: 440, at: 0, dur: 0.025, wave: 'square' },
+    { freq: 440, at: 0.045, dur: 0.025, wave: 'square' },
   ],
 }
 
@@ -93,6 +107,7 @@ export function playNotes(notes: readonly Note[], volume = VOLUME) {
       const t = start + note.at
       osc.type = note.wave
       osc.frequency.setValueAtTime(note.freq, t)
+      if (note.to) osc.frequency.exponentialRampToValueAtTime(note.to, t + note.dur)
       // A tiny attack and a fast decay avoid clicks at the start and end of each note.
       env.gain.setValueAtTime(0, t)
       env.gain.linearRampToValueAtTime(1, t + 0.005)

@@ -28,4 +28,16 @@ describe('sound', () => {
     }
     assert.equal(signatures.size, Object.keys(cues).length)
   })
+
+  it('keeps the new-tab, skill-tab, and paging cues apart from the others', () => {
+    const shape = (name: keyof typeof cues) => cues[name].map((note) => `${note.wave}:${note.freq}>${note.to ?? '-'}`).join(' ')
+    for (const fresh of ['external', 'tab', 'page'] as const) {
+      for (const other of Object.keys(cues) as (keyof typeof cues)[]) {
+        if (other !== fresh) assert.notEqual(shape(fresh), shape(other), `${fresh} vs ${other}`)
+      }
+    }
+    // Slides are what make external and tab sound different from the stepped cues.
+    assert.ok(cues.external.some((note) => note.to))
+    assert.ok(cues.tab.some((note) => note.to))
+  })
 })

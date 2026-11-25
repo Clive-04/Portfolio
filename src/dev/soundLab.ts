@@ -10,12 +10,14 @@ import '../styles/global.css'
 import { VOLUME, cues, playNotes, type Note, type SoundName } from '../lib/sound'
 
 const descriptions: Record<SoundName, string> = {
-  navigate: 'Jumping to a section, switching skill tabs, Previous/Next between case studies',
-  confirm:
-    'Day/Night, turning sound on, switching designs, email and external links (LinkedIn, GitHub, Verify, Credly, Live, Code), pausing the technology strip',
+  navigate: 'Jumping to a section (sidebar, menu, Back to top)',
+  confirm: 'Day/Night, turning sound on, switching designs, the email link, pausing the technology strip',
   back: 'Closing a dialog or the phone menu, turning sound off',
   open: 'Opening a project case study or the phone menu',
   download: 'Starting the résumé download',
+  external: 'Links that open another browser tab: LinkedIn, GitHub, Verify, Credly, project Live and Code',
+  tab: 'Switching a skill category (Inventory pocket)',
+  page: 'Previous / Next between case studies',
 }
 
 interface Tuning {
@@ -33,6 +35,7 @@ function tuned(name: SoundName): Note[] {
   return cues[name].map((note) => ({
     ...note,
     freq: Math.round(note.freq * pitch * 100) / 100,
+    ...(note.to && { to: Math.round(note.to * pitch * 100) / 100 }),
     at: Math.round(note.at * length * 1000) / 1000,
     dur: Math.round(note.dur * length * 1000) / 1000,
   }))
