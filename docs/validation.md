@@ -206,3 +206,22 @@ New dialog checks, run in Classic, Day, and Night at 1280, 390, and 320 px: open
 Screenshots reviewed: the project grid (Day, 1280 px) and the open dialog (Day 1280 px, Night 390 px). Screenshots stay whole at 25:12. The Classic green window dot and teal glows are replaced in Pixel by vermilion, yellow, and cobalt; the projects' own screenshots keep their real colors as evidence.
 
 Noted, not a regression: on the phone bottom sheet, headless Edge draws the dialog's reserved scrollbar space as a solid strip at the right edge. Classic shows the same strip, and phone browsers overlay their scrollbars, so it should not appear on a real phone; confirm during the R6 real-phone check.
+
+## Run 7 — 2026-11-25 (R4 batch 3: Skills, About, technology strip, automated)
+
+Scope: pixel Inventory (Skills), Adventurer card (About), and the moving technology strip; CSS only. Commits `96269d0`, `7a21bdb`, and `7433029`.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 28/28 |
+| `npm run build` | Passed |
+| Browser suite (as in Run 6) | **155 passed, 0 failed** |
+
+Screenshots reviewed: Skills (Day 1280 and 390 px; the Backend tab at Night to confirm AI-Assisted cells), About (Day 1280, Night 390), and the strip (Night 1280).
+
+- AI-Assisted marking: Built is a filled pixel circle and AI-Assisted a hollow pixel ring, with the same "Built / AI-Assisted" key; table cells still announce "Used", "AI-assisted", or "Not used".
+- Layout decision: in Pixel, About's numbers tile is hidden because the hero stats strip already shows the same three counts; Classic keeps it. The counts are still computed from `src/content/*`.
+- The Classic teal fills and glows in these components (the "Looking for" gradient, matrix dot glows, clock dots, marquee stars) are replaced in Pixel by cobalt, yellow, and navy.
+
+Not covered yet: Certifications (Emblem case), Résumé (Save file), Contact, and footer.
