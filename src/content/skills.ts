@@ -40,6 +40,9 @@ export const skillGroups: SkillGroup[] = [
     blurb: 'Schemas, queries, and migrations.',
     skills: [
       { name: 'PostgreSQL', projects: ['careertrack'] },
+      // CareerTrack's production database and private résumé storage (DEPLOYMENT.md; checked 2026-11-25).
+      // SmartFeather also uses Supabase Storage, but that code is by teammates, so it is not listed here.
+      { name: 'Supabase (Postgres & storage)', projects: ['careertrack'] },
       { name: 'MySQL', projects: ['pasa-buy'] },
       { name: 'SQLAlchemy', projects: ['careertrack'] },
       { name: 'Alembic migrations', projects: ['careertrack'] },

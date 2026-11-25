@@ -26,6 +26,7 @@ export const projects: Project[] = [
       { name: 'FastAPI', evidence: 'confirmed' },
       { name: 'SQLAlchemy', evidence: 'confirmed' },
       { name: 'PostgreSQL', evidence: 'confirmed' },
+      { name: 'Supabase', evidence: 'confirmed' },
       { name: 'Gemini API', evidence: 'confirmed' },
       { name: 'Docker', evidence: 'confirmed' },
     ],
