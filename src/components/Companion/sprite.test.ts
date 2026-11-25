@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { SPRITE_GRID, frames, palettes, toRuns } from './sprite.ts'
+import { SPRITE_GRID, frames, palette, toRuns } from './sprite.ts'
 
-const all = [frames.idle, frames.blink, ...frames.walk, ...frames.teleport]
-const roles = new Set(Object.keys(palettes.day))
+const all = [frames.idle, frames.blink, ...frames.walkDown, ...frames.walkSide, ...frames.teleport]
+const roles = new Set(Object.keys(palette))
 
 describe('companion sprite', () => {
   it('has 16 × 16 frames that only use known colour roles', () => {
@@ -11,17 +11,14 @@ describe('companion sprite', () => {
       assert.equal(frame.length, SPRITE_GRID)
       for (const row of frame) {
         assert.equal(row.length, SPRITE_GRID, row)
-        for (const ch of row) assert.ok(ch === '.' || roles.has(ch), `unknown role ${ch}`)
+        for (const ch of row) assert.ok(ch === '.' || roles.has(ch), `unknown role ${ch} in ${row}`)
       }
     }
   })
 
-  it('defines every role in both Day and Night', () => {
-    assert.deepEqual(Object.keys(palettes.night).sort(), [...roles].sort())
-  })
-
-  it('proposes 2 idle, 4 walk, and 4 teleport frames', () => {
-    assert.equal(frames.walk.length, 4)
+  it('has four-step walks facing down and sideways, and four teleport frames', () => {
+    assert.equal(frames.walkDown.length, 4)
+    assert.equal(frames.walkSide.length, 4)
     assert.equal(frames.teleport.length, 4)
   })
 

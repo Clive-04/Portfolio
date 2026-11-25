@@ -1,103 +1,98 @@
 /**
  * Original 16 × 16 pixel sprite of Clive, drawn for this site from his
  * formal portfolio photo (public/profile.jpg): swept black hair with a
- * curtain fringe, warm skin, a smile, white collar, black suit, and a dark
- * striped tie. Colours were sampled from the photo and fitted to the pixel
- * Day / Night palette. Not traced or adapted from any game sprite.
+ * curtain fringe, warm skin, a moustache and smile, white collar, black suit,
+ * and a dark striped tie. Colours were sampled from the photo.
  *
- * Each frame is 16 rows of 16 characters; each character is a colour role
- * (see `palettes`), `.` is transparent. No imports, so Node's test runner can
- * check the frames directly.
+ * Style: general conventions of handheld 16-bit-era RPG overworld sprites —
+ * coloured (selective) outlines, three-tone shading lit from the top left,
+ * two-pixel eyes, a facing-down walk. Drawn by hand; not traced from the photo
+ * and not copied or adapted from any existing game sprite.
+ *
+ * Each frame is 16 rows of 16 characters; each character is a colour role,
+ * `.` is transparent. The art is identical in Day and Night; Night only adds a
+ * light outline around the silhouette (see the companion styles). No imports,
+ * so Node's test runner can check the frames directly.
  */
 
 export const SPRITE_GRID = 16
 
-/** Colour roles. Day and Night differ only where contrast needs it. */
-export const palettes = {
-  day: {
-    o: '#17324d', // outline: site navy
-    h: '#1a1d2b', // hair (photo #171a26)
-    H: '#3b4258', // hair highlight
-    s: '#c39176', // skin (photo #bf9074)
-    S: '#9a6656', // skin shadow (photo #946458)
-    e: '#2a1d26', // eyes (photo #301e26)
-    m: '#fff6d8', // smile: site cream
-    w: '#f4efe6', // shirt (photo #dbd5cf, lifted)
-    j: '#262a35', // jacket (photo #202021, cooled)
-    J: '#171a22', // jacket shade
-    t: '#4a4652', // tie (photo #3e3937)
-    T: '#9c98a6', // tie stripe
-    p: '#1f222c', // trousers
-    b: '#101218', // shoes
-    c: '#25b7d3', // teleport beam: site cyan
-    y: '#f3c847', // teleport spark: site yellow
-  },
-  night: {
-    o: '#9fb3d6', // light outline so the dark suit and hair read on navy
-    h: '#20243a',
-    H: '#46507a',
-    s: '#c39176',
-    S: '#9a6656',
-    e: '#2a1d26',
-    m: '#fff6d8',
-    w: '#f4efe6',
-    j: '#30364a', // slightly lifted so the jacket separates from the background
-    J: '#20243a',
-    t: '#5a5666',
-    T: '#b0acbb',
-    p: '#272b3a',
-    b: '#151826',
-    c: '#51d2f0',
-    y: '#ffd45a',
-  },
+export const palette = {
+  o: '#14161f', // outline next to hair and suit
+  k: '#6f4535', // outline next to skin
+  h: '#1f2232', // hair (photo #171a26)
+  H: '#454e6b', // hair highlight
+  s: '#c99478', // skin (photo #bf9074)
+  S: '#a06a56', // skin shadow (photo #946458)
+  e: '#1d1520', // eyes (photo #301e26)
+  m: '#fff6d8', // teeth: site cream
+  w: '#f3eee5', // shirt (photo #dbd5cf, lifted)
+  j: '#2c313f', // jacket (photo #202021)
+  J: '#1b1e28', // jacket shadow
+  K: '#48506a', // jacket highlight
+  t: '#4b4754', // tie (photo #3e3937)
+  T: '#a29eac', // tie stripe
+  p: '#23262f', // trousers
+  b: '#0f1016', // shoes
+  c: '#25b7d3', // teleport beam: site cyan
+  y: '#f3c847', // teleport spark: site yellow
 } as const
 
-export type Role = keyof typeof palettes.day
+export type Role = keyof typeof palette
 
-const idle = [
-  '....oooooooo....',
-  '...ohhhhHHhho...',
-  '..ohhhHHhhhhho..',
-  '..ohhhhhhhhhhho.',
-  '..ohhssshhhhhho.',
-  '..ohssssshhhhho.',
-  '..osesssseshho..',
-  '..osssSSssshho..',
-  '..ossSmmSssSo...',
-  '...oSssssSSo....',
-  '..ojjwwtwwjjo...',
-  '.ojjjjwtTwjjjo..',
-  '.ojJjjjtTjjjJjo.',
-  '.osjjjjTtjjjjso.',
-  '..oopppoopppoo..',
-  '...obbo..obbo...',
+/** Facing down, standing. Rows 0–10 head, 11–15 body. */
+const head = [
+  '.....oooooo.....',
+  '....oHHhhhhho...',
+  '...oHHhhhhhhho..',
+  '...ohHhhhhhhhho.',
+  '...ohhhsshhhhho.',
+  '...ohhsssssshho.',
+  '...ohsesssesho..',
+  '...kssesssesk...',
+  '...kSssSSSsSk...',
+  '....kSsmmmSk....',
+  '.....kSSSSk.....',
 ]
+
+const body = ['...oKjwtTwjJo...', '..oKjjjtTjjjJo..', '..osjjjTtjjJso..']
+
+const idle = [...head, ...body, '....opppJpppo...', '....obbo.obbo...']
 
 /** Idle blink: eyes closed for one frame. */
-const blink = idle.map((row, y) => (y === 6 ? '..osSsssSsshho..' : row))
+const blink = idle.map((row, y) => (y === 6 ? '...ohsSsssSsho..' : y === 7 ? '...kssSsssSsk...' : row))
 
-/** Side-view head (facing right), shared by the walk frames. */
-const sideHead = [
-  '.....oooooo.....',
-  '....ohhhhHHoo...',
-  '...ohhhHHhhhhoo.',
-  '...ohhhhhhhhhhho',
-  '...ohhhhhhhhshho',
-  '...ohhhhsssssso.',
-  '...ohhSsssssesso',
-  '...ohhSsssssSSo.',
-  '....ohsssssmmo..',
-  '.....oSSSSSSo...',
+/** Facing down: step with the left foot, stand, step with the right foot, stand. */
+const walkDown = [
+  [...head, '...oKjwtTwjJo...', '..oKjjjtTjjjJo..', '..ojjjjTtjjJso..', '...osppJpppo....', '...obbbo..oo....'],
+  idle,
+  [...head, '...oKjwtTwjJo...', '..oKjjjtTjjjJo..', '..osjjjTtjjjjo..', '.....opppJpps...', '.....oo..obbbo..'],
+  idle,
 ]
 
-const torso = ['....ojjjwwo.....', '....ojjjjwto....']
+/** Side view (facing right), shared by the sideways walk. */
+const sideHead = [
+  '.....oooooo.....',
+  '....oHHhhhhoo...',
+  '...oHHhhhhhhhoo.',
+  '...ohHhhhhhhhhho',
+  '...ohhhhhhhhshho',
+  '...ohhhhsssssso.',
+  '...ohhSssssesk..',
+  '...ohhSsssssssk.',
+  '....ohSssssSSk..',
+  '....kSsssmmk....',
+  '.....kSSSSk.....',
+]
 
-/** Four-step walk (facing right): stride, pass, stride with legs swapped, pass. */
-const walk = [
-  [...sideHead, ...torso, '....osjjjjto....', '....ojjjjjjo....', '...oJJo..oppo...', '..obbo....obbbo.'],
-  [...sideHead, ...torso, '....ojjjjjto....', '....ojjsjjjo....', '.....oppppo.....', '.....obbbbbo....'],
-  [...sideHead, ...torso, '....ojjjjsto....', '....ojjjjjjo....', '...oppo..oJJo...', '..obbo....obbbo.'],
-  [...sideHead, ...torso, '....ojjjjjto....', '....ojjsjjjo....', '.....oJJJJo.....', '.....obbbbbo....'],
+const sideBody = ['....oKjjwwo.....', '....oKjjjwto....']
+
+/** Facing right: stride, pass, stride with legs swapped, pass. Mirrored for left. */
+const walkSide = [
+  [...sideHead, ...sideBody, '....osjjjjto....', '...oJpo.oppo....', '..obbo...obbbo..'],
+  [...sideHead, ...sideBody, '....ojjsjjjo....', '.....opppJo.....', '.....obbbbbo....'],
+  [...sideHead, ...sideBody, '....ojjjjsto....', '...oppo.oJpo....', '..obbo...obbbo..'],
+  [...sideHead, ...sideBody, '....ojjsjjjo....', '.....oJJppo.....', '.....obbbbbo....'],
 ]
 
 /**
@@ -106,7 +101,7 @@ const walk = [
  * 3: a narrow column of light. 4: a few fading sparks.
  */
 const teleport = [
-  idle.map((row, y) => (y === 15 ? '.y.obbo..obbo.y.' : y === 13 ? 'yosjjjjTtjjjjsoy' : row)),
+  idle.map((row, y) => (y === 15 ? '.y..obbo.obbo.y.' : y === 13 ? 'y.osjjjTtjjJso.y' : row)),
   idle.map((row, y) => (y % 2 ? row.replace(/[^.]/g, 'c') : row)),
   [
     '.......y........', '.......cc.......', '......cccc......', '.......cc.......',
@@ -122,7 +117,7 @@ const teleport = [
   ],
 ]
 
-export const frames = { idle, blink, walk, teleport }
+export const frames = { idle, blink, walkDown, walkSide, teleport }
 
 /** One SVG path per colour role: each horizontal run of a role becomes a rectangle. */
 export function toRuns(rows: readonly string[]): Partial<Record<Role, string>> {
