@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type CSSProperties } from 'react'
 import type { Project, ProjectStatus } from '../../content/types'
+import { quietDialogSounds } from '../../lib/useInterfaceSounds'
 import { Badge, type BadgeTone } from '../Badge/Badge'
 import buttonStyles from '../ButtonLink/ButtonLink.module.css'
 import { ButtonLink } from '../ButtonLink/ButtonLink'
@@ -184,6 +185,8 @@ export function ProjectCard({ project, index = 0, total = 1, previous, next }: P
   function switchTo(target: Neighbour, direction: 'previous' | 'next') {
     const dialog = dialogRef.current
     if (!dialog?.open) return
+    // The pager button plays "navigate"; skip the close/open cues of the swap.
+    quietDialogSounds()
     const go = () => {
       dialog.close()
       window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: target.slug }))
