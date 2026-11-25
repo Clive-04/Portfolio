@@ -5,6 +5,8 @@ import { KineticName } from './components/KineticName/KineticName'
 import { TechMarquee } from './components/TechMarquee/TechMarquee'
 import { CertificationList } from './components/CertificationList/CertificationList'
 import { Pending } from './components/Pending/Pending'
+import { PixelIcon } from './components/PixelIcon/PixelIcon'
+import type { PixelIconName } from './components/PixelIcon/bitmaps'
 import { ProjectCard } from './components/ProjectCard/ProjectCard'
 import { Section } from './components/Section/Section'
 import { SiteFooter } from './components/SiteFooter/SiteFooter'
@@ -26,10 +28,10 @@ const courseBadges = published.filter((item) => item.kind === 'course-badge')
 
 // Counts shown in the About tiles come from the content files, so they stay accurate.
 const liveCount = projects.filter((project) => project.links.live).length
-const stats = [
-  { value: projects.length, label: projects.length === 1 ? 'Project' : 'Projects' },
-  { value: published.length, label: published.length === 1 ? 'Credential' : 'Credentials' },
-  { value: liveCount, label: liveCount === 1 ? 'Live app' : 'Live apps' },
+const stats: { value: number; label: string; icon: PixelIconName }[] = [
+  { value: projects.length, label: projects.length === 1 ? 'Project' : 'Projects', icon: 'monitor' },
+  { value: published.length, label: published.length === 1 ? 'Credential' : 'Credentials', icon: 'emblem' },
+  { value: liveCount, label: liveCount === 1 ? 'Live app' : 'Live apps', icon: 'globe' },
 ]
 
 // Assembled at render time so the full address is never a single string in the page source.
@@ -75,7 +77,12 @@ export default function App() {
               </div>
             </div>
 
-            {/* Portrait with decorative orbit rings. The facts live in About and Résumé. */}
+            {/*
+              Portrait with decorative orbit rings (Classic). The pixel design swaps
+              the rings for a keyline frame and a CSS-only halftone overlay; the
+              photo file and its size come from profile.ts, so replacing it later
+              only means swapping the file and its width/height.
+            */}
             {profile.photo && (
               <div className={styles.portrait}>
                 <span className={styles.orbit} aria-hidden="true" />
@@ -92,6 +99,17 @@ export default function App() {
                 </span>
               </div>
             )}
+
+            {/* Pixel design only: the same counts as the About tiles, as a compact strip. */}
+            <dl className={styles.heroStats}>
+              {stats.map((stat) => (
+                <div key={stat.label} className={styles.heroStat}>
+                  <PixelIcon name={stat.icon} size={32} className={styles.heroStatIcon} />
+                  <dt>{stat.label}</dt>
+                  <dd>{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 

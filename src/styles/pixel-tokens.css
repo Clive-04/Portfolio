@@ -98,6 +98,8 @@
   --pixel-yellow: #f3c847;
   --pixel-violet: #6248a8; /* 6.45:1 on bg */
   --pixel-on-yellow: #17324d; /* 8.23:1 */
+  --pixel-on-vermilion: #ffffff; /* 5.63:1 */
+  --halftone-ink: rgb(23 50 77 / 0.9); /* navy dots over the portrait */
   --pixel-shadow: #17324d;
 
   --glow-accent: rgb(36 90 165 / 0.25);
@@ -160,6 +162,8 @@
   --pixel-yellow: #ffd45a; /* 12.17:1 on bg */
   --pixel-violet: #b69af5; /* 7.33:1 on bg */
   --pixel-on-yellow: #101a33;
+  --pixel-on-vermilion: #101a33; /* 6.71:1 on coral */
+  --halftone-ink: rgb(5 10 24 / 0.9);
   --pixel-shadow: #050a18;
 
   --glow-accent: rgb(114 167 255 / 0.3);

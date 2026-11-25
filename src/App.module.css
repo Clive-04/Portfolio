@@ -392,3 +392,164 @@
   font-family: var(--font-mono);
   font-size: var(--text-sm);
 }
+
+/* Pixel-design hero stats strip; Classic shows these counts in About only. */
+.heroStats {
+  display: none;
+}
+
+/* ==========================================================================
+   Pixel design: hero
+   ========================================================================== */
+
+/* A dithered dot field in the top-right corner instead of the teal grid. */
+:global(html[data-design="pixel"]) .hero::before {
+  background-image: radial-gradient(color-mix(in srgb, var(--pixel-cobalt) 28%, transparent) 1px, transparent 1.5px);
+  background-size: 12px 12px;
+  mask-image: radial-gradient(40rem 22rem at 100% 0%, black, transparent 70%);
+}
+
+:global(html[data-design="pixel"]) .status {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .statusDot,
+:global(html[data-design="pixel"]) .statusDot::after {
+  border-radius: 0;
+}
+
+:global(html[data-design="pixel"]) .statusDot {
+  background: var(--pixel-cobalt);
+}
+
+:global(html[data-design="pixel"]) .statusDot::after {
+  border-color: var(--pixel-cobalt);
+}
+
+/* Title banner: white on vermilion (5.63:1 Day), navy on coral (6.71:1 Night). */
+:global(html[data-design="pixel"]) .eyebrow {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  background: var(--pixel-vermilion);
+  color: var(--pixel-on-vermilion);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-label);
+  box-shadow: 4px 4px 0 var(--color-border-strong);
+}
+
+:global(html[data-design="pixel"]) .headline {
+  margin-top: var(--space-5);
+}
+
+/* ---------- Portrait: keyline frame and halftone ---------- */
+
+:global(html[data-design="pixel"]) .orbit {
+  display: none;
+}
+
+:global(html[data-design="pixel"]) .portrait {
+  aspect-ratio: auto;
+}
+
+:global(html[data-design="pixel"]) .photoFrame,
+:global(html[data-design="pixel"]) .photoFrame:hover {
+  padding: var(--space-2);
+  border: var(--pixel-frame) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  transform: none;
+}
+
+/*
+ * Halftone: the real photo in monochrome, with a fine dot screen over it.
+ * Purely CSS, so the source image is never altered and a sharper photo can
+ * replace public/profile.jpg without touching these rules.
+ */
+:global(html[data-design="pixel"]) .photo {
+  border: 0;
+  border-radius: 0;
+  filter: grayscale(1) contrast(1.2) brightness(1.06);
+}
+
+:global(html[data-design="pixel"]) .photoFrame::after {
+  content: "";
+  position: absolute;
+  inset: var(--space-2);
+  /* `overlay` darkens shadows and mid-tones but barely touches highlights, like a real halftone screen. */
+  background-image: radial-gradient(circle, var(--halftone-ink) 1.1px, transparent 1.5px);
+  background-size: 4px 4px;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  :global(html[data-design="pixel"]) .photoFrame::after {
+    display: none;
+  }
+}
+
+/* ---------- Stats strip ---------- */
+
+:global(html[data-design="pixel"]) .heroStats {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  border-block: var(--pixel-line) solid var(--color-border-strong);
+}
+
+:global(html[data-design="pixel"]) .heroStat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "icon value" "icon label";
+  align-items: center;
+  column-gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+:global(html[data-design="pixel"]) .heroStat + .heroStat {
+  border-left: var(--pixel-line) solid var(--color-border);
+}
+
+:global(html[data-design="pixel"]) .heroStatIcon {
+  grid-area: icon;
+  color: var(--pixel-cobalt);
+}
+
+:global(html[data-design="pixel"]) .heroStat dd {
+  grid-area: value;
+  margin: 0;
+  color: var(--pixel-cobalt);
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+
+:global(html[data-design="pixel"]) .heroStat:nth-child(2) :is(dd, .heroStatIcon) {
+  color: var(--pixel-vermilion);
+}
+
+:global(html[data-design="pixel"]) .heroStat dt {
+  grid-area: label;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* Phones: stats stack, so the dividers run horizontally. */
+@media (max-width: 35.99rem) {
+  :global(html[data-design="pixel"]) .heroStat + .heroStat {
+    border-left: 0;
+    border-top: var(--pixel-line) solid var(--color-border);
+  }
+}
