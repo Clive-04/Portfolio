@@ -225,3 +225,20 @@ Screenshots reviewed: Skills (Day 1280 and 390 px; the Backend tab at Night to c
 - The Classic teal fills and glows in these components (the "Looking for" gradient, matrix dot glows, clock dots, marquee stars) are replaced in Pixel by cobalt, yellow, and navy.
 
 Not covered yet: Certifications (Emblem case), Résumé (Save file), Contact, and footer.
+
+## Run 8 — 2026-11-25 (R4 batch 4: Certifications, Résumé, Contact, footer, and a font fix; automated)
+
+Scope: pixel Emblem case, Save file, footer rule, and a legibility fix for Pixelify Sans. Commits `096b4de`, `35cca36`, `afbdb79`, and `566fb9a`. This completes the R4 section restyle.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 28/28 |
+| `npm run build` | Passed |
+| Browser suite (as in Run 6, font check updated to the new family name) | **155 passed, 0 failed** |
+
+Legibility defect found and fixed: at weights above about 500, Pixelify Sans closes its capital "C" so it reads as "O" ("Clive" looked like "Olive"; "CERTIFICATIONS" like "OERTIFIOATIONS"). A glyph sheet at weights 400, 500, 600, and 700 confirmed it. The pixel design now uses the same self-hosted files registered as "Pixelify Sans UI" with `font-weight: 400`, so bold requests clamp to 400, synthetic bold is off, and the hero name no longer sets per-letter weights in Pixel. Screenshots after the fix show "Clive Owen S. Benito" and "CERTIFICATIONS" correctly. The contact email and the footer copyright stay in their readable fonts (monospace and Plus Jakarta Sans), so the address and name can't be misread.
+
+Other checks: exam-certification emblems are vermilion and course badges cobalt, each with a yellow verified tick that is not clipped; every Verify link is at least 44 px tall in Pixel; verification links and wording are unchanged.
+
+Remaining before release (R6): sound audition and tuning (local test page), then the full manual set for Day and Night (NVDA, real phone including the dialog's scrollbar strip, 400% zoom, Windows animation setting, PageSpeed, Firefox; Safari/iOS if available).
