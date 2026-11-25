@@ -1,7 +1,8 @@
 /**
  * Original 24 × 32 pixel companion of Clive, drawn for this site from his
  * formal portrait (`public/profile.jpg`): thick dark hair with a parted
- * fringe, ears showing, wide smile, dark suit, white shirt and tie. The tie is
+ * fringe, ears showing, dark suit, white shirt and tie; no mouth, by Clive's
+ * choice. The tie is
  * the site's vermilion so it reads at actual size; the portrait's tie is a
  * grey stripe. Nothing is traced from the photo or adapted from a game sprite.
  *
@@ -20,7 +21,6 @@ export const palette = {
   H: '#4a4462', // hair highlight
   s: '#d29d80', // skin
   S: '#a86f59', // skin shade
-  t: '#fff6d8', // teeth: site cream
   j: '#323850', // suit
   J: '#22263a', // suit shade
   L: '#56608a', // suit light: lapels, shoe shine
@@ -70,9 +70,9 @@ const front: Frame = [
   '....ohhshssshhhhhhho....',
   '....oShssossssoshhSo....',
   '....oSsssossssossSSo....',
-  '.....ossssSSSSsssSo.....',
-  '.....osssottttossSo.....',
-  '......ossssSSsssSo......',
+  '.....ossssssSssssSo.....',
+  '.....osssssssssssSo.....',
+  '......osssssssssSo......',
   '.......oooSSSSooo.......',
   '....oooojwwrrwwJoooo....',
   '...ojjjjLwwrrwwLJJJJo...',
@@ -177,19 +177,19 @@ const back = [
 /* ---------- Side view, facing right (mirrored for left) ---------- */
 
 const sideHead = [
-  '........oooooo..........',
-  '......ooHHHhhhoo........',
-  '.....oHHHhhhhhhhoo......',
-  '....oHHhhhhhHhhhhho.....',
-  '....ohHhhhhhhhHhhhho....',
-  '....ohhhhhhhhhhhhhhho...',
-  '....ohhhhhhhhshhhhso....',
-  '....ohHhhhSShsssosso....',
-  '....ohhhhhSsssssossso...',
-  '....ohhhhhhSssssssSo....',
-  '.....ohhhhSsssssoto.....',
-  '......ohhSsssssSo.......',
-  '........oSSSSoooo.......',
+  '..........ooooo.........',
+  '........ooHhhhhoo.......',
+  '.......oHHhhhhhho.......',
+  '......oHhhhhHhhhho......',
+  '......ohHhhhhhHhhho.....',
+  '......ohhhhhhhhhhhho....',
+  '......ohhhhhshhhhso.....',
+  '......ohhSSssssosso.....',
+  '......ohhSsssssossso....',
+  '......ohhhsssssssSo.....',
+  '......ohhSssssssSo......',
+  '.......oSsssssSo........',
+  '........oSSSSooo........',
   '......oojjjjLwro........',
   '.....ojjjjjjLwro........',
 ]
