@@ -292,4 +292,20 @@ Owner request before shipping: icons on the About section, a more noticeable hov
 - Hover (Pixel only): cards lift 4 px onto an 8 px hard shadow with a cobalt keyline, also on keyboard focus inside a card; buttons and small controls lift 2 px onto a 4 px shadow. Screenshots mid-hover were reviewed in Day and Night; Night uses a mid-blue hover shadow because the near-black one was not visible on navy.
 - Favicon: a 16 × 16 pixel "CB" tile in the approved palette, reviewed at 16, 32, and 64 px on light and dark browser tabs.
 
-Remaining before release (R6): sound audition and tuning (local test page), then the full manual set for Day and Night (NVDA, real phone including the dialog's scrollbar strip, 400% zoom, Windows animation setting, PageSpeed, Firefox; Safari/iOS if available).
+## Run 12 — 2026-11-25 (R6 manual release checks, by the owner)
+
+Reported by Clive; recorded as stated, not re-run by Claude Code.
+
+| Check (Pixel Day and Night) | Result |
+|---|---|
+| NVDA screen reader | Passed |
+| Real phone, including the case-study sheet | Passed |
+| 400% browser zoom | Passed |
+| Windows "Animation effects" off (reduced motion) | Passed |
+| PageSpeed Insights | Passed |
+| Firefox | Not run: the owner does not have Firefox installed |
+| Safari / iOS | Not run: no access |
+
+Sound: the owner listened and found the cues too quiet (audible only at 60–80% system volume). Fixed in `5936825` (master level 0.05 → 0.15, triangle notes lifted 1.6×); a re-listen at about 30% is still to confirm. Layout: the About bio card had a large empty area under its text on wide screens; fixed in `d7a04ef` by moving Focus to a full-width row.
+
+Remaining: Firefox is untested on real hardware. Automated Firefox checks are possible with Playwright's Firefox build if the owner approves downloading it.
