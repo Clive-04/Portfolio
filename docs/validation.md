@@ -241,4 +241,18 @@ Legibility defect found and fixed: at weights above about 500, Pixelify Sans clo
 
 Other checks: exam-certification emblems are vermilion and course badges cobalt, each with a yellow verified tick that is not clipped; every Verify link is at least 44 px tall in Pixel; verification links and wording are unchanged.
 
+## Run 9 — 2026-11-25 (interface sound coverage, automated)
+
+Reported by the owner: Skills, Certifications, and Contact buttons made no sound. Cause: the shared listener only handled section links, downloads, and dialogs. Fixed in `9c22aa3`, `528e620`, and `3af54bd`; the rule for which control plays which cue is now `src/lib/soundFor.ts` with unit tests.
+
+| Command | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 34/34 (6 new `soundFor` tests) |
+| `npm run build` | Passed |
+| Browser suite (as in Run 6) | **155 passed, 0 failed** |
+| New click-through check: every control with sound on, counting scheduled notes (navigate 1, confirm 2, back 2, open 3, download 4) | **22 passed, 0 failed** |
+
+Covered: sidebar and footer section links, Day/Night (no double cue), skill tabs by click and arrow keys (silent when the same tab is clicked), project Live and Code, opening, Next, and closing a case study, Credly and Verify, the résumé download, Contact Email/LinkedIn/GitHub, the technology-strip pause, the phone menu open/close, and two controls with sound off (silent). Two bugs found by this check and fixed: the phone menu cues were reversed, and Next played the dialog close and open cues on top of navigate.
+
 Remaining before release (R6): sound audition and tuning (local test page), then the full manual set for Day and Night (NVDA, real phone including the dialog's scrollbar strip, 400% zoom, Windows animation setting, PageSpeed, Firefox; Safari/iOS if available).
