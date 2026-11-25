@@ -9,6 +9,7 @@ import {
   docked,
   isClear,
   pixelScale,
+  placeBubble,
   positionAt,
   targetAt,
   walkClip,
@@ -152,13 +153,37 @@ describe('sidebar docking', () => {
     assert.equal(docked(false, 4999, 5000), true)
   })
 
-  it('stays docked for small upward nudges, then leaves', () => {
+  it('stays docked however far the visitor scrolls back up', () => {
     assert.equal(docked(true, 4950, 5000), true)
-    assert.equal(docked(true, 4800, 5000), false)
+    assert.equal(docked(true, 0, 5000), true)
   })
 
   it('never docks on a page too short to scroll', () => {
     assert.equal(docked(false, 0, 0), false)
+  })
+})
+
+describe('placeBubble', () => {
+  const size = { w: 200, h: 36 }
+  const bounds = { x0: 0, x1: 1280 }
+
+  it('puts the bubble above his head, tail pointing at him', () => {
+    const b = placeBubble(1000, 500, size, [], bounds)!
+    assert.equal(b.tail, 'down')
+    assert.ok(b.y + size.h <= 500 - SPRITE_BOX.h)
+    assert.ok(b.at > 0 && b.at < size.w)
+  })
+
+  it('moves to his left when text sits above him', () => {
+    const b = placeBubble(1000, 500, size, [{ x: 900, y: 380, w: 300, h: 40 }], bounds)!
+    assert.equal(b.tail, 'right')
+    assert.ok(b.x + size.w <= 1000)
+  })
+
+  it('stays inside the page and says nothing when there is no clear spot', () => {
+    const above = placeBubble(1200, 500, size, [], bounds)!
+    assert.ok(above.x + size.w <= 1280)
+    assert.equal(placeBubble(100, 500, size, [{ x: 0, y: 0, w: 1280, h: 480 }], bounds), null)
   })
 })
 

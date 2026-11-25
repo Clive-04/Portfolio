@@ -1,3 +1,4 @@
+import { companionLines } from '../../content/companion'
 import sheetUrl from './companion-sprites.png'
 import sheet from './companion-sprites.json'
 import {
@@ -5,11 +6,13 @@ import {
   buildRoute,
   docked,
   pixelScale,
+  placeBubble,
   positionAt,
   snap,
   targetAt,
   walkClip,
   walkFrame,
+  walkingDistance,
   type Box,
   type Ledge,
   type Rect,
@@ -22,6 +25,12 @@ type Frame = [clip: Clip, index: number, ms: number]
 /** The companion aims for the route point level with this share of the viewport height. */
 const LINE = 0.75
 const INTERACTIVE = 'a, button, input, select, textarea, summary, label, [tabindex], [role="tab"], img, svg, video, canvas, iframe'
+
+/** Once he reaches the sidebar he stays there until the page is reloaded, even if the companion restarts (resize, design switch). */
+let dockedThisLoad = false
+/** Each ledge's line is said once per page load. */
+const said = new Set<string>()
+const BUBBLE_MS = 3500
 
 const frames = (clip: Clip): Frame[] => sheet.clips[clip].ms.map((ms, i) => [clip, i, ms])
 
@@ -60,7 +69,7 @@ function measureLedges(): Ledge[] {
     const r = toDocument(el.getBoundingClientRect(), 0)
     // The sprite stands just above the edge, over whichever panel is there.
     const behind = panels.find((p) => r.y - 32 >= p.rect.y && r.y - 32 < p.rect.y + p.rect.h)
-    return { y: r.y, x0: r.x, x1: Math.min(r.x + r.w, right), dark: Boolean(behind?.dark) }
+    return { y: r.y, x0: r.x, x1: Math.min(r.x + r.w, right), dark: Boolean(behind?.dark), id: el.dataset.companionLedge }
   })
 }
 
@@ -85,17 +94,21 @@ function measureObstacles(): Rect[] {
 }
 
 /**
- * Runs the companion: measures its route, follows the scroll, and docks in
- * the sidebar slot at the bottom of the page. Returns a cleanup function that
- * removes every listener and timer and restores the "CB" mark.
+ * Runs the companion: measures its route, follows the scroll, says a line
+ * at each ledge, and docks in the sidebar slot at the bottom of the page.
+ * Returns a cleanup function that removes every listener and timer and
+ * restores the "CB" mark.
  */
-export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): () => void {
+export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: HTMLElement | null): () => void {
   const root = document.documentElement
   let stopped = false
   let points: RoutePoint[] = []
+  let obstacles: Rect[] = []
+  let bounds = { x0: 0, x1: 0 }
   let p = 0
   let walked = 0
-  let isDocked = false
+  let isDocked = dockedThisLoad
+  let bubbleTimer = 0
   let busy = false
   let raf = 0
   let lastTime = 0
@@ -129,6 +142,7 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
     const { x, y, dark } = positionAt(points, p)
     sprite.style.transform = `translate(${snap(x, dpr)}px, ${snap(y - box.h, dpr)}px)`
     sprite.toggleAttribute('data-dark', dark)
+    followSpeech()
   }
 
   function wake() {
@@ -138,6 +152,58 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
   function stopIdle() {
     idleRun += 1
     idling = false
+  }
+
+  let speaking: string | undefined
+  let bubbleSize: Box = { w: 0, h: 0 }
+
+  function hideBubble() {
+    window.clearTimeout(bubbleTimer)
+    bubble.hidden = true
+    speaking = undefined
+  }
+
+  /** The ledge he is on (standing or strolling), or undefined while walking between ledges. */
+  function currentLedge() {
+    const a = points[Math.floor(p)]
+    const b = points[Math.ceil(p)]
+    return a?.ledge && a.ledge === b?.ledge ? a.ledge : undefined
+  }
+
+  /** Put the bubble beside him where it covers nothing; false when there is no such spot. */
+  function placeSpeech() {
+    const { x, y } = positionAt(points, p)
+    const spot = placeBubble(x, y, bubbleSize, obstacles, bounds, box)
+    if (!spot) return false
+    bubble.dataset.tail = spot.tail
+    bubble.style.setProperty('--at', `${Math.round(spot.at)}px`)
+    bubble.style.transform = `translate(${snap(spot.x, dpr)}px, ${snap(spot.y, dpr)}px)`
+    return true
+  }
+
+  /** On arriving at a ledge with a line he has not said yet this visit, say it. */
+  function speak() {
+    const ledge = currentLedge()
+    const line = ledge && companionLines[ledge]
+    if (!ledge || !line || said.has(ledge) || speaking || !onScreen()) return
+    bubble.textContent = line
+    bubble.style.visibility = 'hidden'
+    bubble.hidden = false
+    const { width, height } = bubble.getBoundingClientRect()
+    bubbleSize = { w: width, h: height }
+    bubble.style.visibility = ''
+    if (!placeSpeech()) {
+      bubble.hidden = true
+      return
+    }
+    said.add(ledge)
+    speaking = ledge
+    bubbleTimer = window.setTimeout(hideBubble, BUBBLE_MS)
+  }
+
+  /** Keep the bubble with him for its full time, as long as it still has a clear spot. */
+  function followSpeech() {
+    if (speaking && !placeSpeech()) hideBubble()
   }
 
   /** Breathing, a blink every third breath, and one tie-straightening beat after four still seconds. */
@@ -167,6 +233,7 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
   async function sequence(task: () => Promise<void>) {
     busy = true
     stopIdle()
+    hideBubble()
     await task()
     busy = false
     walked = 0
@@ -190,25 +257,15 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
 
   const dock = () =>
     sequence(async () => {
+      isDocked = true
+      dockedThisLoad = true
       if (onScreen()) await play(sprite, frames('teleportOut'), scale)
       sprite.hidden = true
-      isDocked = true
       root.dataset.companion = 'sidebar'
       if (slot) {
         await play(slot, frames('teleportIn'), pixelScale(1, dpr))
         show(slot, ['sidebar', 0], pixelScale(1, dpr))
       }
-    })
-
-  const undock = () =>
-    sequence(async () => {
-      if (slot) await play(slot, frames('teleportOut'), pixelScale(1, dpr))
-      delete root.dataset.companion
-      isDocked = false
-      p = targetAt(points, line())
-      place()
-      sprite.hidden = false
-      await play(sprite, frames('teleportIn'), scale)
     })
 
   function tick(now: number) {
@@ -217,24 +274,26 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
     const dt = lastTime ? Math.min(now - lastTime, 64) : 16
     lastTime = now
 
-    const shouldDock = docked(isDocked, window.scrollY, root.scrollHeight - window.innerHeight)
-    if (shouldDock !== isDocked) {
-      void (shouldDock ? dock() : undock())
+    if (isDocked) return
+    if (docked(false, window.scrollY, root.scrollHeight - window.innerHeight)) {
+      void dock()
       return
     }
-    if (isDocked) return
 
     const to = targetAt(points, line())
     if (Math.abs(to - p) < 1e-6) {
       lastTime = 0
       void idle()
+      speak()
       return
     }
     stopIdle()
 
-    // A long way to go (a fast scroll or a jump link): teleport there instead of a long walk.
+    // A long walk (a fast scroll or a jump link): teleport there instead. When a
+    // teleport already lies on the way, take that one so he arrives on the ledge.
     const gap = Math.abs(positionAt(points, to).y - positionAt(points, p).y)
-    if (gap > 1.5 * window.innerHeight) {
+    const walk = walkingDistance(points, p, to)
+    if (walk !== Infinity && walk > 1.5 * window.innerHeight) {
       void teleportTo(to)
       return
     }
@@ -246,6 +305,7 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
       walked += step.walked
       show(sprite, [walkClip(step.dx, step.dy), walkFrame(walked, 4 * scale)], scale)
       place()
+      speak()
     }
     if (step.blinkTo !== null) {
       const next = step.blinkTo
@@ -262,9 +322,20 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
     scale = pixelScale(2, dpr)
     box = { w: sheet.frameWidth * scale, h: sheet.frameHeight * scale }
     dress(sprite, scale)
-    if (slot) dress(slot, pixelScale(1, dpr))
-    points = buildRoute(measureLedges(), measureObstacles(), window.innerHeight, box)
-    sprite.hidden = isDocked || !points.length
+    if (slot) {
+      dress(slot, pixelScale(1, dpr))
+      if (isDocked) show(slot, ['sidebar', 0], pixelScale(1, dpr))
+    }
+    if (isDocked) {
+      root.dataset.companion = 'sidebar'
+      sprite.hidden = true
+      return
+    }
+    const main = document.querySelector('main')?.getBoundingClientRect()
+    bounds = main ? { x0: main.left + window.scrollX, x1: main.right + window.scrollX } : { x0: 0, x1: window.innerWidth }
+    obstacles = measureObstacles()
+    points = buildRoute(measureLedges(), obstacles, window.innerHeight, box)
+    sprite.hidden = !points.length
     if (!points.length) return
     p = measured ? Math.min(p, points.length - 1) : targetAt(points, line())
     if (!measured) show(sprite, ['idle', 0], scale)
@@ -290,6 +361,7 @@ export function startCompanion(sprite: HTMLElement, slot: HTMLElement | null): (
   return () => {
     stopped = true
     stopIdle()
+    hideBubble()
     cancelAnimationFrame(raf)
     window.clearTimeout(measureTimer)
     timers.forEach((id) => window.clearTimeout(id))

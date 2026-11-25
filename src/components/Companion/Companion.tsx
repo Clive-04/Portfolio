@@ -29,11 +29,12 @@ export function Companion() {
   const reducedMotion = useMedia('(prefers-reduced-motion: reduce)')
   const enabled = companionEnabled({ pixel: design === 'pixel', wide, reducedMotion })
   const ref = useRef<HTMLDivElement>(null)
+  const bubbleRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!enabled || !ref.current) return
+    if (!enabled || !ref.current || !bubbleRef.current) return
     try {
-      return startCompanion(ref.current, document.querySelector<HTMLElement>('[data-companion-slot]'))
+      return startCompanion(ref.current, bubbleRef.current, document.querySelector<HTMLElement>('[data-companion-slot]'))
     } catch {
       // Any failure leaves the page and the "CB" mark exactly as they were.
       delete document.documentElement.dataset.companion
@@ -41,5 +42,11 @@ export function Companion() {
     }
   }, [enabled])
 
-  return enabled ? <div ref={ref} className={styles.sprite} aria-hidden="true" hidden /> : null
+  if (!enabled) return null
+  return (
+    <>
+      <div ref={ref} className={styles.sprite} aria-hidden="true" hidden />
+      <div ref={bubbleRef} className={styles.bubble} aria-hidden="true" hidden />
+    </>
+  )
 }

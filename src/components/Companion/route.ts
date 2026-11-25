@@ -25,6 +25,8 @@ export interface Ledge {
   x1: number
   /** The sprite would stand over a dark panel, so it needs its light rim even in Day. */
   dark?: boolean
+  /** The ledge's name (its `data-companion-ledge` value), used to pick what the companion says there. */
+  id?: string
 }
 
 export interface RoutePoint {
@@ -35,6 +37,7 @@ export interface RoutePoint {
   /** Reached by a short teleport from the previous point instead of walking. */
   blink: boolean
   dark: boolean
+  ledge?: string
 }
 
 /** Boxes that only touch, or meet within half a pixel of rounding, do not overlap. */
@@ -94,25 +97,25 @@ export function buildRoute(
     const prev = points.at(-1)
     if (prev && ledge.y - prev.y < box.h) continue // too close to the last ledge to read as a step
 
-    const dark = Boolean(ledge.dark)
+    const shared = { dark: Boolean(ledge.dark), ledge: ledge.id }
     const [left, right] = run
     const enter = !prev || Math.abs(prev.x - right) <= Math.abs(prev.x - left) ? right : left
     const leave = enter === right ? left : right
 
     if (!prev) {
-      points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, dark })
+      points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, ...shared })
     } else if (
       isClear(sweep(prev.x, prev.y, prev.x, ledge.y, box), obstacles) &&
       isClear(sweep(prev.x, ledge.y, enter, ledge.y, box), obstacles)
     ) {
-      if (prev.x !== enter) points.push({ x: prev.x, y: ledge.y, key: ledge.y, blink: false, dark })
-      points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, dark })
+      if (prev.x !== enter) points.push({ x: prev.x, y: ledge.y, key: ledge.y, blink: false, ...shared })
+      points.push({ x: enter, y: ledge.y, key: ledge.y, blink: false, ...shared })
     } else {
       // Stay on the last ledge as it scrolls away; arrive once the next one is well into view.
       const key = Math.max(prev.key, ledge.y - 0.15 * viewportHeight)
-      points.push({ x: enter, y: ledge.y, key, blink: true, dark })
+      points.push({ x: enter, y: ledge.y, key, blink: true, ...shared })
     }
-    if (leave !== enter) points.push({ x: leave, y: ledge.y, key: points.at(-1)!.key, blink: false, dark })
+    if (leave !== enter) points.push({ x: leave, y: ledge.y, key: points.at(-1)!.key, blink: false, ...shared })
   }
   return points
 }
@@ -219,13 +222,47 @@ export const walkFrame = (distance: number, pxPerFrame = 8) => Math.floor(distan
 
 /**
  * Whether the companion belongs in the sidebar slot. It docks at the very
- * bottom and leaves only after the visitor scrolls clearly back up, so it
- * does not flicker at the edge.
+ * bottom of the page and then stays there until the page is reloaded.
  */
-export function docked(wasDocked: boolean, scrollY: number, maxScroll: number, leaveBy = 96): boolean {
-  if (maxScroll <= 0) return false
-  if (!wasDocked) return scrollY >= maxScroll - 2
-  return scrollY > maxScroll - leaveBy
+export function docked(wasDocked: boolean, scrollY: number, maxScroll: number): boolean {
+  if (wasDocked) return true
+  return maxScroll > 0 && scrollY >= maxScroll - 2
+}
+
+export interface Bubble {
+  x: number
+  y: number
+  /** Which side of the bubble its tail is on, pointing at the companion. */
+  tail: 'down' | 'right'
+  /** Tail position along that side, in px from the bubble's left (down) or top (right). */
+  at: number
+}
+
+const GAP = 10 // room for the tail between the bubble and the sprite
+
+/**
+ * Where a speech bubble of `size` can go for a companion standing at
+ * (x, y): above his head (preferred), else to his left. Null when neither
+ * spot is clear of the obstacles and inside the bounds, so it never covers
+ * page content.
+ */
+export function placeBubble(
+  x: number,
+  y: number,
+  size: Box,
+  obstacles: readonly Rect[],
+  bounds: { x0: number; x1: number },
+  box = SPRITE_BOX,
+): Bubble | null {
+  const fits = (b: Rect) => b.x >= bounds.x0 && b.x + b.w <= bounds.x1 && b.y >= 0 && isClear(b, obstacles)
+
+  const aboveX = Math.max(bounds.x0, Math.min(x + box.w - size.w, bounds.x1 - size.w))
+  const above = { x: aboveX, y: y - box.h - GAP - size.h, w: size.w, h: size.h }
+  if (fits(above)) return { x: above.x, y: above.y, tail: 'down', at: x + box.w / 2 - above.x }
+
+  const left = { x: x - GAP - size.w, y: y - box.h, w: size.w, h: size.h }
+  if (fits(left)) return { x: left.x, y: left.y, tail: 'right', at: Math.min(size.h / 2, box.h / 3) }
+  return null
 }
 
 /**
