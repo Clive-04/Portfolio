@@ -31,6 +31,7 @@ Every file in this repository that was not written or drawn for this site is lis
 |---|---|---|---|
 | Line icons in `src/components/Icon/Icon.tsx` | Drawn for this site | Part of this repository | 2026-11-22 |
 | 16 × 16 pixel icons in `src/components/PixelIcon/bitmaps.ts` | Drawn for this site | Part of this repository | 2026-11-25 |
+| `public/favicon.svg` (pixel "CB" tile) | Drawn for this site as a 16 × 16 grid | Part of this repository | 2026-11-25 |
 | GitHub and LinkedIn marks in `src/components/Icon/Icon.tsx` | The companies' published brand marks, used only to link to Clive's profiles | Trademarks of their owners | 2026-11-22 |
 
 ## Sound
