@@ -23,7 +23,7 @@ Every file in this repository that was not written or drawn for this site is lis
 |---|---|---|---|
 | `public/profile.jpg` | Clive's own formal photo | Owned by Clive; all rights reserved | 2026-11-22 |
 | `public/projects/*` | Screenshots of Clive's own projects | Owned by Clive; all rights reserved | 2026-11-22 onward |
-| `public/og-image.jpg` | Render of this site | Owned by Clive; all rights reserved | 2026-11-22 |
+| `public/og-image.jpg` | Render of this site's pixel design (redrawn 2026-11-25) with Clive's own photo | Owned by Clive; all rights reserved | 2026-11-22 |
 
 ## Icons and interface art
 
