@@ -3,6 +3,7 @@ import sheetUrl from './companion-sprites.png'
 import sheet from './companion-sprites.json'
 import { planPlacements } from './measure'
 import {
+  BRIEF_WALK,
   advance,
   docked,
   pickStops,
@@ -164,6 +165,27 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     window.clearTimeout(bubbleTimer)
     bubble.hidden = true
     speaking = undefined
+    wake() // he may have been waiting to finish a line before docking
+  }
+
+  /**
+   * At the bottom of the page he docks only after finishing at the last
+   * section: the short walk, the stop, and his line (or a few seconds there
+   * if the line has nowhere clear to go).
+   */
+  let atLastSince = 0
+  function finishedLastStop() {
+    const last = points.length - 1
+    if (p !== last) {
+      atLastSince = 0
+      return false
+    }
+    atLastSince ||= performance.now()
+    const section = points[last].ledge
+    const lineDone = !section || !companionLines[section] || (said.has(section) && speaking !== section)
+    if (lineDone || performance.now() - atLastSince > 4500) return true
+    window.setTimeout(wake, 500)
+    return false
   }
 
   function speakFor(ms: number) {
@@ -281,10 +303,13 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     wake()
   }
 
-  /** Fully on screen and below the top tenth, so nothing starts as he is about to scroll away. */
+  /** Whether he is fully in view, so a line or an action is never started where it cannot be seen. */
   function inClearView() {
     const { y } = positionAt(points, p)
-    return !sprite.hidden && y - box.h >= window.scrollY + 0.1 * window.innerHeight && y <= window.scrollY + window.innerHeight
+    // Fully on screen, and below the top bar on narrow screens (on desktop the header is the side bar).
+    const header = document.querySelector('header')?.getBoundingClientRect()
+    const top = header && header.width >= window.innerWidth * 0.9 ? header.bottom : 0
+    return !sprite.hidden && y - box.h >= window.scrollY + top + 4 && y <= window.scrollY + window.innerHeight
   }
 
   /** Departures are only played when the visitor can see them. */
@@ -320,6 +345,12 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   }
 
   /** The anchor (a whole route point) to settle on near a fractional target: the nearer one, unless only the other is in view. */
+  /** The first point of the stop that point i belongs to: arrivals begin there and take the short walk. */
+  function stopStart(i: number) {
+    while (i > 0 && !points[i].blink && points[i - 1].ledge === points[i].ledge) i -= 1
+    return i
+  }
+
   function restingPoint(to: number) {
     const inView = (i: number) => {
       const { y } = positionAt(points, i)
@@ -339,17 +370,17 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     lastTime = now
 
     if (isDocked) return
-    if (docked(false, window.scrollY, root.scrollHeight - window.innerHeight)) {
+    if (docked(false, window.scrollY, root.scrollHeight - window.innerHeight) && finishedLastStop()) {
       void dock()
       return
     }
-    speak() // the moment he lands on an anchor, before taking another step
-
     let to = targetAt(points, line())
     // Scrolling has paused: never rest between anchors; finish the walk to the nearest one in view.
     if (performance.now() - lastScroll >= SETTLE_MS && !Number.isInteger(to)) to = restingPoint(to)
     if (Math.abs(to - p) < 1e-6) {
+      // He has stopped: now he talks (the section action waits for scrolling to pause).
       lastTime = 0
+      speak()
       void idle()
       return
     }
@@ -360,19 +391,19 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     const walk = walkingDistance(points, p, to)
     const gap = Math.abs(positionAt(points, to).y - positionAt(points, p).y)
     if (gap > 1.5 * window.innerHeight || (walk !== Infinity && walk > 1.5 * window.innerHeight)) {
-      void teleportTo(to > p ? Math.floor(to) : Math.ceil(to))
+      void teleportTo(stopStart(to > p ? Math.floor(to) : Math.ceil(to)))
       return
     }
 
-    // Brisker the further behind he is, so he keeps up; frames follow distance, so the feet still match.
-    const speed = Math.min(420, 90 + Math.min(walk, 600) * 2) // CSS px per second
+    // The short walk on a card is an unhurried stroll; anything longer is brisker so he keeps up.
+    // Frames follow distance, so the feet match either way.
+    const speed = walk <= BRIEF_WALK ? 70 : Math.min(420, 90 + Math.min(walk, 600) * 2) // CSS px per second
     const step = advance(points, p, to, (speed * dt) / 1000)
     p = step.p
     if (step.walked > 0) {
       walked += step.walked
       show(sprite, [walkClip(step.dx, step.dy), walkFrame(walked, 4 * scale)], scale)
       place()
-      speak()
     }
     if (step.blinkTo !== null) {
       void teleportTo(step.blinkTo)
@@ -407,7 +438,8 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     // Too few safe places for a coherent route (very small screens): stay out of the way.
     sprite.hidden = points.length < 2 || paused
     if (points.length < 2) return hideBubble()
-    p = measured ? Math.min(p, points.length - 1) : targetAt(points, line())
+    // On load he starts at the beginning of his stop, so he takes his short walk before talking.
+    p = measured ? Math.min(p, points.length - 1) : stopStart(Math.floor(targetAt(points, line())))
     if (!measured) show(sprite, ['idle', 0], scale)
     measured = true
     place()

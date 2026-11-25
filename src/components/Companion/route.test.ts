@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
+  BRIEF_WALK,
   SPRITE_BOX,
   advance,
   clearRun,
@@ -13,7 +14,6 @@ import {
   type Anchor,
   pixelScale,
   placeBubble,
-  positionAt,
   targetAt,
   walkClip,
   walkFrame,
@@ -81,25 +81,29 @@ describe('pickStops', () => {
 describe('tour', () => {
   const route = tour([stop('about', 1000), stop('projects', 2000), stop('skills', 3000)], VH)
 
-  it('walks the length of each card top and teleports between sections', () => {
+  it('walks briefly on each card top, alternating direction, and teleports between sections', () => {
     assert.deepEqual(route.map((p) => [p.ledge, p.x, p.blink]), [
-      ['about', 600, false], ['about', 300, false],
-      ['projects', 300, true], ['projects', 600, false],
-      ['skills', 600, true], ['skills', 300, false],
+      ['about', 600, false], ['about', 600 - BRIEF_WALK, false],
+      ['projects', 300, true], ['projects', 300 + BRIEF_WALK, false],
+      ['skills', 600, true], ['skills', 600 - BRIEF_WALK, false],
     ])
     assert.ok(route.every((p) => p.y === { about: 1000, projects: 2000, skills: 3000 }[p.ledge!]), 'feet stay on each card top')
   })
 
-  it('arrives on the next card once it is well into view, after finishing the walk', () => {
-    const arrival = route[2]
-    assert.equal(arrival.key, 2000 - 0.15 * VH)
-    assert.ok(route[1].key <= arrival.key - 40)
+  it('takes the short walk as soon as he arrives (it does not wait for scrolling)', () => {
+    assert.equal(route[1].key, route[0].key)
+    assert.equal(route[3].key, route[2].key)
+  })
+
+  it('arrives on the next card once it is well into view', () => {
+    assert.equal(route[2].key, 2000 - 0.15 * VH)
     route.forEach((p, i) => assert.ok(i === 0 || p.key >= route[i - 1].key))
   })
 
-  it('stands still on a stop with no room to walk', () => {
-    const r = tour([stop('contact', 6000, 900, 900)], VH)
-    assert.equal(r.length, 1)
+  it('walks no further than the card allows, and stands still when there is no room', () => {
+    const r = tour([stop('certifications', 5000, 560, 600)], VH)
+    assert.deepEqual(r.map((p) => p.x), [600, 560])
+    assert.equal(tour([stop('contact', 6000, 900, 900)], VH).length, 1)
   })
 })
 
@@ -107,21 +111,20 @@ describe('following the scroll', () => {
   const route = tour([stop('about', 1000), stop('projects', 2000)], VH)
   const last = route.length - 1
 
-  it('starts on the first card and ends on the last', () => {
-    assert.equal(targetAt(route, 0), 0)
+  it('starts on the first card, walks to his stopping spot there, and ends on the last', () => {
+    assert.equal(targetAt(route, 0), 1, 'on load he takes his short walk straight away')
+    assert.equal(targetAt(route, 1000), 1)
+    assert.equal(targetAt(route, 1500), 1, 'then he stays put while the reader scrolls the section')
     assert.equal(targetAt(route, 99999), last)
   })
 
-  it('walks along the card as the page scrolls, never backwards while scrolling down', () => {
+  it('never moves backwards while the page scrolls down', () => {
     let previous = -1
     for (let line = 0; line <= 3000; line += 25) {
       const t = targetAt(route, line)
       assert.ok(t >= previous)
       previous = t
     }
-    const mid = targetAt(route, 1150)
-    assert.ok(mid > 0 && mid < 1, 'part-way along the first card')
-    assert.equal(positionAt(route, mid).y, 1000)
   })
 
   it('walks no further than its budget and reports the distance', () => {
@@ -184,6 +187,20 @@ describe('placeBubble', () => {
     const b = placeBubble(1000, 500, size, [{ x: 900, y: 380, w: 300, h: 40 }], bounds)!
     assert.equal(b.tail, 'right')
     assert.ok(b.x + size.w <= 1000)
+  })
+
+  it('extends the bubble to the right when text sits above-left of him (near the column edge)', () => {
+    const heading: Rect = { x: 0, y: 380, w: 1000, h: 40 }
+    const b = placeBubble(300, 500, size, [{ x: 0, y: 390, w: 290, h: 40 }], bounds)!
+    assert.equal(b.tail, 'down')
+    assert.ok(b.x >= 300 - 1)
+    assert.ok(placeBubble(300, 500, size, [heading], bounds)?.tail !== 'down', 'a full-width heading above moves it beside him')
+  })
+
+  it('goes to his right, tail pointing left, when above and left are taken', () => {
+    const b = placeBubble(300, 500, size, [{ x: 0, y: 380, w: 1280, h: 40 }, { x: 0, y: 420, w: 300, h: 90 }], bounds)!
+    assert.equal(b.tail, 'left')
+    assert.ok(b.x >= 300 + SPRITE_BOX.w)
   })
 
   it('stays inside the page and says nothing when there is no clear spot', () => {

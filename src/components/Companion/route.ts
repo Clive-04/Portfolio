@@ -186,26 +186,28 @@ export function pickStops(resolved: readonly { anchor: Anchor; placement: Placem
   return stops.sort((a, b) => a.y - b.y)
 }
 
+/** How far he walks on each card after arriving: a step or two, then he stops. */
+export const BRIEF_WALK = 64
+
 /**
- * His tour: on each stop he walks the clear length of the card top as the
- * reader scrolls through that section (alternating direction from section
- * to section), then teleports onto the next section's stop once it is well
- * into view. The first stop is where he appears on load.
+ * His tour: he appears on each section's stop (the first one on load, the
+ * rest by teleport once that section is well into view), walks briefly
+ * along the card top (alternating direction from section to section), and
+ * stops there until the reader scrolls to the next section.
  */
 export function tour(stops: readonly Placement[], viewportHeight: number): RoutePoint[] {
   const points: RoutePoint[] = []
-  const arrive = stops.map((s, i) => (i === 0 ? s.y : s.y - 0.15 * viewportHeight))
   stops.forEach((stop, i) => {
     const shared = { y: stop.y, dark: stop.dark, ledge: stop.id, mode: stop.mode, acts: stop.acts }
     const [left, right] = stop.run
-    const [from, to] = i % 2 ? [left, right] : [right, left]
-    const key = Math.max(points.at(-1)?.key ?? -Infinity, arrive[i])
+    const leftward = i % 2 === 0
+    const from = leftward ? right : left
+    const to = leftward ? Math.max(left, from - BRIEF_WALK) : Math.min(right, from + BRIEF_WALK)
+    // The first stop is where he appears on load (his short walk plays straight away); later ones arrive by teleport.
+    const key = Math.max(points.at(-1)?.key ?? -Infinity, i === 0 ? 0 : stop.y - 0.15 * viewportHeight)
     points.push({ x: from, key, blink: i > 0, ...shared })
-    if (to !== from) {
-      // Walk the card as the reader scrolls, finishing a little before the next section's arrival.
-      const room = i + 1 < stops.length ? arrive[i + 1] - key - 40 : Infinity
-      points.push({ x: to, key: key + Math.max(0, Math.min(Math.abs(to - from), room)), blink: false, ...shared })
-    }
+    // Same key: the short walk plays out in time as soon as he arrives, not with the scroll.
+    if (to !== from) points.push({ x: to, key, blink: false, ...shared })
   })
   return points
 }
@@ -323,8 +325,8 @@ export interface Bubble {
   x: number
   y: number
   /** Which side of the bubble its tail is on, pointing at the companion. */
-  tail: 'down' | 'right'
-  /** Tail position along that side, in px from the bubble's left (down) or top (right). */
+  tail: 'down' | 'right' | 'left'
+  /** Tail position along that side, in px from the bubble's left (down) or top (right, left). */
   at: number
 }
 
@@ -332,9 +334,9 @@ const GAP = 10 // room for the tail between the bubble and the sprite
 
 /**
  * Where a speech bubble of `size` can go for a companion standing at
- * (x, y): above his head (preferred), else to his left. Null when neither
- * spot is clear of the obstacles and inside the bounds, so it never covers
- * page content.
+ * (x, y), best first: above his head extending left, above extending right,
+ * beside him on the left, beside him on the right. Null when none is clear
+ * of the obstacles and inside the bounds, so it never covers page content.
  */
 export function placeBubble(
   x: number,
@@ -345,13 +347,20 @@ export function placeBubble(
   box = SPRITE_BOX,
 ): Bubble | null {
   const fits = (b: Rect) => b.x >= bounds.x0 && b.x + b.w <= bounds.x1 && b.y >= 0 && isClear(b, obstacles)
-
-  const aboveX = Math.max(bounds.x0, Math.min(x + box.w - size.w, bounds.x1 - size.w))
-  const above = { x: aboveX, y: y - box.h - GAP - size.h, w: size.w, h: size.h }
-  if (fits(above)) return { x: above.x, y: above.y, tail: 'down', at: x + box.w / 2 - above.x }
-
-  const left = { x: x - GAP - size.w, y: y - box.h, w: size.w, h: size.h }
-  if (fits(left)) return { x: left.x, y: left.y, tail: 'right', at: Math.min(size.h / 2, box.h / 3) }
+  const clamp = (bx: number) => Math.max(bounds.x0, Math.min(bx, bounds.x1 - size.w))
+  const aboveY = y - box.h - GAP - size.h
+  const sideY = y - box.h
+  const sideAt = Math.min(size.h / 2, box.h / 3)
+  const candidates: Bubble[] = [
+    { x: clamp(x + box.w - size.w), y: aboveY, tail: 'down', at: 0 },
+    { x: clamp(x), y: aboveY, tail: 'down', at: 0 },
+    { x: x - GAP - size.w, y: sideY, tail: 'right', at: sideAt },
+    { x: x + box.w + GAP, y: sideY, tail: 'left', at: sideAt },
+  ]
+  for (const c of candidates) {
+    if (!fits({ x: c.x, y: c.y, w: size.w, h: size.h })) continue
+    return c.tail === 'down' ? { ...c, at: x + box.w / 2 - c.x } : c
+  }
   return null
 }
 

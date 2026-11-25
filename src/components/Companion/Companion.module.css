@@ -83,6 +83,12 @@
   rotate: -90deg;
 }
 
+.bubble[data-tail="left"]::after {
+  right: 100%;
+  top: calc(var(--at) - 5px);
+  rotate: 90deg;
+}
+
 @keyframes bubble-in {
   from {
     opacity: 0;
