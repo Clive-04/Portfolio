@@ -207,3 +207,94 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
 }
+
+/* ==========================================================================
+   Pixel design: Adventurer card. Keyline tiles, one cobalt "looking for"
+   tile, and the counts live in the hero strip, so the stats tile is hidden
+   here instead of repeating them.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .stats {
+  display: none;
+}
+
+@media (min-width: 40rem) {
+  :global(html[data-design="pixel"]) .grid {
+    grid-template-areas:
+      "bio bio"
+      "look clock"
+      "focus focus";
+  }
+}
+
+@media (min-width: 64rem) {
+  :global(html[data-design="pixel"]) .grid {
+    grid-template-areas:
+      "bio bio bio look"
+      "bio bio bio clock"
+      "bio bio bio focus";
+  }
+}
+
+:global(html[data-design="pixel"]) .tile {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .tile:hover {
+    transform: none;
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+:global(html[data-design="pixel"]) .bio {
+  box-shadow: var(--shadow-md);
+}
+
+:global(html[data-design="pixel"]) .label {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+}
+
+:global(html[data-design="pixel"]) .big,
+:global(html[data-design="pixel"]) .lookText {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
+
+/* Looking for: the one filled tile, cobalt with white text (6.82:1) / bright blue with navy (7.13:1). */
+:global(html[data-design="pixel"]) .look {
+  border-color: var(--color-border-strong);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+:global(html[data-design="pixel"]) .look .label {
+  color: var(--color-on-accent);
+}
+
+:global(html[data-design="pixel"]) .dot {
+  border-radius: 0;
+  background: var(--pixel-yellow);
+  box-shadow: 0 0 0 1px var(--color-border-strong);
+}
+
+/* Clock: a cobalt dot "map" in the corner instead of teal. */
+:global(html[data-design="pixel"]) .clock {
+  background-image: radial-gradient(color-mix(in srgb, var(--pixel-cobalt) 30%, transparent) 1px, transparent 1.5px);
+  background-size: 12px 12px;
+}
+
+:global(html[data-design="pixel"]) .time {
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .focusList li {
+  border: var(--pixel-line) solid var(--color-tag-border);
+  border-radius: 0;
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+}
