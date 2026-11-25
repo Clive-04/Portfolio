@@ -53,6 +53,8 @@
 
   /* Shadows go darker and lean on a faint teal glow instead of grey. */
   --glow-accent: rgb(46 196 176 / 0.35);
+  /* Cursor spotlight on cards (global.css). */
+  --spotlight: rgb(46 196 176 / 0.1);
 
   /* Decorative gradients (never behind body text without a contrast check). */
   --gradient-hero: radial-gradient(56rem 30rem at 92% -18%, rgb(46 196 176 / 0.16), transparent 62%),

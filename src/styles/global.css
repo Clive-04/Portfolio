@@ -1,4 +1,5 @@
 @import "./tokens.css";
+@import "./pixel-tokens.css";
 
 *,
 *::before,
@@ -176,7 +177,7 @@ ul[role="list"] {
   [data-spotlight]:hover {
     background-image: radial-gradient(
       22rem circle at var(--mx, 50%) var(--my, 50%),
-      rgb(46 196 176 / 0.1),
+      var(--spotlight),
       transparent 60%
     );
   }

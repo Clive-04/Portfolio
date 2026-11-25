@@ -1,0 +1,184 @@
+/*
+ * Pixel design tokens (8-bit redesign, docs/design/pixel-theme-style-guide.md).
+ *
+ * The pixel design re-points the same semantic tokens Classic uses
+ * (--color-bg, --color-accent, …), so every shared component follows it
+ * without a second component tree. Day (light) and Night (dark) change
+ * colors only; layout, content, and art are identical.
+ *
+ * No green anywhere. Cobalt is the primary, vermilion the strongest accent,
+ * then sunny yellow, cyan, and limited violet.
+ *
+ * Contrast (WCAG 2.x, measured 2026-11-25): every text pair below is AA or
+ * better; control outlines are at least 3:1. Decorative colors (sky, cyan
+ * in Day) are not approved for text.
+ */
+
+/* ---------- Shared by Day and Night ---------- */
+
+:root[data-design="pixel"] {
+  --font-display: "Pixelify Sans Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  /* Squared chips and controls; stepped corners come from --pixel-step. */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-full: 0;
+
+  /* Pixel fonts read best with neutral tracking. */
+  --tracking-display: 0;
+  --tracking-heading: 0;
+  --tracking-label: 0.04em;
+
+  /* Keylines: mostly 2px, heavier frames only for small feature moments. */
+  --pixel-line: 2px;
+  --pixel-frame: 3px;
+  /* Stepped (notched) corners: clip each corner by one 4px "pixel". */
+  --pixel-step: polygon(
+    0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+  );
+
+  --sidebar-width: 15rem;
+
+  /* Flat textures and gradients: the pixel look avoids soft noise. */
+  --texture-grain: none;
+  --texture-grain-light: none;
+  --spotlight: rgb(36 90 165 / 0.08);
+}
+
+/* ---------- Day (light) ---------- */
+
+:root[data-design="pixel"][data-color-theme="day"] {
+  color-scheme: light;
+
+  --color-bg: #fff6d8; /* warm sunny base */
+  --color-surface: #fffdf3; /* cards and sidebar */
+  --color-surface-muted: #fbefcb; /* insets; text 11.45:1, muted 5.75:1 */
+  --color-band: #fff1c9;
+  --color-border: #e6d6a6; /* decorative hairlines */
+  --color-border-strong: #17324d; /* pixel keylines are navy */
+  --color-border-control: #6a7889; /* 4.17:1 on bg, 4.42:1 on surface */
+  --color-text: #17324d; /* 12.14:1 on bg, 12.87:1 on surface */
+  --color-text-muted: #4d5f70; /* 6.10:1 on bg */
+  --color-accent: #245aa5; /* cobalt: 6.31:1 on bg */
+  --color-accent-hover: #1c4886; /* darker on hover in a light theme: 8.37:1 */
+  --color-accent-soft: #dce8f8; /* use accent-hover for text on it: 7.30:1 */
+  --color-mist: #4ea5e8; /* sky blue, decorative only */
+  --color-slate: #4d5f70;
+  --color-on-accent: #ffffff; /* 6.82:1 on cobalt */
+  --color-focus: #245aa5;
+  --color-selected: #ffd3b6; /* active navigation; text 9.53:1 */
+
+  --color-ink: #17324d; /* navy panel for contact and footer */
+  --color-ink-raised: #1f4064;
+  --color-on-ink: #fff6d8; /* 12.14:1 */
+  --color-on-ink-muted: #c9d6e6; /* 8.90:1 */
+  --color-on-ink-accent: #f3c847; /* 8.23:1 */
+
+  --color-tag-bg: #fffdf3;
+  --color-tag-border: #6a7889;
+  --color-tag-text: #17324d; /* 12.87:1 */
+
+  /* Status chips: blue and amber instead of green. */
+  --color-status-done-bg: #dce8f8;
+  --color-status-done-text: #1c4886; /* 7.30:1 */
+  --color-status-progress-bg: #fce8a6;
+  --color-status-progress-text: #7a4a00; /* 6.14:1 */
+  --color-status-pending-bg: #efe6cc;
+  --color-status-pending-text: #4d5f70; /* 5.29:1 */
+
+  /* Named palette for pixel details. */
+  --pixel-cobalt: #245aa5;
+  --pixel-sky: #4ea5e8; /* decorative */
+  --pixel-cyan: #25b7d3; /* decorative, or behind navy text */
+  --pixel-vermilion: #b73d33; /* 5.21:1 on bg */
+  --pixel-yellow: #f3c847;
+  --pixel-violet: #6248a8; /* 6.45:1 on bg */
+  --pixel-on-yellow: #17324d; /* 8.23:1 */
+  --pixel-shadow: #17324d;
+
+  --glow-accent: rgb(36 90 165 / 0.25);
+  --shadow-sm: 2px 2px 0 var(--pixel-shadow);
+  --shadow-md: 4px 4px 0 var(--pixel-shadow);
+  --shadow-lg: 6px 6px 0 var(--pixel-shadow);
+
+  --gradient-hero: linear-gradient(var(--color-bg), var(--color-bg));
+  --gradient-band: linear-gradient(var(--color-band), var(--color-band));
+  --gradient-name: linear-gradient(var(--color-text), var(--color-text));
+  --gradient-rule: linear-gradient(90deg, var(--pixel-cobalt) 70%, var(--pixel-vermilion) 70%);
+  --gradient-ink: linear-gradient(var(--color-ink), var(--color-ink));
+  --gradient-accent: linear-gradient(var(--color-accent), var(--color-accent));
+}
+
+/* ---------- Night (dark) ---------- */
+
+:root[data-design="pixel"][data-color-theme="night"] {
+  color-scheme: dark;
+
+  --color-bg: #101a33; /* deep navy base */
+  --color-surface: #182746; /* raised blue */
+  --color-surface-muted: #1f3155; /* text 11.93:1, muted 7.44:1 */
+  --color-band: #13203d;
+  --color-border: #2a3d63;
+  --color-border-strong: #7f93b8;
+  --color-border-control: #7f93b8; /* 5.56:1 on bg, 4.77:1 on surface */
+  --color-text: #fff6d8; /* 15.95:1 on bg, 13.70:1 on surface */
+  --color-text-muted: #b4c6e2; /* 9.95:1 on bg */
+  --color-accent: #72a7ff; /* bright blue: 7.13:1 on bg */
+  --color-accent-hover: #9cc2ff; /* lighter on hover in a dark theme: 9.51:1 */
+  --color-accent-soft: #1e3563; /* accent text on it 4.98:1, hover 6.63:1 */
+  --color-mist: #51d2f0;
+  --color-slate: #b4c6e2;
+  --color-on-accent: #101a33; /* 7.13:1 on bright blue */
+  --color-focus: #72a7ff;
+  --color-selected: #2a3f6e; /* active navigation; text 9.55:1 */
+
+  --color-ink: #0a1226;
+  --color-ink-raised: #142140;
+  --color-on-ink: #fff6d8; /* 17.23:1 */
+  --color-on-ink-muted: #b4c6e2; /* 10.75:1 */
+  --color-on-ink-accent: #ffd45a; /* 13.14:1 */
+
+  --color-tag-bg: #1f3155;
+  --color-tag-border: #7f93b8;
+  --color-tag-text: #e3ecf8; /* 10.82:1 */
+
+  --color-status-done-bg: #1e3563;
+  --color-status-done-text: #9cc2ff; /* 6.63:1 */
+  --color-status-progress-bg: #3a2e10;
+  --color-status-progress-text: #ffd45a; /* 9.39:1 */
+  --color-status-pending-bg: #22304f;
+  --color-status-pending-text: #b4c6e2; /* 7.56:1 */
+
+  --pixel-cobalt: #72a7ff;
+  --pixel-sky: #72a7ff;
+  --pixel-cyan: #51d2f0; /* 9.71:1 on bg */
+  --pixel-vermilion: #ff7965; /* coral: 6.71:1 on bg */
+  --pixel-yellow: #ffd45a; /* 12.17:1 on bg */
+  --pixel-violet: #b69af5; /* 7.33:1 on bg */
+  --pixel-on-yellow: #101a33;
+  --pixel-shadow: #050a18;
+
+  --glow-accent: rgb(114 167 255 / 0.3);
+  --shadow-sm: 2px 2px 0 var(--pixel-shadow);
+  --shadow-md: 4px 4px 0 var(--pixel-shadow);
+  --shadow-lg: 6px 6px 0 var(--pixel-shadow);
+
+  --gradient-hero: linear-gradient(var(--color-bg), var(--color-bg));
+  --gradient-band: linear-gradient(var(--color-band), var(--color-band));
+  --gradient-name: linear-gradient(var(--color-text), var(--color-text));
+  --gradient-rule: linear-gradient(90deg, var(--pixel-cobalt) 70%, var(--pixel-vermilion) 70%);
+  --gradient-ink: linear-gradient(var(--color-ink), var(--color-ink));
+  --gradient-accent: linear-gradient(var(--color-accent), var(--color-accent));
+}
+
+/* ---------- Base type ---------- */
+
+/* Pixelify Sans for short headings only; paragraphs stay in Plus Jakarta Sans. */
+:root[data-design="pixel"] :is(h1, h2) {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
