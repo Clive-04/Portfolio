@@ -15,6 +15,7 @@ Every file in this repository that was not written or drawn for this site is lis
 | Asset | Used for | Source | Licence | Added |
 |---|---|---|---|---|
 | Plus Jakarta Sans (variable) | Body text, details, longer reading | [Fontsource `@fontsource-variable/plus-jakarta-sans`](https://fontsource.org/fonts/plus-jakarta-sans); upstream [tokotype/PlusJakartaSans](https://github.com/tokotype/PlusJakartaSans) | OFL 1.1 | 2026-11-22 |
+| Pixelify Sans (variable) | Pixel design: headings, navigation, section numbers, short UI labels | [Fontsource `@fontsource-variable/pixelify-sans` 5.3.0](https://fontsource.org/fonts/pixelify-sans); upstream [eifetx/Pixelify-Sans](https://github.com/eifetx/Pixelify-Sans), © 2021 The Pixelify Sans Project Authors | OFL 1.1 | 2026-11-25 |
 
 ## Images
 
