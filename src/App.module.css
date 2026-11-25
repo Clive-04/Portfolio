@@ -557,3 +557,34 @@
     border-top: var(--pixel-line) solid var(--color-border);
   }
 }
+
+/* ==========================================================================
+   Pixel design: Emblem case summary, Save file, and contact details
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .subheading {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+}
+
+:global(html[data-design="pixel"]) .certSummary {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+:global(html[data-design="pixel"]) .certStats dt {
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .certStats dd {
+  background: none;
+  color: var(--pixel-cobalt);
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .certStats div:first-child dd {
+  color: var(--pixel-vermilion);
+}

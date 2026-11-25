@@ -308,3 +308,126 @@
   background: var(--color-accent-soft);
   color: var(--color-accent-hover);
 }
+
+/* ==========================================================================
+   Pixel design: Emblem case. Issuer seals become stepped pixel emblems:
+   vermilion for exam-based certifications (large), cobalt for course badges
+   (small), each with a yellow square "verified" tick.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .card,
+:global(html[data-design="pixel"]) .badge {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .card {
+  box-shadow: var(--shadow-md);
+}
+
+/* The "foil strip" becomes a stepped cobalt / vermilion bar. */
+:global(html[data-design="pixel"]) .card::before {
+  height: 4px;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .card:hover,
+  :global(html[data-design="pixel"]) .badge:hover {
+    transform: none;
+    translate: -1px -1px;
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-lg);
+  }
+
+  :global(html[data-design="pixel"]) .card:hover .seal,
+  :global(html[data-design="pixel"]) .badge:hover .seal {
+    transform: none;
+  }
+
+  :global(html[data-design="pixel"]) .card:hover .watermark {
+    transform: rotate(-8deg);
+  }
+}
+
+/* ---------- Pixel emblem ---------- */
+
+:global(html[data-design="pixel"]) .seal {
+  --emblem: polygon(30% 0, 70% 0, 70% 10%, 90% 10%, 90% 30%, 100% 30%, 100% 70%, 90% 70%, 90% 90%, 70% 90%, 70% 100%, 30% 100%, 30% 90%, 10% 90%, 10% 70%, 0 70%, 0 30%, 10% 30%, 10% 10%, 30% 10%);
+  isolation: isolate;
+  padding: 4px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* The ring is a clipped layer behind the face, so the tick on the edge is not clipped. */
+:global(html[data-design="pixel"]) .seal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pixel-vermilion);
+  clip-path: var(--emblem);
+}
+
+:global(html[data-design="pixel"]) .badge .seal {
+  padding: 3px;
+}
+
+:global(html[data-design="pixel"]) .badge .seal::before {
+  background: var(--pixel-cobalt);
+}
+
+:global(html[data-design="pixel"]) .sealInner {
+  border-radius: 0;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  clip-path: var(--emblem);
+}
+
+:global(html[data-design="pixel"]) .sealTick {
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--pixel-yellow);
+  color: var(--pixel-on-yellow);
+}
+
+/* ---------- Text and links ---------- */
+
+:global(html[data-design="pixel"]) .kind {
+  color: var(--pixel-vermilion);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+}
+
+:global(html[data-design="pixel"]) .skills li {
+  border: var(--pixel-line) solid var(--color-tag-border);
+  border-radius: 0;
+  font-family: var(--font-display);
+}
+
+:global(html[data-design="pixel"]) .footer {
+  border-top: var(--pixel-line) dashed var(--color-border);
+}
+
+/* Verify: square keyline link with a 44px target. */
+:global(html[data-design="pixel"]) .verify,
+:global(html[data-design="pixel"]) .verifyCompact {
+  min-height: 44px;
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .verify:hover,
+:global(html[data-design="pixel"]) .verifyCompact:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-selected);
+  color: var(--color-text);
+}
