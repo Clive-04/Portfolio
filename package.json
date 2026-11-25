@@ -11,7 +11,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint --deny-warnings",
     "test": "node --test \"src/**/*.test.ts\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "qa:companion": "node scripts/qa/companion-browser.mjs"
   },
   "dependencies": {
     "@fontsource-variable/pixelify-sans": "5.3.0",
