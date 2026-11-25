@@ -13,7 +13,7 @@
 
 export type SoundName = 'navigate' | 'confirm' | 'back' | 'open' | 'download'
 
-interface Note {
+export interface Note {
   /** Frequency in hertz. */
   freq: number
   /** Start time in seconds after the cue begins. */
@@ -53,7 +53,7 @@ export const cues: Record<SoundName, readonly Note[]> = {
 }
 
 /** Quiet on purpose: interface sounds should sit well under speech and music. */
-const VOLUME = 0.05
+export const VOLUME = 0.05
 
 let enabled = false
 let context: AudioContext | null = null
@@ -66,17 +66,28 @@ export function isSoundEnabled() {
   return enabled
 }
 
+/** Plays a named cue, but only after the visitor turned sound on. */
 export function playSound(name: SoundName) {
-  if (!enabled || typeof window === 'undefined' || !('AudioContext' in window)) return
+  if (!enabled) return
+  playNotes(cues[name])
+}
+
+/**
+ * Plays notes directly, without the "sound is on" check. Only for the
+ * local sound lab (sound-lab.html), which is never part of the built site;
+ * the site itself always goes through `playSound`.
+ */
+export function playNotes(notes: readonly Note[], volume = VOLUME) {
+  if (typeof window === 'undefined' || !('AudioContext' in window)) return
   try {
     context ??= new AudioContext()
     if (context.state === 'suspended') void context.resume()
     const start = context.currentTime + 0.005
     const master = context.createGain()
-    master.gain.value = VOLUME
+    master.gain.value = volume
     master.connect(context.destination)
 
-    for (const note of cues[name]) {
+    for (const note of notes) {
       const osc = context.createOscillator()
       const env = context.createGain()
       const t = start + note.at
