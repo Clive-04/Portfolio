@@ -34,3 +34,16 @@
   background: var(--color-accent-soft);
   color: var(--color-accent-hover);
 }
+
+/* Pixel design: square chips with a keyline in the chip's own text color. */
+:global(html[data-design="pixel"]) .badge {
+  border: var(--pixel-line) solid currentColor;
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+}
+
+:global(html[data-design="pixel"]) .neutral {
+  border-color: var(--color-tag-border);
+}
