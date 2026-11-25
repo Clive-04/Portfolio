@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel companion review (v7)</title>
+<title>Pixel companion review (v7.1)</title>
 <!--
   Review sheet for the companion sprite. Open it through the dev server
   (npm run dev → /docs/design/companion/companion-review-sheet.html): the
@@ -59,8 +59,8 @@
 </head>
 <body>
 <main>
-  <h1>Pixel companion · review sheet (v7)</h1>
-  <p class="lede">An original 24 × 32 sprite of Clive drawn from his formal portrait (<code>public/profile.jpg</code>), made to the pixel-art standard: silhouette first, top-left light, hard 1-bit edges, 15 colours, one fixed cell size, explicit timings, integer scaling only. Not traced from the photo; not taken from or modelled on any game sprite. Every image here is drawn from the exported production file <code>companion-sprites.png</code> (2.6 KB, transparent, 4-bit indexed).</p>
+  <h1>Pixel companion · review sheet (v7.1)</h1>
+  <p class="lede">An original 24 × 32 sprite of Clive drawn from his formal portrait (<code>public/profile.jpg</code>), made to the pixel-art standard: silhouette first, top-left light, hard 1-bit edges, 14 colours, one fixed cell size, explicit timings, integer scaling only. Not traced from the photo; not taken from or modelled on any game sprite. Every image here is drawn from the exported production file <code>companion-sprites.png</code> (2.6 KB, transparent, 4-bit indexed).</p>
 
   <h2>1 · Portrait and pixel interpretation</h2>
   <div class="row">
@@ -73,11 +73,11 @@
   </div>
   <div class="cols" style="margin-top:14px">
     <ul>
-      <li><b>Kept from the portrait:</b> thick, dark hair with volume on top and a parted fringe falling to the brows; ears showing below the hair; a wide, open smile; the faint moustache as a shadow line above the lip; dark suit, white shirt with a pointed collar, and tie.</li>
+      <li><b>Kept from the portrait:</b> thick, dark hair with volume on top and a parted fringe falling to the brows; ears showing below the hair; dark suit, white shirt with a pointed collar, and tie.</li>
       <li><b>Changed for readability:</b> the tie is the site's vermilion (the photo's is grey-striped), so the white collar and red tie form the brightest mark at 1×. The suit is a blue-black charcoal so it sits in the cobalt/navy palette.</li>
     </ul>
     <ul>
-      <li><b>Left out:</b> the moustache as separate pixels (it merged with the mouth at 1×), the tie's diagonal stripe pattern (2 px wide is too narrow; one darker stripe pixel stands in), and the jacket buttons.</li>
+      <li><b>Left out:</b> the mouth and moustache (removed at Clive's request in v7.1; one nose-shade pixel keeps the face from reading flat), the tie's diagonal stripe pattern (2 px wide is too narrow; one darker stripe pixel stands in), and the jacket buttons.</li>
       <li><b>Invented:</b> the lower body (the portrait stops at the chest): suit trousers and black shoes with a shine pixel.</li>
     </ul>
   </div>
@@ -90,7 +90,7 @@
     <figure><canvas data-frame="sidebar 0" data-scale="1"></canvas><figcaption><b>1× sidebar</b><br>24 × 32</figcaption></figure>
     <figure class="wide" style="max-width:520px">
       <div class="swatches" id="swatches"></div>
-      <figcaption style="text-align:left">15 colours plus transparency, one 4-bit indexed PNG. Character: 12 (outline, hair ×2, skin ×2, teeth, suit ×3, shirt, tie ×2). Effects: cobalt, cyan, yellow, all from the site palette. Shadows shift cool (blue-grey suit shade, red-brown skin shade) rather than going grey.</figcaption>
+      <figcaption style="text-align:left">14 colours plus transparency, one 4-bit indexed PNG. Character: 11 (outline, hair ×2, skin ×2, suit ×3, shirt, tie ×2). Effects: cobalt, cyan, yellow, all from the site palette. Shadows shift cool (blue-grey suit shade, red-brown skin shade) rather than going grey.</figcaption>
     </figure>
   </div>
 
@@ -135,7 +135,7 @@
   <h2>10 · Specification</h2>
   <div class="cols">
     <ul>
-      <li><b>Grid: 24 × 32.</b> The likeness lives in the vertical: hair volume, face, collar-and-tie, suit. 24 wide holds two eyes 4 px apart, ears, and a 6-px smile; 32 tall leaves 13 rows for the head and 19 for the suit and legs. A 32 × 32 cell would only add empty columns to the front view.</li>
+      <li><b>Grid: 24 × 32.</b> The likeness lives in the vertical: hair volume, face, collar-and-tie, suit. 24 wide holds two eyes 4 px apart, and ears; 32 tall leaves 13 rows for the head and 19 for the suit and legs. In profile the head is 13 px deep (plus the nose), about the depth of the body and arm, so it doesn't overhang the shoulders. A 32 × 32 cell would only add empty columns to the front view.</li>
       <li><b>Sizes:</b> 2× (48 × 64) on the route, 1× (24 × 32) in the sidebar. Whole-number scales only, <code>image-rendering: pixelated</code>, positions rounded to whole CSS pixels.</li>
       <li><b>Light:</b> top left. Lapels and the left sleeve catch it; the right side and the far leg drop to the suit shade. No pillow shading.</li>
       <li><b>Edges:</b> 1 px near-black outline on the outside; no semi-transparent pixels, so no halos on either theme.</li>
@@ -164,7 +164,7 @@ await sheet.decode()
 const W = meta.frameWidth, H = meta.frameHeight
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(location.search).has('still')
 
-const palette = { o: ['#1a1824', 'outline, eyes'], h: ['#262233', 'hair'], H: ['#4a4462', 'hair highlight'], s: ['#d29d80', 'skin'], S: ['#a86f59', 'skin shade'], t: ['#fff6d8', 'teeth (site cream)'], j: ['#323850', 'suit'], J: ['#22263a', 'suit shade'], L: ['#56608a', 'suit light, shoe shine'], w: ['#f4f1ea', 'shirt'], r: ['#b73d33', 'tie (site vermilion)'], R: ['#7a2630', 'tie stripe'], b: ['#245aa5', 'teleport edge (cobalt)'], c: ['#25b7d3', 'teleport light (cyan)'], y: ['#f3c847', 'spark (yellow)'] }
+const palette = { o: ['#1a1824', 'outline, eyes'], h: ['#262233', 'hair'], H: ['#4a4462', 'hair highlight'], s: ['#d29d80', 'skin'], S: ['#a86f59', 'skin shade'], j: ['#323850', 'suit'], J: ['#22263a', 'suit shade'], L: ['#56608a', 'suit light, shoe shine'], w: ['#f4f1ea', 'shirt'], r: ['#b73d33', 'tie (site vermilion)'], R: ['#7a2630', 'tie stripe'], b: ['#245aa5', 'teleport edge (cobalt)'], c: ['#25b7d3', 'teleport light (cyan)'], y: ['#f3c847', 'spark (yellow)'] }
 document.getElementById('swatches').innerHTML = Object.entries(palette).map(([k, [hex, name]]) => `<div><span style="background:${hex}"></span><code>${k}</code> ${hex} · ${name}</div>`).join('')
 
 /** Draw one frame into a canvas at an integer scale (nearest neighbour). */
