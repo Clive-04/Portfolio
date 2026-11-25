@@ -104,8 +104,11 @@ export default function App() {
             <dl className={styles.heroStats}>
               {stats.map((stat) => (
                 <div key={stat.label} className={styles.heroStat}>
-                  <PixelIcon name={stat.icon} size={32} className={styles.heroStatIcon} />
-                  <dt>{stat.label}</dt>
+                  {/* The icon sits inside <dt>: a <dl> group may only contain <dt> and <dd>. */}
+                  <dt>
+                    <PixelIcon name={stat.icon} size={32} className={styles.heroStatIcon} />
+                    {stat.label}
+                  </dt>
                   <dd>{stat.value}</dd>
                 </div>
               ))}
