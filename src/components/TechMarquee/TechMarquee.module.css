@@ -119,3 +119,46 @@
     display: none;
   }
 }
+
+/* ==========================================================================
+   Pixel design: a quieter strip. The top row uses Pixelify at a moderate
+   size (no oversized pixel display text); the second row stays in Plus
+   Jakarta. Stars become small yellow pixel squares.
+   ========================================================================== */
+
+:global(html[data-design="pixel"]) .marquee {
+  border-block: var(--pixel-line) solid var(--color-border-strong);
+}
+
+:global(html[data-design="pixel"]) .item {
+  font-size: clamp(1.25rem, 1rem + 1.4vw, 2.25rem);
+}
+
+:global(html[data-design="pixel"]) .track[data-direction="left"] .item {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+}
+
+:global(html[data-design="pixel"]) .star {
+  width: 8px;
+  height: 8px;
+  overflow: hidden;
+  background: var(--pixel-yellow);
+  box-shadow: 0 0 0 2px var(--color-border-strong);
+  color: transparent;
+}
+
+/* Pause / play: a square 44px button. */
+:global(html[data-design="pixel"]) .toggle {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--pixel-line) solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+:global(html[data-design="pixel"]) .toggle:hover {
+  background: var(--color-selected);
+  color: var(--color-text);
+}
