@@ -1,13 +1,13 @@
 /**
  * Original 16 × 16 pixel sprite of Clive, drawn for this site. Likeness from
  * two of his own photos: a casual photo he provided (hair swept up and to the
- * right, round thin-framed glasses, big smile, white mock-neck sweater) and his
- * formal portrait (skin and hair tones). Jeans and shoes are invented; the
- * casual photo is cropped at the waist.
+ * right, thin glasses, smile, white mock-neck sweater) and his formal portrait
+ * (skin and hair tones). Jeans and shoes are invented; the casual photo is
+ * cropped at the waist.
  *
- * Style follows a chibi pixel-character reference Clive supplied: one dark
- * navy outline around everything, a wide head about as tall as the body,
- * flat colours with a single shade, 1 × 2 eyes, and short two-pixel legs.
+ * Style follows a chibi pixel-character reference Clive supplied (one dark
+ * outline, flat colours, short legs), with a smaller head — half the height
+ * and eight pixels wide — and subtle browline glasses, at Clive's request.
  * Drawn by hand; nothing traced from the photos or copied from the reference
  * or any game's sprites.
  *
@@ -26,8 +26,7 @@ export const palette = {
   s: '#d29d80', // skin (formal photo #bf9074, lifted for flat shading)
   S: '#a86f59', // skin shade
   e: '#1c2a44', // eyes: same navy as the outline
-  g: '#5d6370', // glasses frame (casual photo #586061)
-  l: '#dfe8f2', // glasses lens: pale blue-grey, so the glasses read without hiding the eyes
+  g: '#7b818e', // thin browline glasses (casual photo frame #586061, lightened to stay subtle)
   m: '#fff6d8', // smile: site cream
   w: '#f4f4f1', // sweater (casual photo, lifted from overcast light)
   W: '#c6c9d3', // sweater shade (casual photo #c7c9cf)
@@ -40,68 +39,71 @@ export const palette = {
 
 export type Role = keyof typeof palette
 
-/** Facing down. Rows 0–8 head (glasses: rims on row 5, lenses and eyes rows 6–7), 9–15 body. */
+/**
+ * Facing down. Rows 0–6 head (quiff; eyes on rows 4–5 with a thin glasses
+ * bridge and frame ticks), rows 7–15 body.
+ */
 const head = [
-  '....oooooooo....',
-  '...ohhhHHHhho...',
-  '..ohhhhhhHHhho..',
-  '..ohhhhhhhhhhho.',
-  '..ohhssshhhhho..',
-  '..osgggssgggso..',
-  '..oslelgglelso..',
-  '..oslelsslelso..',
-  '...ossSmmSsso...',
+  '.....oooooo.....',
+  '....ohhhHHHo....',
+  '...ohhhhhhhho...',
+  '...ohsssssshho..',
+  '...ogesggsego...',
+  '...osesssseso...',
+  '....ossmmsso....',
 ]
 
 const body = [
-  '...owwWWWWwwo...',
-  '..owwwwwwwwwwo..',
-  '..oswwwwwwwwso..',
-  '..oowwwwwwwwoo..',
-  '...onnnnnnnno...',
+  '.....owWWwo.....',
+  '....owwwwwwo....',
+  '...owwwwwwwwo...',
+  '...owowwwwowo...',
+  '...osowwwwoso...',
+  '....onnnnnno....',
+  '....onnoonno....',
 ]
 
-const idle = [...head, ...body, '...onno..onno...', '...obbo..obbo...']
+const idle = [...head, ...body, '....onnoonno....', '....obboobbo....']
 
-/** Idle blink: eyes closed behind the glasses for one frame. */
-const blink = idle.map((row, y) => (y === 6 ? '..oslllgglllso..' : y === 7 ? '..oslSlsslSlso..' : row))
+/** Idle blink: eyes closed for one frame. */
+const blink = idle.map((row, y) => (y === 4 ? '...ogSsggsSgo...' : y === 5 ? '...osssssssso...' : row))
 
 /**
  * Facing down: left step, stand, right step, stand. The stepping foot is
  * lifted one pixel while the other stays planted, so both legs stay visible.
  */
 const walkDown = [
-  [...head, ...body, '...onno..obbo...', '...obbo.........'],
+  [...head, ...body, '....onnoobbo....', '....obbo........'],
   idle,
-  [...head, ...body, '...obbo..onno...', '.........obbo...'],
+  [...head, ...body, '....obboonno....', '........obbo....'],
   idle,
 ]
 
-/** Side view (facing right): glasses temple runs back to the ear. */
+/** Side view (facing right): the glasses arm runs from the ear to the frame. */
 const sideHead = [
-  '....oooooooo....',
-  '...ohhhHHHhho...',
-  '..ohhhhhhHHhhho.',
-  '..ohhhhhhhhhhhho',
-  '..ohhhhhhhsssso.',
-  '..ohhhhsssggggo.',
-  '..ohhSsggglelso.',
-  '..ohhSsssslelsso',
-  '...ohssssssmmso.',
+  '.....oooooo.....',
+  '....ohhhHHHo....',
+  '...ohhhhhhhho...',
+  '...ohhhhhhssso..',
+  '...ohhSgggegso..',
+  '...ohhSsssesso..',
+  '....ohssssmmo...',
 ]
 
-const sideTop = ['...owwWWwwo.....', '...owwwwwwWo....']
-const hem = ['...oowwwwwoo....', '....onnnnno.....']
+const sideTop = ['.....owWWwo.....', '.....owwwwwo....', '.....owwwwwo....']
+const waist = ['.....owwwwwo....', '.....onnnnno....']
+const strideFeet = '...obbo...obbo..'
+const passFeet = '.....obbbbo.....'
 
 /**
  * Facing right: stride, pass, stride with the legs swapped, pass. The back
  * leg is the darker shade, so the swap reads. Mirrored for walking left.
  */
 const walkSide = [
-  [...sideHead, ...sideTop, '...oswwwwwWo....', ...hem, '...oNNo.onno....', '...obo...obbo...'],
-  [...sideHead, ...sideTop, '...owwwswwWo....', ...hem, '.....onNno......', '.....obbbo......'],
-  [...sideHead, ...sideTop, '...owwwwwsWo....', ...hem, '...onno.oNNo....', '...obo...obbo...'],
-  [...sideHead, ...sideTop, '...owwwswwWo....', ...hem, '.....oNnno......', '.....obbbo......'],
+  [...sideHead, ...sideTop, '....oswwwwwo....', ...waist, '....oNNoonno....', '...oNNo..onno...', strideFeet],
+  [...sideHead, ...sideTop, '.....owwswwo....', ...waist, '.....onnNo......', '.....onnNo......', passFeet],
+  [...sideHead, ...sideTop, '.....owwwwwso...', ...waist, '....onnooNNo....', '...onno..oNNo...', strideFeet],
+  [...sideHead, ...sideTop, '.....owwswwo....', ...waist, '.....oNnno......', '.....oNnno......', passFeet],
 ]
 
 /**
@@ -110,7 +112,7 @@ const walkSide = [
  * 3: a narrow column of light. 4: a few fading sparks.
  */
 const teleport = [
-  idle.map((row, y) => (y === 15 ? '.y.obbo..obbo.y.' : y === 11 ? 'y.oswwwwwwwwso.y' : row)),
+  idle.map((row, y) => (y === 15 ? '.y..obboobbo..y.' : y === 11 ? 'y..osowwwwoso..y' : row)),
   idle.map((row, y) => (y % 2 ? row.replace(/[^.]/g, 'c') : row)),
   [
     '.......y........', '.......cc.......', '......cccc......', '.......cc.......',
