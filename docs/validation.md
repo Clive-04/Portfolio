@@ -495,3 +495,34 @@ Also the rewritten lines (owner request, 2026-11-26: speak to the visitor while 
 
 - Firefox, Safari/iOS, a real phone, and a real screen reader.
 - Text contrast under the companion bubble on every panel; covered by the earlier contrast work, not re-measured here.
+
+## Run 20 — 2026-11-26 (desktop room beside Email, owner decisions, test-browser fix; automated)
+
+Owner decisions (2026-11-26):
+1. Make a small Pixel-only desktop Contact layout change so the companion has room beside Email: **approved**.
+2. Tablet at 1× density, where no whole-pixel sprite fits beside the name: **keep "CB"** (no change).
+3. Review screenshots and recordings: **keep a small final set**, and leave the rest out of the repository's history.
+
+### Changes
+
+| Change | Detail |
+|---|---|
+| Room beside Email (Pixel, 56rem and wider) | 5rem more space after "Email me". He now stands between Email and LinkedIn and presses Email at every desktop width checked: 920, 1100, 1280 (and 1280 at 125%), 1366, 1440, 1536, 1920 px. Tablet, phone, and Classic are unchanged |
+| Review images | `docs/design/companion/` went from 8.3 MB to 1.3 MB: the approved sprite review sheet plus `final/` (nine captures, about 100 KB, with a README). The placement review and the fast-scroll recording were removed from the branch's history as well as its files |
+| Browser suite: test browser | Runs 3, 7, 9, and 13 during this work failed intermittently: he stopped part-way along a card and his lines stayed silent. Cause: in a fresh Edge profile, an installed extension sometimes opened its welcome tab in front of the test page. A background tab gets no animation frames, so his walk paused. The suite now starts Edge with extensions and first-run pages disabled, closes any other tab before each page load, and stops with an error if its page is ever in the background. This corrects Run 19, which put those failures down to measuring before reveals: that fix stands on its own, but it was not their cause |
+| Browser suite: brand slot | Waits up to 15 s for docking. Desktop now plays the full goodbye with the Email press (about 6 s) before docking |
+
+### Results
+
+| Check | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 152 of 152 |
+| `npm run build` | Passed (JS 307.2 kB, 96.5 kB gzip) |
+| `npm run qa:companion` (dev server, headless Edge; test page confirmed in front at 61 frames per second) | **81 passed, 0 failed**. Desktop and wide desktop read-throughs: press > line > wave > closes > dock |
+| Production build under the real CSP (`vercel.json` headers); desktop, tablet, 320 px, 400% zoom; Day and Night; reduced motion (12 runs) | 0 CSP violations, 0 console errors, no horizontal overflow, no hidden text in view, companion `aria-hidden` with nothing focusable, tab stops unchanged. Docked in every run except tablet at 1× ("CB" kept, decision 2) |
+| Layout shift | Unchanged: desktop 0.0011, tablet 0.022, reduced motion 0.009 |
+
+### Not checked
+
+Firefox, Safari/iOS, a real phone, and a real screen reader.
