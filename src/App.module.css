@@ -388,13 +388,24 @@
 /* ---------- Contact ---------- */
 
 /*
- * Pixel design, desktop: room beside "Email me" for the companion to stand
- * and press it in his goodbye (a sprite plus the focus-ring clearance on
- * both buttons). Also sets the main action apart from the social links.
+ * Pixel design, desktop, while the companion is on tour: room beside
+ * "Email me" for him to stand and press it in his goodbye (a sprite plus the
+ * focus-ring clearance on both buttons). Once he docks in the sidebar the
+ * buttons step back together.
  */
 @media (min-width: 56rem) {
   :global(html[data-design="pixel"]) .contactActions > :first-child {
+    transition: margin-inline-end 300ms steps(3, end);
+  }
+
+  :global(html[data-design="pixel"][data-companion="tour"]) .contactActions > :first-child {
     margin-inline-end: 5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactActions > :first-child {
+    transition: none;
   }
 }
 

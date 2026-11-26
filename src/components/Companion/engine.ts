@@ -566,6 +566,11 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   void probe.decode().then(
     () => {
       sheetReady = true
+      // On tour: the page makes room for his goodbye (the space beside Email on desktop), then plans around it.
+      if (!still && !isDocked) {
+        root.dataset.companion = 'tour'
+        remeasure()
+      }
       wake()
     },
     () => {
