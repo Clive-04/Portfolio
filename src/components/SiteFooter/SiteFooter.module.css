@@ -35,3 +35,27 @@
 :global(html[data-design="pixel"]) .footer {
   border-top: var(--pixel-line) dashed color-mix(in srgb, var(--color-on-ink) 30%, transparent);
 }
+
+.topIcon {
+  display: none;
+}
+
+/* Pixel design: "BACK TO TOP" in the pixel font beside a pixel arrow that steps up on hover. */
+:global(html[data-design="pixel"]) .top {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+:global(html[data-design="pixel"]) .topIcon {
+  display: block;
+}
+
+@media (hover: hover) {
+  :global(html[data-design="pixel"]) .top:hover .topIcon {
+    translate: 0 -2px;
+  }
+}

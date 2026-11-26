@@ -1,3 +1,4 @@
+import { PixelIcon } from '../PixelIcon/PixelIcon'
 import styles from './SiteFooter.module.css'
 
 // Read once when the module loads, so rendering stays pure.
@@ -14,7 +15,11 @@ export function SiteFooter({ name }: SiteFooterProps) {
         <p>
           © {currentYear} {name}. All rights reserved.
         </p>
-        <a href="#top">Back to top</a>
+        <a className={styles.top} href="#top">
+          {/* Pixel design only (hidden in Classic). */}
+          <PixelIcon name="up" className={styles.topIcon} />
+          Back to top
+        </a>
       </div>
     </footer>
   )
