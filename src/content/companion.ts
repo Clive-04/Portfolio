@@ -1,18 +1,19 @@
 /**
  * What the pixel companion says and does in each section, keyed by the
  * section name on its anchors (`data-companion-anchor`). The line plays when
- * he first arrives; the action plays once he stands still on an anchor and
- * scrolling has paused. Keep lines short (one line, about 30 characters) so
- * the bubble fits beside the content without covering it.
+ * he stops on its first card; the action plays once scrolling has paused.
+ * He speaks to the visitor as a guide to the portfolio. Keep each line to
+ * about two short lines (50 characters or fewer) so the bubble can sit
+ * beside him without covering content.
  */
 export const companionLines: Record<string, string> = {
-  start: 'Hi, I’m Clive! Scroll with me.',
-  about: 'First, a little about me.',
-  projects: 'Here’s what I’ve built.',
-  skills: 'These are the tools I use.',
-  resume: 'My studies, in brief.',
-  certifications: 'Each one links to its proof.',
-  contact: 'Let’s work together!',
+  start: 'Hi, I’m Clive! Let me show you around.',
+  about: 'First, a bit about me and what I’m after.',
+  projects: 'Here’s what I’ve built. Open one for the story!',
+  skills: 'My toolkit. Pick a category to see it used.',
+  resume: 'My studies so far. The PDF is right here.',
+  certifications: 'Every badge links to its proof. Go check!',
+  contact: 'That’s the tour! Say hi anytime.',
 }
 
 /**

@@ -60,7 +60,8 @@ export default function App() {
         <section id="top" aria-labelledby="hero-heading" className={styles.hero}>
           <div className={styles.heroInner}>
             <div className={styles.heroText}>
-              <p className={styles.status}>
+              {/* Companion: where he says hello on load when the hero is taller than the screen (phones). */}
+              <p className={styles.status} data-companion-anchor="start" data-companion-place="beside" data-companion-early data-companion-act>
                 <span className={styles.statusDot} aria-hidden="true" />
                 Open to internships
               </p>

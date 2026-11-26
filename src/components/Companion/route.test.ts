@@ -13,6 +13,7 @@ import {
   type Anchor,
   pixelScale,
   placeBubble,
+  placeNote,
   targetAt,
   walkClip,
   walkFrame,
@@ -74,6 +75,43 @@ describe('pickStops', () => {
     assert.deepEqual(stops.map((s) => [s.id, s.y]), [['skills', 3400], ['contact', 6000]])
   })
 
+  it('prefers the first card where his line fits, except at Contact (the goodbye needs its buttons)', () => {
+    const resolved = [
+      { anchor: anchorFor('certifications'), placement: stop('certifications', 5000) },
+      { anchor: anchorFor('certifications'), placement: stop('certifications', 5400) },
+      { anchor: anchorFor('contact'), placement: stop('contact', 6000) },
+      { anchor: anchorFor('contact'), placement: stop('contact', 6200) },
+    ]
+    const talks = (p: Placement) => p.y !== 5000 && p.y !== 6000
+    assert.deepEqual(pickStops(resolved, talks).map((s) => s.y), [5400, 6000])
+    assert.deepEqual(pickStops(resolved, () => false).map((s) => s.y), [5000, 6000], 'no card fits his line: still the first card')
+  })
+
+  it('uses the heading when the only card his line fits on is too far down to introduce the section', () => {
+    const resolved = [
+      { anchor: anchorFor('skills', ['ledge']), placement: stop('skills', 3000) },
+      { anchor: anchorFor('skills'), placement: stop('skills', 4400) }, // below a tall panel
+    ]
+    assert.deepEqual(pickStops(resolved, () => true, 800).map((s) => s.y), [3000])
+    assert.deepEqual(pickStops(resolved, () => true, 3000).map((s) => s.y), [4400], 'close enough to the heading: the card')
+    assert.deepEqual(pickStops(resolved, (p) => p.y !== 3000, 800).map((s) => s.y), [4400], 'heading cannot fit his line: the card')
+  })
+
+  it('plays the goodbye wherever the Contact stop is, even at its heading', () => {
+    const [contact] = pickStops([{ anchor: anchorFor('contact', ['ledge']), placement: stop('contact', 6000, 300, 600, { acts: false }) }])
+    assert.equal(contact.acts, true)
+  })
+
+  it('uses an early spot only when the usual opening stop is below the first screen', () => {
+    const resolved = [
+      { anchor: { ...anchorFor('start', ['beside']), early: true }, placement: stop('start', 165) },
+      { anchor: anchorFor('start', ['ledge']), placement: stop('start', 1206) },
+      { anchor: anchorFor('about'), placement: stop('about', 1500) },
+    ]
+    assert.deepEqual(pickStops(resolved, () => true, 844).map((s) => s.y), [165, 1500], 'a phone: the hero is taller than the screen')
+    assert.deepEqual(pickStops(resolved, () => true, 1300).map((s) => s.y), [1206, 1500], 'the usual stop is in the first screen')
+  })
+
   it('makes no stop at the footer (he docks before it)', () => {
     const stops = pickStops([{ anchor: anchorFor('footer', ['ledge']), placement: stop('footer', 7000) }])
     assert.equal(stops.length, 0)
@@ -100,6 +138,15 @@ describe('tour', () => {
   it('arrives on the next card once it is well into view', () => {
     assert.equal(route[2].key, 2000 - 0.15 * VH)
     route.forEach((p, i) => assert.ok(i === 0 || p.key >= route[i - 1].key))
+  })
+
+  it('stops where his line has room: the planned spot, or the nearest spot along the card that has it', () => {
+    const roomy = tour([stop('about', 1000, 100, 600)], VH, () => true)
+    assert.equal(roomy[1].x, 600 - BRIEF_WALK, 'room everywhere: the usual short walk')
+    const onlyLeftEnd = tour([stop('about', 1000, 100, 600)], VH, (_s, x) => x <= 120)
+    assert.ok(onlyLeftEnd[1].x <= 120, 'walks on to where the bubble fits')
+    const nowhere = tour([stop('about', 1000, 100, 600)], VH, () => false)
+    assert.equal(nowhere[1].x, 600 - BRIEF_WALK, 'no room anywhere: the usual walk, and he stays quiet')
   })
 
   it('walks no further than the card allows, and stands still when there is no room', () => {
@@ -212,6 +259,40 @@ describe('placeBubble', () => {
   })
 })
 
+describe('placeNote (his line when nothing beside him is clear)', () => {
+  const size = { w: 200, h: 36 }
+  const area = { x: 0, y: 0, w: 1280, h: 800 }
+  const clearOf = (b: { x: number; y: number }, rects: Rect[]) => isClear({ x: b.x, y: b.y, w: size.w, h: size.h }, rects)
+
+  it('prefers a clear spot above his head, even one further away than the space below him', () => {
+    // Content packed around him: text above, a button on each side.
+    const content: Rect[] = [{ x: 0, y: 380, w: 1280, h: 60 }, { x: 0, y: 440, w: 290, h: 60 }, { x: 360, y: 440, w: 920, h: 60 }]
+    const b = placeNote(300, 500, size, content, area)!
+    assert.ok(clearOf(b, content))
+    assert.ok(clearOf(b, [{ x: 300, y: 500 - SPRITE_BOX.h, w: SPRITE_BOX.w, h: SPRITE_BOX.h }]), 'not over him')
+    assert.ok(b.y + size.h <= 380, 'above the text over his head')
+  })
+
+  it('goes below him only when nothing above his head is clear', () => {
+    const aboveAndSides = [{ x: 0, y: 0, w: 1280, h: 440 }, { x: 0, y: 440, w: 290, h: 70 }, { x: 358, y: 440, w: 922, h: 70 }]
+    const b = placeNote(300, 500, size, aboveAndSides, area)!
+    assert.ok(b.y >= 500)
+  })
+
+  it('points its tail at him when it sits just beside him, and has none when it is further away', () => {
+    const beside = placeNote(300, 500, size, [{ x: 0, y: 0, w: 1280, h: 430 }, { x: 360, y: 430, w: 920, h: 400 }], area)!
+    assert.equal(beside.tail, 'right')
+    const far = placeNote(300, 500, size, [{ x: 0, y: 0, w: 1280, h: 560 }], area)!
+    assert.equal(far.tail, 'none')
+  })
+
+  it('stays inside the area and gives up when nothing there is clear', () => {
+    const b = placeNote(300, 500, size, [], { x: 100, y: 300, w: 400, h: 300 })!
+    assert.ok(b.x >= 100 && b.x + size.w <= 500 && b.y >= 300 && b.y + size.h <= 600)
+    assert.equal(placeNote(300, 500, size, [area], area), null)
+  })
+})
+
 describe('pixelScale', () => {
   it('keeps every sprite pixel on whole device pixels', () => {
     for (const dpr of [1, 1.25, 1.5, 1.75, 2, 3]) {
@@ -316,6 +397,12 @@ describe('nextMove (always from the latest scroll position)', () => {
     const back = nextMove(route, 0, 900)
     assert.equal(down.kind, 'teleport')
     assert.deepEqual(back, { kind: 'walk', to: 1 }, 'back at the start: finish the short walk, no teleport')
+  })
+
+  it('copes with a position from a longer route (the page was re-measured and lost a stop)', () => {
+    const shorter = route.slice(0, 4)
+    assert.deepEqual(nextMove(shorter, route.length - 1, 2000), { kind: 'walk', to: 3 }, 'already in the reader\'s section')
+    assert.deepEqual(nextMove(shorter, route.length - 1, 1000), { kind: 'teleport', to: 0 })
   })
 
   it('clamps to the first and last stops at the very top and bottom', () => {

@@ -40,6 +40,8 @@ export interface Anchor {
   modes: Mode[]
   dark?: boolean
   acts?: boolean
+  /** Only for introducing the section on load: used when its usual stop is below the first screen. */
+  early?: boolean
 }
 
 export interface Attempt {
@@ -176,17 +178,47 @@ const NOT_A_STOP = new Set(['footer'])
 
 /**
  * One stop per section, in page order: the section's first card he can stand
- * on (or below or beside); if none of its cards is safe, its heading ledge.
+ * on (or below or beside) where his line fits and that is within 60% of a
+ * screen below the heading (reached while the section is being introduced);
+ * else the heading, if his line fits there; else its first safe card.
+ * Contact always uses its first card (the goodbye needs its buttons). An
+ * "early" anchor is used only when the section's usual stop is below the
+ * first screen (the opening line on a phone, where the hero is tall).
  * `resolved` is every anchor in document order with its placement (or null).
  */
-export function pickStops(resolved: readonly { anchor: Anchor; placement: Placement | null }[]): Placement[] {
+export function pickStops(
+  resolved: readonly { anchor: Anchor; placement: Placement | null }[],
+  /** Whether his line can be said somewhere along a placement. Prefers the first card where it can. */
+  talks: (placement: Placement) => boolean = () => true,
+  /** Viewport height: a card more than 60% of it below the heading is reached too late to introduce the section. */
+  viewportHeight = Infinity,
+): Placement[] {
   const stops: Placement[] = []
   const sections = [...new Set(resolved.map((r) => r.anchor.id))].filter((id) => !NOT_A_STOP.has(id))
   for (const id of sections) {
-    const inSection = resolved.filter((r) => r.anchor.id === id && r.placement)
-    const card = inSection.find((r) => !r.anchor.modes.every((m) => m === 'ledge'))
-    const pick = (card ?? inSection[0])?.placement
-    if (pick) stops.push(pick)
+    const all = resolved.filter((r) => r.anchor.id === id && r.placement)
+    const inSection = all.filter((r) => !r.anchor.early)
+    const cards = inSection.filter((r) => !r.anchor.modes.every((m) => m === 'ledge'))
+    const heading = inSection.find((r) => r.anchor.modes.every((m) => m === 'ledge'))?.placement
+    // The goodbye needs the Contact buttons, so there the first card wins even if his line cannot fit.
+    if (id === 'contact') {
+      const pick = (cards[0] ?? inSection[0])?.placement
+      // The goodbye plays wherever the Contact stop is (at its heading too, where there is no room by the buttons).
+      if (pick) stops.push({ ...pick, acts: true })
+      continue
+    }
+    // A card where his line fits, near enough to the heading to introduce the section; else the heading
+    // if his line fits there; else the first card (he stays quiet).
+    const near = (p: Placement) => !heading || p.y - heading.y <= 0.6 * viewportHeight
+    const pick =
+      cards.find((r) => talks(r.placement!) && near(r.placement!))?.placement ??
+      (heading && talks(heading) ? heading : undefined) ??
+      cards[0]?.placement ??
+      heading
+    // The opening section is introduced on load: below the first screen, use its early spot if it has one.
+    const early = pick && pick.y > viewportHeight ? all.find((r) => r.anchor.early && r.placement!.y <= viewportHeight) : undefined
+    const chosen = early?.placement ?? pick
+    if (chosen) stops.push(chosen)
   }
   return stops.sort((a, b) => a.y - b.y)
 }
@@ -198,16 +230,29 @@ export const BRIEF_WALK = 64
  * His tour: he appears on each section's stop (the first one on load, the
  * rest by teleport once that section is well into view), walks briefly
  * along the card top (alternating direction from section to section), and
- * stops there until the reader scrolls to the next section.
+ * stops there until the reader scrolls to the next section. Where his
+ * line would have no clear bubble spot, he walks on to the nearest spot
+ * along the card where it does.
  */
-export function tour(stops: readonly Placement[], viewportHeight: number): RoutePoint[] {
+export function tour(
+  stops: readonly Placement[],
+  viewportHeight: number,
+  /** Whether his line for that stop has a clear bubble spot with him standing at x. */
+  canTalk: (stop: Placement, x: number) => boolean = () => true,
+): RoutePoint[] {
   const points: RoutePoint[] = []
   stops.forEach((stop, i) => {
     const shared = { y: stop.y, dark: stop.dark, ledge: stop.id, mode: stop.mode, acts: stop.acts }
     const [left, right] = stop.run
     const leftward = i % 2 === 0
     const from = leftward ? right : left
-    const to = leftward ? Math.max(left, from - BRIEF_WALK) : Math.min(right, from + BRIEF_WALK)
+    const planned = leftward ? Math.max(left, from - BRIEF_WALK) : Math.min(right, from + BRIEF_WALK)
+    // He stops where his line has room: the planned spot, or the nearest spot along the card that has it.
+    const spots: number[] = []
+    for (let x = left; x <= right; x += 8) spots.push(x)
+    spots.push(right)
+    spots.sort((a, b) => Math.abs(a - planned) - Math.abs(b - planned))
+    const to = canTalk(stop, planned) ? planned : (spots.find((x) => canTalk(stop, x)) ?? planned)
     // The first stop is where he appears on load (his short walk plays straight away); later ones arrive by teleport.
     const key = Math.max(points.at(-1)?.key ?? -Infinity, i === 0 ? 0 : stop.y - 0.15 * viewportHeight)
     points.push({ x: from, key, blink: i > 0, ...shared })
@@ -330,7 +375,7 @@ export interface Bubble {
   x: number
   y: number
   /** Which side of the bubble its tail is on, pointing at the companion. */
-  tail: 'down' | 'right' | 'left'
+  tail: 'down' | 'right' | 'left' | 'none'
   /** Tail position along that side, in px from the bubble's left (down) or top (right, left). */
   at: number
 }
@@ -369,6 +414,42 @@ export function placeBubble(
   return null
 }
 
+/** How far the fallback bubble may sit from him and still point at him with its tail. */
+const NOTE_REACH = 3 * GAP
+
+/**
+ * Where his line goes when no spot beside him is clear: the clear spot
+ * nearest his head inside `area` (the part of the page in view), above his
+ * head if anywhere there is clear, never over him. Its tail points at him when it sits just above or beside him;
+ * otherwise it has none. Null when nothing in the area is clear.
+ */
+export function placeNote(x: number, y: number, size: Box, obstacles: readonly Rect[], area: Rect, box = SPRITE_BOX): Bubble | null {
+  const him = { x: x - GAP, y: y - box.h - GAP, w: box.w + 2 * GAP, h: box.h + 2 * GAP }
+  const blocked = [...obstacles.filter((o) => overlaps(o, area)), him]
+  const head = { x: x + box.w / 2, y: y - box.h + box.h / 3 }
+  const spots: { x: number; y: number; d: number }[] = []
+  for (let by = area.y; by + size.h <= area.y + area.h; by += 8) {
+    for (let bx = area.x; bx + size.w <= area.x + area.w; bx += 8) {
+      const dx = Math.max(bx - head.x, 0, head.x - bx - size.w)
+      const dy = Math.max(by - head.y, 0, head.y - by - size.h)
+      // A speech bubble reads as his when it is above his head: any spot there beats one below him.
+      const below = by + size.h > y - box.h
+      spots.push({ x: bx, y: by, d: dx * dx + dy * dy + (below ? 1e12 : 0) })
+    }
+  }
+  spots.sort((a, b) => a.d - b.d)
+  const spot = spots.find((s) => isClear({ x: s.x, y: s.y, w: size.w, h: size.h }, blocked))
+  if (!spot) return null
+  const { x: bx, y: by } = spot
+  const sideAt = Math.min(Math.max(head.y - by, 8), size.h - 8)
+  if (bx + size.w <= x && x - bx - size.w <= NOTE_REACH) return { x: bx, y: by, tail: 'right', at: sideAt }
+  if (bx >= x + box.w && bx - x - box.w <= NOTE_REACH) return { x: bx, y: by, tail: 'left', at: sideAt }
+  if (by + size.h <= y - box.h && y - box.h - by - size.h <= NOTE_REACH) {
+    return { x: bx, y: by, tail: 'down', at: Math.min(Math.max(head.x - bx, 8), size.w - 8) }
+  }
+  return { x: bx, y: by, tail: 'none', at: 0 }
+}
+
 /**
  * CSS pixels per sprite pixel, so each sprite pixel covers a whole number of
  * device pixels: 2 at 100% and 200% scaling, 2.4 at 125% (3 device px), 2 at
@@ -398,7 +479,8 @@ export function nextMove(points: readonly RoutePoint[], p: number, line: number)
   if (!points.length) return { kind: 'still' }
   const to = targetAt(points, line)
   const there = stopStart(points, to)
-  if (stopStart(points, Math.floor(p)) !== there) return { kind: 'teleport', to: there }
+  // A re-measured route can be shorter than the one his position came from.
+  if (stopStart(points, Math.min(Math.floor(p), points.length - 1)) !== there) return { kind: 'teleport', to: there }
   return Math.abs(to - p) < 1e-6 ? { kind: 'still' } : { kind: 'walk', to }
 }
 

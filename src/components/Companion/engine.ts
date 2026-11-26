@@ -1,20 +1,22 @@
 import { companionActions, companionLines } from '../../content/companion'
 import sheetUrl from './companion-sprites.png'
 import sheet from './companion-sprites.json'
-import { planPlacements } from './measure'
+import { measureLines, planRoute } from './measure'
 import {
+  BRIEF_WALK,
   advance,
   brandScale,
   docked,
+  isClear,
   nextMove,
-  pickStops,
   pixelScale,
   placeBubble,
+  placeNote,
   positionAt,
   snap,
-  tour,
   walkClip,
   walkFrame,
+  walkingDistance,
   type Box,
   type Rect,
   type RoutePoint,
@@ -29,6 +31,8 @@ const LINE = 0.75
 const SETTLE_MS = 600
 /** A line shows this long. */
 const BUBBLE_MS = 3500
+/** At Contact his line stays up this long before he steps back and waves (then it closes). */
+const GOODBYE_READ_MS = 2600
 /** The short walk on each card is an unhurried stroll (CSS px per second). */
 const STROLL_SPEED = 70
 
@@ -58,18 +62,6 @@ function show(el: HTMLElement, [clip, index]: Frame | [Clip, number], scale: num
   el.toggleAttribute('data-seated', clip === 'sit')
 }
 
-/** Finite CSS animations still running on page content (reveals, the hero entrance); their transforms skew measurements. */
-const contentAnimations = () =>
-  document.getAnimations().filter((a) => {
-    const target = (a.effect as KeyframeEffect | null)?.target
-    return (
-      a.playState === 'running' &&
-      target instanceof Element &&
-      target.closest('main, footer') !== null &&
-      Number.isFinite(a.effect?.getComputedTiming().endTime ?? Infinity)
-    )
-  })
-
 export type Reaction = 'shield' | 'lantern' | 'music' | 'thumbsUp'
 
 export interface CompanionHandle {
@@ -96,7 +88,8 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   const root = document.documentElement
   let stopped = false
   let points: RoutePoint[] = []
-  let obstacles: Rect[] = []
+  let obstacles: Rect[] = [] // what his speech bubble avoids
+  let controls: Rect[] = [] // what it never covers, even briefly
   let bounds = { x0: 0, x1: 0 }
   let p = 0
   let walked = 0
@@ -149,6 +142,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     const { x, y, dark } = positionAt(points, p)
     sprite.style.transform = `translate(${snap(x, dpr)}px, ${snap(y - box.h, dpr)}px)`
     sprite.toggleAttribute('data-dark', dark)
+    bubble.toggleAttribute('data-dark', dark)
     followSpeech()
     yieldToFocus()
   }
@@ -206,26 +200,65 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     speaking = undefined
   }
 
-  /** Put the bubble beside him where it covers nothing; false when there is no such spot. */
+  /** The part of the page in view, below the top bar on narrow screens. */
+  function view(): Rect {
+    const header = document.querySelector('header')?.getBoundingClientRect()
+    const top = (header && header.width >= window.innerWidth * 0.9 ? header.bottom : 0) + 4
+    return { x: bounds.x0, y: window.scrollY + top, w: bounds.x1 - bounds.x0, h: window.innerHeight - top - 4 }
+  }
+
+  /**
+   * Put the bubble where it can be read, in view, pointing at him: beside him
+   * where it covers nothing; else the nearest clear spot that still touches
+   * him; else beside him (above his head first) over text, which it hides
+   * only while he speaks, but never over a link, control, or image; else the
+   * nearest clear spot in view. False when there is none.
+   */
   function placeSpeech() {
     const { x, y } = positionAt(points, p)
-    const spot = placeBubble(x, y, bubbleSize, obstacles, bounds, box)
+    const v = view()
+    const outOfView = [
+      { x: -1e5, y: -1e5, w: 2e5, h: 1e5 + v.y },
+      { x: -1e5, y: v.y + v.h, w: 2e5, h: 1e5 },
+    ]
+    let spot = placeBubble(x, y, bubbleSize, [...obstacles, ...outOfView], bounds, box)
+    if (!spot) {
+      const clear = placeNote(x, y, bubbleSize, obstacles, v, box)
+      spot = clear && clear.tail !== 'none' ? clear : (placeBubble(x, y, bubbleSize, [...controls, ...outOfView], bounds, box) ?? clear)
+    }
     if (!spot) return false
+    shownAt = { x: spot.x, y: spot.y, ...bubbleSize }
     bubble.dataset.tail = spot.tail
     bubble.style.setProperty('--at', `${Math.round(spot.at)}px`)
     bubble.style.transform = `translate(${snap(spot.x, dpr)}px, ${snap(spot.y, dpr)}px)`
     return true
   }
 
+  /** Where the bubble is showing, in page coordinates. */
+  let shownAt: Rect | null = null
+
+  /**
+   * Re-place his line after he or the page moves. While content is still
+   * settling there may briefly be no spot at all: the line then stays where
+   * it is, as long as it is still in view and off every control, rather than
+   * blinking out and back.
+   */
   function followSpeech() {
-    if (speaking) bubble.hidden = !placeSpeech()
+    if (!speaking || placeSpeech()) return
+    const v = view()
+    bubble.hidden = !(shownAt && shownAt.y >= v.y && shownAt.y + shownAt.h <= v.y + v.h && isClear(shownAt, controls))
   }
 
-  /** Standing still on a stop: say its section's line, once per visit. */
+  /** Standing still on a stop: say its section's line, once per visit. At Contact the goodbye says it. */
   function speak() {
     const section = points[p]?.ledge
-    const text = section && companionLines[section]
-    if (!section || !text || said.has(section) || speaking || !inClearView()) return
+    if (section && (still || companionActions[section]?.[0] !== 'goodbye')) say(section)
+  }
+
+  /** Show a section's line where it can be read; it closes after `ms`, or when the caller closes it. */
+  function say(section: string, ms = BUBBLE_MS) {
+    const text = companionLines[section]
+    if (!text || said.has(section) || speaking || !inClearView()) return false
     bubble.textContent = text
     bubble.style.visibility = 'hidden'
     bubble.hidden = false
@@ -234,14 +267,17 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     bubble.style.visibility = ''
     if (!placeSpeech()) {
       bubble.hidden = true
-      return
+      return false
     }
     said.add(section)
     speaking = section
-    bubbleTimer = window.setTimeout(() => {
-      hideBubble()
-      wake() // he may be waiting to finish before docking
-    }, BUBBLE_MS)
+    if (Number.isFinite(ms)) {
+      bubbleTimer = window.setTimeout(() => {
+        hideBubble()
+        wake() // he may be waiting to finish before docking
+      }, ms)
+    }
+    return true
   }
 
   /* ---------- Standing still: section action, then idle beats ---------- */
@@ -286,11 +322,13 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   }
 
   /**
-   * Contact: he faces the Email button, presses it (the button shows only its
-   * own pressed look; nothing is clicked, focused, or opened), steps back,
-   * waves goodbye, and teleports to the brand slot. Skips the press when the
-   * button is not beside him on his ground line. Cancelled cleanly if the
-   * reader scrolls away. Returns true once he has docked.
+   * Contact: he faces the Email button and presses it (the button shows only
+   * its own pressed look; nothing is clicked, focused, or opened), says his
+   * last line and lets it be read, steps back, waves goodbye, closes the
+   * line, and teleports to the brand slot. Skips the press when the button
+   * is not beside him on his ground line; the line, wave, and docking still
+   * play. Cancelled cleanly if the reader scrolls away. Returns true once
+   * he has docked.
    */
   async function goodbye(owns: () => boolean) {
     const button = document.querySelector<HTMLElement>('main a[href^="mailto:"]')
@@ -299,9 +337,9 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     const level = r && Math.abs(r.bottom + window.scrollY - here.y) <= 2
     const gap = r ? Math.min(Math.abs(r.left + window.scrollX - (here.x + box.w)), Math.abs(here.x - (r.right + window.scrollX))) : Infinity
     const beside = button && level && gap <= 2 * box.w
+    const toLeft = beside && r!.left + window.scrollX < here.x
     try {
       if (beside) {
-        const toLeft = r!.left + window.scrollX < here.x
         const press = frames(toLeft ? 'pressLeft' : 'pressRight')
         for (const [i, frame] of press.entries()) {
           if (!owns()) return false
@@ -310,6 +348,9 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
           await wait(frame[2])
         }
         button!.removeAttribute('data-companion-press')
+      }
+      if (say('contact', Infinity) && !(await play(sprite, [['idle', 0, GOODBYE_READ_MS]], scale, owns))) return false
+      if (beside) {
         // Step back two paces, facing away from the button.
         for (const pace of [1, 2]) {
           if (!owns()) return false
@@ -321,8 +362,14 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       if (!(await play(sprite, frames('wave'), scale, owns))) return false
     } finally {
       button?.removeAttribute('data-companion-press')
-      if (!owns()) place() // cancelled: back to his route position
+      if (!owns()) {
+        // Cancelled: back to his route position; the line comes back with the goodbye next time.
+        if (speaking === 'contact') hideBubble()
+        said.delete('contact')
+        place()
+      }
     }
+    hideBubble()
     acted.add('contact')
     if (!slotScale || !sheetReady) return false
     await dock()
@@ -398,7 +445,10 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     }
     if (move.kind === 'walk' && !still) {
       if (idling) claim() // stop the idle beat; he is moving again
-      const step = advance(points, p, move.to, (STROLL_SPEED * dt) / 1000)
+      // His short walk is an unhurried stroll; a longer one (to where his line fits) is brisker.
+      const remaining = walkingDistance(points, p, move.to)
+      const speed = remaining > BRIEF_WALK ? Math.min(420, 90 + remaining * 2) : STROLL_SPEED
+      const step = advance(points, p, move.to, (speed * dt) / 1000)
       p = step.p
       walked += step.walked
       show(sprite, [walkClip(step.dx, step.dy), walkFrame(walked, 4 * scale)], scale)
@@ -447,16 +497,12 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       return
     }
 
-    // Measuring while a reveal is mid-way would include its offset; measure again when it finishes.
-    const settling = contentAnimations()
-    if (settling.length) void Promise.allSettled(settling.map((a) => a.finished)).then(remeasure)
-
-    const plan = planPlacements(box)
-    obstacles = plan.obstacles
+    // Each stop ends where his line has a clear bubble spot (lines measured as they will render).
+    const plan = planRoute(box, measureLines(bubble, companionLines), still)
+    obstacles = plan.bubbleObstacles
+    controls = plan.controls
     bounds = plan.bounds
-    const stops = pickStops(plan.anchors)
-    // Reduced motion: one still figure at the last section.
-    points = still ? tour(stops.slice(-1), window.innerHeight).slice(0, 1) : tour(stops, window.innerHeight)
+    points = plan.points
     sprite.hidden = !points.length || paused
     if (!points.length) return hideBubble()
     const move = nextMove(points, measured ? p : -1, line())
@@ -493,6 +539,13 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
     measureTimer = window.setTimeout(measure, 150)
   }
   let settleTimer = 0
+  /**
+   * Content moves while it animates in (reveals, the hero entrance), and a
+   * reveal can start after he measured. Measure again whenever one ends.
+   */
+  const onContentSettled = (event: AnimationEvent) => {
+    if ((event.target as Element).closest('main, footer')) remeasure()
+  }
   const onScroll = () => {
     lastScroll = performance.now()
     wake()
@@ -527,6 +580,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
   const overlayObserver = new MutationObserver(checkOverlays)
   overlayObserver.observe(document.body, { subtree: true, attributeFilter: ['open', 'aria-expanded'] })
   window.addEventListener('scroll', onScroll, { passive: true })
+  document.addEventListener('animationend', onContentSettled)
   window.addEventListener('resize', remeasure)
   document.addEventListener('click', onClick, true)
   document.addEventListener('focusin', yieldToFocus)
@@ -548,6 +602,7 @@ export function startCompanion(sprite: HTMLElement, bubble: HTMLElement, slot: H
       resizeObserver.disconnect()
       overlayObserver.disconnect()
       window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('animationend', onContentSettled)
       window.removeEventListener('resize', remeasure)
       document.removeEventListener('click', onClick, true)
       document.removeEventListener('focusin', yieldToFocus)
