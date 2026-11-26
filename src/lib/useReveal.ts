@@ -33,7 +33,8 @@ export function useReveal() {
           if (entry.isIntersecting || entry.boundingClientRect.bottom < 0) reveal(entry.target)
         }
       },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+      // Any part 40 px into view: a tall card that stops near the bottom edge must not show a blank band.
+      { rootMargin: '0px 0px -40px 0px', threshold: 0 },
     )
     document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element))
 
