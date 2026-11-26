@@ -230,7 +230,7 @@ export default function App() {
           title="Let’s work together"
           intro="Email is the fastest way to reach me. You can also find me on LinkedIn and GitHub."
         >
-          <div className={styles.actions}>
+          <div className={`${styles.actions} ${styles.contactActions}`}>
             {email && (
               <ButtonLink href={`mailto:${email}`} variant="light" icon="mail" data={contactAnchor("beside below top")}>
                 Email me

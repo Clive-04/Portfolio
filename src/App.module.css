@@ -387,6 +387,17 @@
 
 /* ---------- Contact ---------- */
 
+/*
+ * Pixel design, desktop: room beside "Email me" for the companion to stand
+ * and press it in his goodbye (a sprite plus the focus-ring clearance on
+ * both buttons). Also sets the main action apart from the social links.
+ */
+@media (min-width: 56rem) {
+  :global(html[data-design="pixel"]) .contactActions > :first-child {
+    margin-inline-end: 5rem;
+  }
+}
+
 .contactEmail {
   color: var(--color-on-ink-muted);
   font-family: var(--font-mono);
