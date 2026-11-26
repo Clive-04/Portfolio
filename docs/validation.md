@@ -432,3 +432,66 @@ Owner brief: under fast scrolling the companion missed its card, text looked dra
 | Placement captures | `docs/design/companion/placement-review.html` (desktop, tablet, phone; Day and Night; Contact frames; sidebar at actual size) |
 
 Not checked: Firefox, Safari/iOS, a real screen reader, axe (not installed in this environment).
+
+## Run 19 — 2026-11-26 (companion dialogue, Contact goodbye line, placement and reveal fixes; automated)
+
+Owner brief:
+- the Contact goodbye pressed Email, waved, and docked without his line;
+- the opening line was missed on 390 and 320 px phones, and the Contact line at 820 and 320 px;
+- all seven lines should play once per visit where a safe presentation is possible.
+
+Also the rewritten lines (owner request, 2026-11-26: speak to the visitor while introducing the portfolio). Not merged, pushed, or deployed.
+
+### Problems, root causes, fixes
+
+| Problem | Root cause | Fix |
+|---|---|---|
+| Contact goodbye without his line | His line went through the ordinary "say it when standing still" path. Where the bubble had no clear spot beside him (820, 390, 320 px) it was silently dropped. At 390 px the Contact stop is the heading, which had no action, so the goodbye never ran there | The goodbye owns the line: (press) > line > about 2.6 s to read > step back > wave > line closes > dock. The Contact stop always plays the goodbye, wherever it is |
+| Lines dropped when nothing beside him is clear | The bubble had four spots, all next to him, and all had to be clear of text | Order of preference: clear beside him; a clear spot touching him (tail pointing at him); beside him **over text** (above his head first); the nearest clear spot in view. Owner decision (2026-11-26): a bubble may cover text while he speaks; it never covers a link, control, or image |
+| Contact line placed below him or far away (owner report, desktop and phone) | The clear-spot fallback picked the nearest clear area, which was below him or in the section heading row | Covered by the order above: the Contact line now sits above his head with its tail down at every width checked (1100–1920 px desktop, 820, 390, 320) |
+| Bubble outline and tail invisible on the dark Contact panel in Day | The bubble used Day's dark border on a navy panel | On dark panels the bubble's outline and tail use the sprite's light rim colour (#9fb3d6) |
+| Bubble could sit behind the phone top bar or cover a Contact button | Placement ignored the fixed top bar and the viewport; the Email and GitHub buttons are anchors (he stands beside them), so they were not bubble obstacles | Out-of-view areas and the top bar count as obstacles when he speaks; bubbles avoid every control, anchors included |
+| Opening line missed on phones | The hero is taller than a phone screen, so his first stop (the technology strip) was below the fold and About took over before he could be seen | An "early" spot beside the "Open to internships" status, used only when the usual first stop is below the first screen |
+| Opening bubble blinked out and back at 320 px during load | It was re-placed while the hero entrance was still moving content, and briefly found no spot | While he speaks, a re-placement that finds nothing keeps the line where it is if that spot is still in view and off every control |
+| He stood 2–3 px off the status, or stopped part-way along a card, after some fast scrolls (intermittent) | He re-measured only after animations that were already running when he measured, and only after all of them (the status dot's 7 s pulse held back the hero's correction). Reveals that started later never triggered one, so his talk spot could come from content still 20 px off its place | He re-measures whenever any content animation ends (`animationend`) |
+| `TypeError: Cannot read properties of undefined (reading 'blink')` in the production build at 320 px and 400% zoom; he then stopped following the route | A re-measure can produce a shorter route; `nextMove` read his old position index before it was clamped to the new route | `nextMove` clamps the position to the route (unit test added) |
+| Two certification cards stayed blank after a fling at 820 px (a reader stopping there saw an empty band where their badge and title were) | A reveal waited until 8% of a card was above a line 8% up from the bottom; a tall card stopping just inside the screen never qualified | Reveal once any part is 40 px into view (`src/lib/useReveal.ts`; shared by Classic and Pixel) |
+| The first browser-suite run on the dialogue change failed 4 placement checks | The suite rebuilt his route with the old rule while the engine had a new one | One shared `planRoute()` in `measure.ts` plans the route for the engine and the suite |
+
+### Browser suite changes (`npm run qa:companion`)
+
+- Layouts: desktop 1280 × 800, wide desktop 1536 × 864 (the owner's Contact report), tablet 820 × 1000, phone 390 × 844, phone 320 × 640.
+- Scroll styles at every layout, alternating Day and Night: slow scroll, very fast wheel, momentum fling, scrollbar drag to the bottom, one update across several sections, Page Down × 6, Page Up × 4, End then Home, rapid reversal.
+- He must reach the reader's stop within 8 s, checked every half second. Before, a single snapshot at 4 s failed whenever he was still finishing a walk, which made the result depend on machine load. At Contact, his two 8 px goodbye steps are accepted. At the bottom he has 12 s to finish the goodbye and dock.
+- Read-through at every layout in Day and Night:
+  - all seven lines, each once, in view, never over him or a control, pointing at him;
+  - the Contact order: (press) > line > wave > line closes > dock, with the line up at least 2.5 s;
+  - text a bubble briefly covers is reported, not failed.
+- axe-core 4.14.1 (new dev dependency), WCAG 2.0, 2.1 and 2.2 A and AA rules, run on:
+  - every layout in Day and Night with his opening line showing;
+  - desktop at the bottom, docked;
+  - Classic.
+- Companion, bubble, and brand sprite inside `aria-hidden` and not focusable.
+- The suite closes its browser when stopped with Ctrl+C.
+
+### Results
+
+| Check | Result |
+|---|---|
+| `npm run lint` | Passed, 0 warnings |
+| `npm test` | Passed, 151 of 151. New tests cover the early stop, the Contact goodbye at any stop, the bubble fallbacks, and a route that became shorter |
+| `npm run build` | Passed (JS 306.7 kB, 96.4 kB gzip) |
+| `npm run qa:companion` (dev server, headless Edge) | **81 passed, 0 failed** on the final code. Breakdown: 45 scroll checks (9 styles × 5 layouts); 10 read-throughs (all seven lines at every layout in Day and Night; the Contact line briefly over text at wide desktop and 320 px, where it sits above his head); 12 axe scans with 0 violations; accessibility; resizing; the Contact press and goodbye; the press never clicks, focuses, or opens Email; cancelling the goodbye; 6 brand-slot sizes; reduced motion (says goodbye, no motion, docks); Classic; no console errors. Earlier runs during this work failed on the problems in the table above |
+| Production build under the real CSP (`vercel.json` headers); desktop, tablet, 320 px, 400% zoom; Day and Night; reduced motion at desktop and 320 px (12 runs) | 0 CSP violations and 0 console errors in all 12 runs; no horizontal overflow; no hidden text in view; companion `aria-hidden` with nothing focusable; tab stops unchanged |
+| Brand slot after the scripted fling | Docked in every run except tablet at 1× ("CB" kept by design: no whole-pixel sprite fits beside the name). 320 px Day reported "not docked" at 6 s; with a 10 s wait it docked (the goodbye with the Email press takes about 6 s) |
+| Layout shift | As in Run 18: desktop 0.0011, tablet 0.022, reduced motion 0.009 |
+| axe-core | 0 violations in every scan. `color-contrast` came back "needs review" on every page: axe cannot judge text over the patterned and layered backgrounds, so contrast is still the one recorded in earlier runs |
+
+### Reported by the owner (not automated)
+
+- 2026-11-26: on their own browser, "everything looks good now" after the Contact line moved above his head.
+
+### Not checked
+
+- Firefox, Safari/iOS, a real phone, and a real screen reader.
+- Text contrast under the companion bubble on every panel; covered by the earlier contrast work, not re-measured here.
