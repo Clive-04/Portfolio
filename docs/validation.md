@@ -526,3 +526,31 @@ Owner decisions (2026-11-26):
 ### Not checked
 
 Firefox, Safari/iOS, a real phone, and a real screen reader.
+
+## Run 21 — 2026-11-26 (Contact gap closes after the companion docks; automated)
+
+Owner report: once the companion teleported to the sidebar, the space after "Email me" (Run 20) looked like an awkward gap between the three buttons. Owner's choice, from three options: keep the layout and close the gap after he docks.
+
+### Change
+
+- The engine marks the page `html[data-companion="tour"]` once his sprite sheet has loaded (not with reduced motion, not when he is already docked), then re-plans around the new layout. It becomes `sidebar` when he docks.
+- The 5rem space after Email (Pixel, 56rem and wider) exists only while `tour` is set. When he docks, LinkedIn and GitHub step back in a 300 ms, three-step slide (instant with reduced motion).
+- No gap ever opens:
+  - in Classic;
+  - with reduced motion (he does not press there);
+  - if the sprite sheet cannot load;
+  - on tablet and phone.
+
+### Results
+
+| Check | Result |
+|---|---|
+| Gap, measured in headless Edge | Pixel 1280 and 1920 px: 92 px while he tours, he presses Email, 12 px (the normal spacing) after he docks. Reduced motion, Classic, tablet 820 px: 12 px throughout |
+| `npm run lint` / `npm test` / `npm run build` | Passed / 152 of 152 / Passed (JS 307.2 kB, 96.5 kB gzip) |
+| `npm run qa:companion` | **81 passed, 0 failed** |
+| Production build under the real CSP (12 runs, as in Run 20) | 0 CSP violations and 0 console errors in every run; no overflow, no hidden text; tab stops unchanged; docked everywhere except tablet at 1× ("CB" kept) |
+| Layout shift | Desktop 0.0022 (was 0.0011; the buttons stepping back after he docks, well under the 0.1 "good" threshold). Tablet 0.022 and reduced motion 0.009 unchanged |
+
+### Not checked
+
+Firefox, Safari/iOS, a real phone, and a real screen reader.
