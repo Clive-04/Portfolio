@@ -32,6 +32,11 @@ const browser = spawn(
   browserPath,
   [
     '--headless=new',
+    // An installed extension can open its own welcome tab in front of the test page; a background
+    // tab gets no animation frames, which stalls the companion and spoils the run.
+    '--disable-extensions',
+    '--no-first-run',
+    '--no-default-browser-check',
     '--disable-gpu',
     '--hide-scrollbars',
     `--remote-debugging-port=${PORT}`,
@@ -54,7 +59,13 @@ for (let i = 0; i < 60 && !targets.some((t) => t.type === 'page'); i++) {
   await sleep(200)
   targets = await fetch(`http://127.0.0.1:${PORT}/json/list`).then((r) => r.json(), () => [])
 }
-const ws = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl)
+const page = targets.find((t) => t.type === 'page' && t.url === 'about:blank') ?? targets.find((t) => t.type === 'page')
+/** Close every other tab, so the test page is always the one in front. */
+const closeOtherTabs = async () => {
+  const all = await fetch(`http://127.0.0.1:${PORT}/json/list`).then((r) => r.json())
+  for (const t of all) if (t.type === 'page' && t.id !== page.id) await fetch(`http://127.0.0.1:${PORT}/json/close/${t.id}`)
+}
+const ws = new WebSocket(page.webSocketDebuggerUrl)
 await new Promise((r) => ws.addEventListener('open', r, { once: true }))
 let id = 0
 const pending = new Map()
@@ -92,6 +103,8 @@ const key = async (k, code) => {
 }
 
 async function open({ width = 1280, height = 800, dpr = 1, design = 'pixel', theme = 'day', reduce = false } = {}) {
+  await closeOtherTabs()
+  await send('Page.bringToFront')
   await motion(reduce)
   await size(width, height, dpr)
   await send('Page.navigate', { url: URL })
@@ -103,6 +116,7 @@ async function open({ width = 1280, height = 800, dpr = 1, design = 'pixel', the
   while (Date.now() - started < 3000 && !(await evaluate(`!!document.querySelector('[class*=sprite]')`).catch(() => false))) await sleep(20)
   await evaluate(WATCH)
   await sleep(Math.max(0, 2500 - (Date.now() - started)))
+  if ((await evaluate('document.visibilityState')) !== 'visible') throw new Error('The test page is in the background, so its results would be meaningless.')
 }
 
 /* ---------- In-page probes ---------- */
@@ -387,7 +401,8 @@ try {
   for (const [w, h, dpr] of [[1280, 800, 1], [1280, 800, 2], [1280, 800, 1.25], [390, 844, 3], [320, 200, 4], [820, 1000, 1]]) {
     await open({ width: w, height: h, dpr })
     await evaluate(`document.documentElement.style.scrollBehavior='auto'; scrollTo(0, document.documentElement.scrollHeight)`)
-    await sleep(7000)
+    // His goodbye (with the Email press on desktop) runs before he docks: wait for docking, up to 15 s.
+    for (let waited = 0; waited < 15000 && !(await evaluate(BRAND)).docked; waited += 500) await sleep(500)
     const b = await evaluate(BRAND)
     const ok = b.docked
       ? b.h <= b.limit + 0.01 && Math.abs(b.devicePx - Math.round(b.devicePx)) < 0.01 && b.centred && b.rendering === 'pixelated' && !b.cbVisible
